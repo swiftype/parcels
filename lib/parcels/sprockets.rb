@@ -11,13 +11,21 @@ require 'find'
       context.depend_on(view_path)
       Find.find(view_path) do |filename|
         # TODO: Add support for sidecar .css/.js files, etc.
+        next unless File.file?(filename)
         next unless File.extname(filename).strip.downcase == ".rb"
+
+        subpath = if filename.start_with?(view_path)
+          filename[(view_path.length + 1)..-1]
+        else
+          raise "#{filename.inspect} doesn't start with #{view_path.inspect}?!?"
+        end
+        logical_path = "#{::Parcels::LOGICAL_PATH_PREFIX}/#{subpath}"
 
         klass = ::Fortitude::Widget.widget_class_from_file(filename, :root_dirs => ::Parcels.view_paths)
         if klass && klass.respond_to?(:_parcels_widget_class_css) && (!(css = klass._parcels_widget_class_css).blank?)
-          context.require_asset(filename)
+          context.require_asset(logical_path)
         else
-          context.depend_on_asset(filename)
+          context.depend_on_asset(logical_path)
         end
       end
     end
