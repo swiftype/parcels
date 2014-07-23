@@ -37,9 +37,7 @@ class FortitudeWidgetSet
   end
 
   def each_widget_class(&block)
-    all_widget_classes = widget_class_to_file_map.keys
-    all_widget_classes = tsort.reverse
-    all_widget_classes.each(&block)
+    tsort.reverse.each(&block)
   end
 
   def file_for_widget_class(widget_class)
