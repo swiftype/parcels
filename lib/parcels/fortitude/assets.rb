@@ -13,7 +13,8 @@ module Parcels
       module ClassMethods
         def _parcels_widget_outer_element_classes
           @_parcels_widget_outer_element_classes ||= begin
-            out = [ _parcels_widget_outer_element_class ]
+            out = [ ]
+            out << _parcels_widget_outer_element_class if _parcels_wrapping_css_class_required?
             out += superclass._parcels_widget_outer_element_classes if superclass._parcels_attributes_support_included?
             out
           end
@@ -31,9 +32,20 @@ module Parcels
           @_parcels_widget_class_css ||= ::Parcels::CssFragment.to_css(@_parcels_css_fragments)
         end
 
+        def _parcels_wrapping_css_class_required?
+          @_parcels_wrapping_css_class_required
+        end
+
+        def _parcels_wrapping_css_class_required!
+          @_parcels_wrapping_css_class_required = true
+        end
+
         def css(*css_strings)
           options = css_strings.extract_options!
-          _parcels_ensure_attributes_support_included! if options.fetch(:wrap, true)
+          if options.fetch(:wrap, true)
+            _parcels_ensure_attributes_support_included!
+            _parcels_wrapping_css_class_required!
+          end
 
           caller_line = caller[0]
           if caller_line =~ /^(.*)\s*:\s*(\d+)\s*:\s*in\s+/i
