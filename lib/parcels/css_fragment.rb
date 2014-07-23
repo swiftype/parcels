@@ -7,11 +7,13 @@ module Parcels
       end
     end
 
-    def initialize(css_string, source, options)
+    def initialize(css_string, source, file, line, options)
       options.assert_valid_keys(:engines, :wrap)
 
       @css_string = css_string
       @source = source
+      @file = file
+      @line = line
       @options = options
     end
 
@@ -26,10 +28,17 @@ module Parcels
 
       engine = ::Sass::Engine.new(out, :syntax => :scss)
       out = engine.render
-      out
+      header_comment + out
     end
 
     private
-    attr_reader :css_string, :source, :options
+    attr_reader :css_string, :source, :options, :file, :line
+
+    def header_comment
+      out = "/* From '#{file}'"
+      out << ":#{line}" if line
+      out << " */\n"
+      out
+    end
   end
 end

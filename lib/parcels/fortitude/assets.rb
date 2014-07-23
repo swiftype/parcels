@@ -31,16 +31,22 @@ module Parcels
           @_parcels_widget_class_css ||= ::Parcels::CssFragment.to_css(@_parcels_css_fragments)
         end
 
-        def _parcels_widget_class_name_to_css_class_fragment
-        end
-
         def css(*css_strings)
           options = css_strings.extract_options!
           _parcels_ensure_attributes_support_included! if options.fetch(:wrap, true)
 
+          caller_line = caller[0]
+          if caller_line =~ /^(.*)\s*:\s*(\d+)\s*:\s*in\s+/i
+            caller_file = $1
+            caller_line = Integer($2)
+          else
+            caller_file = caller_line
+            caller_line = nil
+          end
+
           @_parcels_css_fragments ||= [ ]
           @_parcels_css_fragments += css_strings.map do |css_string|
-            ::Parcels::CssFragment.new(css_string, self, options)
+            ::Parcels::CssFragment.new(css_string, self, caller_file, caller_line, options)
           end
 
           @_parcels_widget_class_css = nil
