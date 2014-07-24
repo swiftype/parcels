@@ -29,11 +29,7 @@ module Parcels
         end
 
         def _parcels_widget_class_css(this_widget_filename)
-          @_parcels_widget_class_css ||= begin
-            fragments = _parcels_alongside_fragments(this_widget_filename)
-            fragments += (@_parcels_css_fragments || [ ])
-            ::Parcels::CssFragment.to_css(fragments.compact)
-          end
+          @_parcels_widget_class_css ||= ::Parcels::CssFragment.to_css(@_parcels_css_fragments || [ ])
         end
 
         def _parcels_wrapping_css_class_required?
@@ -42,24 +38,6 @@ module Parcels
 
         def _parcels_wrapping_css_class_required!
           @_parcels_wrapping_css_class_required = true
-        end
-
-        def _parcels_alongside_fragments(this_widget_filename)
-          directory = File.dirname(this_widget_filename)
-          alongside_files = [ ]
-
-          simple_filename = File.basename(this_widget_filename)
-          simple_filename = $1 if simple_filename =~ /^(.*)\.rb$/i
-          escaped_filename = Regexp.escape(simple_filename)
-
-          Dir.entries(directory).each do |entry|
-            full_path = File.join(directory, entry)
-            alongside_files << full_path if File.file?(full_path) && entry =~ /^#{escaped_filename}\.(css|.*\.css)/i
-          end
-
-          alongside_files.map do |alongside_file|
-            ::Parcels::CssFragment.new(File.read(alongside_file), self, alongside_file, 1, { })
-          end
         end
 
         def css(*css_strings)
