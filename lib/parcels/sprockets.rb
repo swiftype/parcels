@@ -60,20 +60,20 @@ end
       Find.find(view_path) do |filename|
         # TODO: Add support for sidecar .css/.js files, etc.
         next unless File.file?(filename)
-        next unless File.extname(filename).strip.downcase == ".rb"
 
-        widget_set.add_widget_from_file!(filename)
+        extension = File.extname(filename).strip.downcase
+
+        case extension
+        when '.rb' then widget_set.add_widget_from_file!(filename)
+        when '.aln' then
+          context.require_asset(_parcels_logical_path_for_filename(filename, view_path))
+        else nil
+        end
       end
 
       widget_set.each_widget_class do |widget_class|
         filename = widget_set.file_for_widget_class(widget_class)
-
-        subpath = if filename.start_with?(view_path)
-          filename[(view_path.length + 1)..-1]
-        else
-          raise "#{filename.inspect} doesn't start with #{view_path.inspect}?!?"
-        end
-        logical_path = "#{::Parcels::LOGICAL_PATH_PREFIX}/#{subpath}"
+        logical_path = _parcels_logical_path_for_filename(filename, view_path)
 
         if widget_class.respond_to?(:_parcels_widget_class_css) && (!(css = widget_class._parcels_widget_class_css(filename)).blank?)
           context.require_asset(logical_path)
@@ -81,9 +81,15 @@ end
           context.depend_on_asset(logical_path)
         end
       end
-
-
-
     end
+  end
+
+  def _parcels_logical_path_for_filename(filename, view_path)
+    subpath = if filename.start_with?(view_path)
+      filename[(view_path.length + 1)..-1]
+    else
+      raise "#{filename.inspect} doesn't start with #{view_path.inspect}?!?"
+    end
+    "#{::Parcels::LOGICAL_PATH_PREFIX}/#{subpath}"
   end
 end
