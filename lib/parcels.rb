@@ -31,11 +31,9 @@ module Parcels
     def _ensure_view_paths_are_symlinked!
       view_paths.each do |view_path|
         parcels_subdir = _sprockets_workaround_directory_for(view_path)
-        $stderr.puts "ensuring #{view_path.inspect} is symlinked; making: #{parcels_subdir}"
         FileUtils.mkdir_p(parcels_subdir)
         Dir.chdir(parcels_subdir) do
           unless File.symlink?(LOGICAL_PATH_PREFIX)
-            $stderr.puts "in #{Dir.pwd}, doing ln_s"
             FileUtils.ln_s("..", LOGICAL_PATH_PREFIX)
           end
         end

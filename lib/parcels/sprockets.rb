@@ -75,7 +75,7 @@ end
         end
         logical_path = "#{::Parcels::LOGICAL_PATH_PREFIX}/#{subpath}"
 
-        if widget_class.respond_to?(:_parcels_widget_class_css) && (!(css = widget_class._parcels_widget_class_css).blank?)
+        if widget_class.respond_to?(:_parcels_widget_class_css) && (!(css = widget_class._parcels_widget_class_css(filename)).blank?)
           context.require_asset(logical_path)
         else
           context.depend_on_asset(logical_path)
