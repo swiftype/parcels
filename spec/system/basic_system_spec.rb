@@ -12,7 +12,7 @@ describe "Parcels basic operations" do
 
     def file(subpath, contents = nil, &block)
       contents ||= block.call
-      contents = $2 if contents =~ /^(\s*\n)*(.*?)(\s\n)*$/mi
+      contents = $2 if contents =~ /\A(\s*\n)*(.*?)(\s\n)*\Z/mi
       files[subpath] = contents
     end
 
@@ -85,41 +85,42 @@ describe "Parcels basic operations" do
 
   before :each do |example|
     @this_example = example
+
+    ::Parcels.view_paths = [ path('fragments') ]
   end
 
   attr_reader :this_example
 
-  def sprockets_env(*args)
-    if args.length > 0
+  def sprockets_env(*args, &block)
+    if args.length > 0 || block
       raise "Duplicate creation of sprockets_env? #{args.inspect}" if @sprockets_env
+      args = [ this_example_root ] if args.length == 0
       @sprockets_env = new_sprockets_env(*args)
+      block.call(@sprockets_env) if block
     else
-      @sprockets_env ||= new_sprockets_env
+      @sprockets_env ||= begin
+        out = new_sprockets_env(this_example_root)
+        out.append_path 'assets'
+        out
+      end
     end
   end
 
   it "should aggregate a simple standalone fragment into one aggregate file" do
     files {
-      file 'assets/basic.css', %w{
+      file 'assets/basic.css', %{
         /*
          *= require_parcels fragments
          */
         FIN
       }
 
-      file 'fragments/one.css', %w{
+      file 'fragments/one.css', %{
         p { color: red; }
       }
     }
 
-    sprockets_env
-    sprockets_env = ::Sprockets::Environment.new(this_example_root)
-    sprockets_env.append_path 'assets'
-    ::Parcels.view_paths = [ path('fragments') ]
-
     asset = sprockets_env.find_asset('basic')
-    $stderr.puts "ASSET: #{asset.class.name}"
-    $stderr.puts "source: #{asset.source}"
-    $stderr.puts "body: #{asset.body}"
+    expect(asset).not_to be_nil
   end
 end
