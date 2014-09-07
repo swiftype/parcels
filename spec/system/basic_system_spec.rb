@@ -5,9 +5,8 @@ require 'parcels'
 
 describe "Parcels basic operations" do
   class FileDefinition
-    def initialize(spec, example)
+    def initialize(spec)
       @spec = spec
-      @example = example
       @files = { }
     end
 
@@ -19,14 +18,14 @@ describe "Parcels basic operations" do
 
     def create!
       files.each do |subpath, contents|
-        full_path = File.join(spec.this_example_root(example), subpath)
+        full_path = File.join(spec.this_example_root, subpath)
         FileUtils.mkdir_p(File.dirname(full_path))
         File.open(full_path, 'w') { |f| f << contents }
       end
     end
 
     private
-    attr_reader :spec, :example, :files
+    attr_reader :spec, :files
   end
 
   def path(*path_components)
@@ -66,22 +65,41 @@ describe "Parcels basic operations" do
     @this_spec_root ||= extant_directory(tempdir_root, this_spec_name)
   end
 
-  def this_example_name(example)
-    @this_example_name ||= example.metadata[:full_description].strip.downcase.gsub(/[^A-Za-z0-9_]+/, '_')
+  def this_example_name
+    @this_example_name ||= this_example.metadata[:full_description].strip.downcase.gsub(/[^A-Za-z0-9_]+/, '_')
   end
 
-  def this_example_root(example)
-    @this_example_root ||= clean_directory(this_spec_root, this_example_name(example))
+  def this_example_root
+    @this_example_root ||= clean_directory(this_spec_root, this_example_name)
   end
 
-  def files(example, &block)
-    @file_definition ||= FileDefinition.new(self, example)
+  def files(&block)
+    @file_definition ||= FileDefinition.new(self)
     @file_definition.instance_eval(&block)
     @file_definition.create!
   end
 
-  it "should aggregate a simple standalone fragment into one aggregate file" do |ex|
-    files(ex) {
+  def new_sprockets_env(*args)
+    ::Sprockets::Environment.new(*args)
+  end
+
+  before :each do |example|
+    @this_example = example
+  end
+
+  attr_reader :this_example
+
+  def sprockets_env(*args)
+    if args.length > 0
+      raise "Duplicate creation of sprockets_env? #{args.inspect}" if @sprockets_env
+      @sprockets_env = new_sprockets_env(*args)
+    else
+      @sprockets_env ||= new_sprockets_env
+    end
+  end
+
+  it "should aggregate a simple standalone fragment into one aggregate file" do
+    files {
       file 'assets/basic.css', %w{
         /*
          *= require_parcels fragments
@@ -94,7 +112,8 @@ describe "Parcels basic operations" do
       }
     }
 
-    sprockets_env = ::Sprockets::Environment.new(this_example_root(ex))
+    sprockets_env
+    sprockets_env = ::Sprockets::Environment.new(this_example_root)
     sprockets_env.append_path 'assets'
     ::Parcels.view_paths = [ path('fragments') ]
 
