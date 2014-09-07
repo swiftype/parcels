@@ -3,17 +3,61 @@ require 'fileutils'
 require 'sprockets'
 require 'parcels'
 
+class ::SpecWidget < ::Fortitude::Widget
+  doctype :html5
+
+  def content
+    text "spec_widget #{self.class.name} contents!"
+  end
+end
+
 describe "Parcels basic operations" do
-  class FileDefinition
+  class WidgetDefinition
+    def initialize(class_name, superclass)
+      @class_name = class_name
+      @superclass = superclass
+      @css = [ ]
+    end
+
+    def css(css_text)
+      @css << css_text
+    end
+
+    def source_text
+      text = [ "class #{class_name} < ::#{superclass}" ]
+      @css.each do |css_text|
+        text += [ "  css <<-EOS", css_text, "EOS" ]
+      end
+      text += [ "end" ]
+      text.join("\n") + "\n"
+    end
+
+    private
+    attr_reader :class_name, :superclass
+  end
+
+  class SpecFileSet
     def initialize(spec)
       @spec = spec
       @files = { }
+      @widgets = { }
     end
 
-    def file(subpath, contents = nil, &block)
-      contents ||= block.call
+    def file(subpath, contents = nil)
       contents = $2 if contents =~ /\A(\s*\n)*(.*?)(\s\n)*\Z/mi
       files[subpath] = contents
+    end
+
+    def widget(subpath, options = { }, &block)
+      class_name = options[:class_name] || subpath.camelize
+      superclass = options[:superclass] || ::SpecWidget
+      superclass = superclass.name if superclass.kind_of?(Class)
+      subpath += ".rb" unless subpath =~ /\.rb$/i
+
+      widget_definition = WidgetDefinition.new(class_name, superclass)
+      widget_definition.instance_eval(&block)
+
+      @widgets[subpath] = widget_definition
     end
 
     def create!
@@ -22,10 +66,16 @@ describe "Parcels basic operations" do
         FileUtils.mkdir_p(File.dirname(full_path))
         File.open(full_path, 'w') { |f| f << contents }
       end
+
+      widgets.each do |subpath, definition|
+        full_path = File.join(spec.this_example_root, subpath)
+        FileUtils.mkdir_p(File.dirname(full_path))
+        File.open(full_path, 'w') { |f| f << definition.source_text }
+      end
     end
 
     private
-    attr_reader :spec, :files
+    attr_reader :spec, :files, :widgets
   end
 
   def path(*path_components)
@@ -74,7 +124,7 @@ describe "Parcels basic operations" do
   end
 
   def files(&block)
-    @file_definition ||= FileDefinition.new(self)
+    @file_definition ||= SpecFileSet.new(self)
     @file_definition.instance_eval(&block)
     @file_definition.create!
   end
@@ -86,7 +136,7 @@ describe "Parcels basic operations" do
   before :each do |example|
     @this_example = example
 
-    ::Parcels.view_paths = [ path('fragments') ]
+    ::Parcels.view_paths = [ path('views') ]
   end
 
   attr_reader :this_example
@@ -106,21 +156,22 @@ describe "Parcels basic operations" do
     end
   end
 
-  it "should aggregate a simple standalone fragment into one aggregate file" do
+  it "should aggregate the CSS from a simple widget properly" do
     files {
       file 'assets/basic.css', %{
-        /*
-         *= require_parcels fragments
-         */
-        FIN
+        //= require_parcels views
+        h1 { color: blue; }
       }
 
-      file 'fragments/one.css', %{
-        p { color: red; }
-      }
+      widget 'views/my_widget' do
+        css %{
+          p { color: red; }
+        }
+      end
     }
 
     asset = sprockets_env.find_asset('basic')
     expect(asset).not_to be_nil
+    $stderr.puts "BODY: <<#{asset.body}>>"
   end
 end
