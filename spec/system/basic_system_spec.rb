@@ -3,11 +3,13 @@ require 'fileutils'
 require 'sprockets'
 require 'parcels'
 
-class ::SpecWidget < ::Fortitude::Widget
-  doctype :html5
+module Views
+  class SpecWidget < ::Fortitude::Widget
+    doctype :html5
 
-  def content
-    text "spec_widget #{self.class.name} contents!"
+    def content
+      text "spec_widget #{self.class.name} contents!"
+    end
   end
 end
 
@@ -50,7 +52,7 @@ describe "Parcels basic operations" do
 
     def widget(subpath, options = { }, &block)
       class_name = options[:class_name] || subpath.camelize
-      superclass = options[:superclass] || ::SpecWidget
+      superclass = options[:superclass] || ::Views::SpecWidget
       superclass = superclass.name if superclass.kind_of?(Class)
       subpath += ".rb" unless subpath =~ /\.rb$/i
 
@@ -136,7 +138,7 @@ describe "Parcels basic operations" do
   before :each do |example|
     @this_example = example
 
-    ::Parcels.view_paths = [ path('views') ]
+    ::Parcels.view_paths = [ File.join(this_example_root, 'views') ]
   end
 
   attr_reader :this_example
@@ -159,7 +161,7 @@ describe "Parcels basic operations" do
   it "should aggregate the CSS from a simple widget properly" do
     files {
       file 'assets/basic.css', %{
-        //= require_parcels views
+        //= require_parcels
         h1 { color: blue; }
       }
 
@@ -170,8 +172,14 @@ describe "Parcels basic operations" do
       end
     }
 
+    ::Parcels._ensure_view_paths_are_symlinked!
+    ::Parcels.view_paths.each do |view_path|
+      sprockets_env.prepend_path(::Parcels._sprockets_workaround_directory_for(view_path))
+    end
+
     asset = sprockets_env.find_asset('basic')
     expect(asset).not_to be_nil
-    $stderr.puts "BODY: <<#{asset.body}>>"
+    expect(asset.source).to match(%r{/*\s*From.*#{File.join(this_example_root, 'views/my_widget.rb')}})
+    expect(asset.source).to match(%r{.#{::Views::MyWidget._parcels_widget_outer_element_class}\s+p\s+\{\s*color:\s*red\s*;\s*\}}mi)
   end
 end
