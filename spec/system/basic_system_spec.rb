@@ -256,6 +256,16 @@ describe "Parcels basic operations" do
     out
   end
 
+  def subpath_to_widget_class(subpath)
+    name = subpath
+    name = $1 if name =~ /^(.*)\.rb\s*$/i
+    name.camelize.constantize
+  end
+
+  def widget_outer_element_class_from_subpath(subpath)
+    ".#{subpath_to_widget_class(subpath)._parcels_widget_outer_element_class}"
+  end
+
   def expect_css_content_in(asset_path, expected_content)
     actual_content = css_content_in(asset_path)
     remaining_content = actual_content.dup
@@ -274,12 +284,16 @@ describe "Parcels basic operations" do
       remaining_css_array = actual_css_array.dup
       expected_css_selector_array_to_rules_map.each do |expected_css_selector_array, expected_rules|
         expected_css_selector_array = Array(expected_css_selector_array)
+
+        if expected_css_selector_array[0] == :_widget_scope
+          expected_css_selector_array = [ widget_outer_element_class_from_subpath(expected_path) ] + expected_css_selector_array[1..-1]
+        end
+        expected_css_selector_array = expected_css_selector_array.map(&:to_s)
+
         expected_rules = Array(expected_rules)
         actual_rules_found = nil
 
-        $stderr.puts "remaining_css_array: #{remaining_css_array.inspect}"
         remaining_css_array.each_with_index do |actual_css_line, index|
-          $stderr.puts "actual_css_line: #{actual_css_line.inspect}"
           if actual_css_line.kind_of?(Array)
             actual_selector_array = actual_css_line[0]
             actual_rules = actual_css_line[1..-1]
@@ -311,56 +325,9 @@ describe "Parcels basic operations" do
     end
   end
 
-  def expect_widget_css_in(asset_path, subpath, css_selector_to_rules_map)
-    source = asset_source(asset_path)
-    $stderr.puts "file_content_in(#{asset_path}):\n#{file_content_in(asset_path).inspect}"
-    $stderr.puts "css_content_in(#{asset_path}):\n#{css_content_in(asset_path).inspect}"
-    from_line_regexp = %r{^\s*/\*\s*From[\s'"]*#{Regexp.escape(File.join(this_example_root, subpath))}(.rb)?['"\s]*:\s*\d+\s*\*/\s*$}mi
-    from_match = source.match(from_line_regexp)
-    unless from_match
-      raise "Unable to find a 'from' line showing an inclusion of #{subpath.inspect} in asset #{asset_path.inspect}; its contents are:\n#{source}"
-    end
-
-    next_from_match = source.match(%r{^\s*/*\s*From[\s'"]*.**/$}i, from_match.end(0))
-    ending = if next_from_match then (next_from_match.start(0) - 1) else -1 end
-    css_rules = source[from_match.end(0)..ending]
-
-    widget_class = subpath.camelize.constantize
-
-    css_selector_to_rules_map.each do |selector, expected_rules|
-      expected_rules = Array(expected_rules)
-
-      expected_rule_start_regexp = /^\s*\.#{Regexp.escape(widget_class._parcels_widget_outer_element_class)}\s+#{Regexp.escape(selector)}\s+\{/m
-      rule_start_match = css_rules.match(expected_rule_start_regexp)
-      unless rule_start_match
-        raise "Found the inclusion of #{subpath.inspect} in asset #{asset_path.inspect}, but were unable to find a rule for #{selector.inspect} in its CSS rules, which are:\n#{css_rules}"
-      end
-      rule_end_match = css_rules.match(/\}/, rule_start_match.end(0))
-      unless rule_end_match
-        raise "Can't find the end of the rule for #{selector} in the CSS for #{subpath.inspect} inside #{asset_path.inspect}, which is:\n#{css_rules}"
-      end
-      all_rules_text = css_rules[(rule_start_match.end(0))..(rule_end_match.begin(0) - 1)]
-      all_rules = all_rules_text.strip.split(/\s*\n\s*/mi).map do |rule|
-        if rule =~ /^\s*(.*?)\s*;\s*$/i
-          $1
-        else
-          rule
-        end
-      end
-
-      expected_rules.each do |expected_rule|
-        matching_actual_rule_index = all_rules.index { |actual_rule| expected_rule == actual_rule }
-        unless matching_actual_rule_index
-          raise "Can't find a rule matching the expected rule #{expected_rule.inspect} in the CSS for #{subpath.inspect} inside #{asset_path.inspect}, which is:\n#{css_rules}"
-        end
-
-        all_rules.delete_at(matching_actual_rule_index)
-      end
-
-      unless all_rules.length == 0
-        raise "Extra rules found for #{selector} in the CSS for #{subpath.inspect} inside #{asset_path.inspect}:\n#{all_rules.inspect}"
-      end
-    end
+  def widget_scoped(*css_selector_array)
+    css_selector_array = css_selector_array.flatten.map(&:to_s)
+    [ :_widget_scope ] + css_selector_array
   end
 
   it "should aggregate the CSS from a simple widget properly" do
@@ -386,12 +353,7 @@ describe "Parcels basic operations" do
 
     expect_css_content_in('basic',
       'views/my_widget.rb' => {
-        [ ".#{::Views::MyWidget._parcels_widget_outer_element_class}", "p" ] => "color: red"
+        widget_scoped(:p) => "color: red"
       })
-    # expect_widget_css_in('basic', 'views/my_widget',
-    #   :p => 'color: red')
-
-    # expect(asset.source).to match(%r{/*\s*From.*#{File.join(this_example_root, 'views/my_widget.rb')}})
-    # expect(asset.source).to match(%r{.#{::Views::MyWidget._parcels_widget_outer_element_class}\s+p\s+\{\s*color:\s*red\s*;\s*\}}mi)
   end
 end
