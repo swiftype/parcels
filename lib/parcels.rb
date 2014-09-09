@@ -1,3 +1,4 @@
+require "sprockets"
 require "parcels/version"
 require "parcels/rails"
 require "parcels/fortitude"
@@ -19,10 +20,6 @@ module Parcels
       @view_paths = new_view_paths
     end
 
-
-    def _sprockets_workaround_directories
-      view_paths.map { |vp| _sprockets_workaround_directory_for(vp) }
-    end
 
     def _sprockets_workaround_directory_for(view_path)
       File.join(view_path, PARCELS_SPROCKETS_WORKAROUND_DIRECTORY_NAME)
