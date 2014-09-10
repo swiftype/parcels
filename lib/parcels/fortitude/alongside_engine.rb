@@ -18,12 +18,14 @@ class Parcels
       end
 
       def evaluate(context, locals, &block)
+        parcels = context.environment.parcels
+
         widget_filename = File.basename(context.pathname.to_s)
         widget_filename = $1 if widget_filename =~ /^(.*?)\./
         widget_filename += ".rb"
         widget_filename = File.join(File.dirname(context.pathname.to_s), widget_filename)
 
-        widget_class = ::Fortitude::Widget.widget_class_from_file(widget_filename, :root_dirs => ::Parcels.view_paths)
+        widget_class = ::Fortitude::Widget.widget_class_from_file(widget_filename, :root_dirs => parcels.view_paths)
         fragment = ::Parcels::CssFragment.new(File.read(context.pathname.to_s), widget_class, context.pathname.to_s, 1, { })
         fragment.to_css
       end

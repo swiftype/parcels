@@ -17,7 +17,8 @@ class Parcels
       end
 
       def evaluate(context, locals, &block)
-        widget_class = ::Fortitude::Widget.widget_class_from_file(context.pathname, :root_dirs => ::Parcels.view_paths)
+        parcels = context.environment.parcels
+        widget_class = ::Fortitude::Widget.widget_class_from_file(context.pathname, :root_dirs => parcels.view_paths)
         widget_class.try(:_parcels_widget_class_css, context.pathname.to_s) || ""
       end
     end

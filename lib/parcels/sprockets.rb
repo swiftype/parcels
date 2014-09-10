@@ -15,13 +15,14 @@ class FortitudeWidgetSet
     (widget_class_to_subclasses_map[widget_class] || [ ]).each(&block)
   end
 
-  def initialize
+  def initialize(parcels)
+    @parcels = parcels
     @widget_class_to_file_map = { }
     @widget_class_to_subclasses_map = { }
   end
 
   def add_widget_from_file!(filename)
-    widget_class = ::Fortitude::Widget.widget_class_from_file(filename, :root_dirs => ::Parcels.view_paths)
+    widget_class = ::Fortitude::Widget.widget_class_from_file(filename, :root_dirs => parcels.view_paths)
 
     widget_class_to_file_map[widget_class] = filename
 
@@ -45,7 +46,7 @@ class FortitudeWidgetSet
   end
 
   private
-  attr_reader :widget_class_to_file_map, :widget_class_to_subclasses_map
+  attr_reader :widget_class_to_file_map, :widget_class_to_subclasses_map, :parcels
 end
 
 ::Sprockets::Base.class_eval do
@@ -69,7 +70,7 @@ end
 
       context.depend_on(view_path)
 
-      widget_set = FortitudeWidgetSet.new
+      widget_set = FortitudeWidgetSet.new(parcels)
 
       Find.find(view_path) do |filename|
         # TODO: Add support for sidecar .css/.js files, etc.

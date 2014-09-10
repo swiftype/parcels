@@ -13,6 +13,7 @@ class Parcels
   def initialize(sprockets_environment)
     @sprockets_environment = sprockets_environment
     @view_paths = [ ].freeze
+    @workaround_directories_created = { }
   end
 
   def root
@@ -22,11 +23,14 @@ class Parcels
   def view_paths=(new_view_paths)
     new_view_paths = Array(new_view_paths).map { |vp| File.expand_path(vp, root) }
     @view_paths = new_view_paths.freeze
+    @view_paths.each { |vp| create_and_add_workaround_directory_if_needed!(vp) }
   end
 
   def add_view_paths(new_view_paths)
     self.view_paths = (self.view_paths | new_view_paths)
   end
+
+  alias_method :add_view_path, :add_view_paths
 
   def logical_path_for(fragment_path)
     fragment_path = File.expand_path(fragment_path, root)
@@ -35,67 +39,35 @@ class Parcels
       raise "Fragment #{fragment_path.inspect} isn't under any of our view paths, which are: #{view_paths.inspect}"
     end
 
-    sprockets_workaround_directory_for(view_path)
-
     subpath = fragment_path[(view_path.length + 1)..-1]
     File.join(LOGICAL_PATH_PREFIX, subpath)
   end
 
-  def sprockets_workaround_directory_for(view_path)
-    view_path = File.expand_path(view_path, root)
-    unless view_paths.include?(view_path)
-      raise "The specified view path, #{view_path.inspect}, is not any of our view paths: #{view_paths.inspect}"
-    end
-
-    out = File.join(view_path, PARCELS_SPROCKETS_WORKAROUND_DIRECTORY_NAME)
-
-    unless sprockets_environment.paths.include?(out)
-      sprockets_environment.prepend_view_path(out)
-    end
-
-    FileUtils.mkdir_p(out)
-    Dir.chdir(out) do
-      unless File.symlink?(LOGICAL_PATH_PREFIX)
-        FileUtils.ln_s("..", LOGICAL_PATH_PREFIX)
-      end
-    end
-
-    out
-  end
-
-  alias_method :add_view_path, :add_view_paths
-
   private
   attr_reader :sprockets_environment
 
-  class << self
-    def view_paths
-      @view_paths = (@view_paths || [ ]).map { |vp| File.expand_path(vp) }
-      @view_paths
-    end
+  def create_and_add_workaround_directory_if_needed!(view_path)
+    @workaround_directories_created[view_path] ||= begin
+      view_path = File.expand_path(view_path, root)
+      unless view_paths.include?(view_path)
+        raise "The specified view path, #{view_path.inspect}, is not any of our view paths: #{view_paths.inspect}"
+      end
 
-    def view_paths=(new_view_paths)
-      new_view_paths = Array(new_view_paths)
-      new_view_paths = new_view_paths.map { |nvp| File.expand_path(nvp) }
-      @view_paths = new_view_paths
-    end
+      workaround_directory = File.join(view_path, PARCELS_SPROCKETS_WORKAROUND_DIRECTORY_NAME)
 
+      unless sprockets_environment.paths.include?(workaround_directory)
+        $stderr.puts "PREPENDING: #{workaround_directory}"
+        sprockets_environment.prepend_path(workaround_directory)
+      end
 
-    def _sprockets_workaround_directory_for(view_path)
-      File.join(view_path, PARCELS_SPROCKETS_WORKAROUND_DIRECTORY_NAME)
-    end
-
-    def _ensure_view_paths_are_symlinked!
-      return
-      view_paths.each do |view_path|
-        parcels_subdir = _sprockets_workaround_directory_for(view_path)
-        FileUtils.mkdir_p(parcels_subdir)
-        Dir.chdir(parcels_subdir) do
-          unless File.symlink?(LOGICAL_PATH_PREFIX)
-            FileUtils.ln_s("..", LOGICAL_PATH_PREFIX)
-          end
+      FileUtils.mkdir_p(workaround_directory)
+      Dir.chdir(workaround_directory) do
+        unless File.symlink?(LOGICAL_PATH_PREFIX)
+          FileUtils.ln_s("..", LOGICAL_PATH_PREFIX)
         end
       end
+
+      workaround_directory
     end
   end
 end
