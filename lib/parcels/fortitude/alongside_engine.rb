@@ -1,7 +1,7 @@
 require 'parcels/css_fragment'
 require 'tilt'
 
-class Parcels
+module Parcels
   module Fortitude
     class AlongsideEngine < Tilt::Template
       self.default_mime_type = 'text/css'

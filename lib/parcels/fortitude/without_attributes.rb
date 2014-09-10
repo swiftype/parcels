@@ -3,7 +3,7 @@ require 'active_support/concern'
 
 require 'parcels/fortitude/attributes'
 
-class Parcels
+module Parcels
   module Fortitude
     module WithoutAttributes
       extend ActiveSupport::Concern

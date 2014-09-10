@@ -4,6 +4,8 @@ require 'active_support/core_ext/string'
 require 'find'
 require 'tsort'
 
+require "parcels/index"
+
 class FortitudeWidgetSet
   include TSort
 
@@ -49,15 +51,22 @@ class FortitudeWidgetSet
   attr_reader :widget_class_to_file_map, :widget_class_to_subclasses_map, :parcels
 end
 
-::Sprockets::Base.class_eval do
+::Sprockets::Environment.class_eval do
   def parcels
-    @parcels ||= ::Parcels.new(self)
+    @parcels ||= ::Parcels::Base.new(self)
   end
+
+  def index_with_parcels
+    parcels.create_and_add_all_workaround_directories!
+    index_without_parcels
+  end
+
+  alias_method_chain :index, :parcels
 end
 
 ::Sprockets::Index.class_eval do
   def parcels
-    @environment.parcels
+    @parcels ||= ::Parcels::Index.new(@environment.parcels)
   end
 end
 

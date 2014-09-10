@@ -1,4 +1,4 @@
-class Parcels
+module Parcels
   module Rails
     class Railtie < ::Rails::Railtie
       # initializer :parcels, :before => :set_autoload_paths do |app|

@@ -5,7 +5,7 @@ require 'parcels/css_fragment'
 
 require 'sass'
 
-class Parcels
+module Parcels
   module Fortitude
     module Assets
       extend ActiveSupport::Concern

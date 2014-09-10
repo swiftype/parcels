@@ -1,6 +1,6 @@
 require 'tilt'
 
-class Parcels
+module Parcels
   module Fortitude
     class WidgetEngine < Tilt::Template
       self.default_mime_type = 'text/css'
