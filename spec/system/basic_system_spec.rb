@@ -21,6 +21,8 @@ describe "Parcels basic operations", :type => :system do
       end
     }
 
+    sprockets_env.parcels.view_paths = [ File.join(this_example_root, 'views') ]
+
     ::Parcels._ensure_view_paths_are_symlinked!
     ::Parcels.view_paths.each do |view_path|
       sprockets_env.prepend_path(::Parcels._sprockets_workaround_directory_for(view_path))

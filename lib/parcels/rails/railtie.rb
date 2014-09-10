@@ -1,4 +1,4 @@
-module Parcels
+class Parcels
   module Rails
     class Railtie < ::Rails::Railtie
       def view_paths

@@ -48,9 +48,23 @@ class FortitudeWidgetSet
   attr_reader :widget_class_to_file_map, :widget_class_to_subclasses_map
 end
 
+::Sprockets::Base.class_eval do
+  def parcels
+    @parcels ||= ::Parcels.new(self)
+  end
+end
+
+::Sprockets::Index.class_eval do
+  def parcels
+    @environment.parcels
+  end
+end
+
 ::Sprockets::DirectiveProcessor.class_eval do
   def process_require_parcels_directive(*args)
-    ::Parcels.view_paths.each do |view_path|
+    parcels = context.environment.parcels
+
+    parcels.view_paths.each do |view_path|
       next unless File.directory?(view_path)
 
       context.depend_on(view_path)
@@ -73,7 +87,7 @@ end
 
       widget_set.each_widget_class do |widget_class|
         filename = widget_set.file_for_widget_class(widget_class)
-        logical_path = _parcels_logical_path_for_filename(filename, view_path)
+        logical_path = parcels.logical_path_for(filename)
 
         if widget_class.respond_to?(:_parcels_widget_class_css) && (!(css = widget_class._parcels_widget_class_css(filename)).blank?)
           context.require_asset(logical_path)

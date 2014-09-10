@@ -1,4 +1,4 @@
-module Parcels
+class Parcels
   class CssFragment
     class << self
       def to_css(fragments)
