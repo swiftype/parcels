@@ -1,31 +1,27 @@
+require 'active_support/core_ext/module/delegation'
+
+require 'parcels/set'
+
 module Parcels
   class Index
     def initialize(base)
       @base = base
-      @workaround_directories_created = { }
+      @sets = { }
     end
 
-    def root
-      base.root
-    end
+    delegate :root, :logical_path_for, :widget_roots, :to => :base
 
     def view_paths
       @view_paths ||= base.view_paths.dup.freeze
     end
 
-    def logical_path_for(fragment_path)
-      base.logical_path_for(fragment_path)
-    end
-
-    def create_and_add_all_workaround_directories!
-      base.create_and_add_all_workaround_directories!
+    def set(name)
+      sets[name] ||= ::Parcels::Set.new(base.set_definition(name))
     end
 
     private
-    attr_reader :base
+    attr_reader :base, :sets
 
-    def sprockets_environment
-      base.sprockets_environment
-    end
+    delegate :sprockets_environment, :to => :base
   end
 end

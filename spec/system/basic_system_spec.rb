@@ -17,7 +17,8 @@ describe "Parcels basic operations", :type => :system do
       end
     }
 
-    sprockets_env.parcels.view_paths = [ File.join(this_example_root, 'views') ]
+    # sprockets_env.parcels.view_paths = [ File.join(this_example_root, 'views') ]
+    sprockets_env.parcels.define_set!('all', File.join(this_example_root, 'views'))
 
     expect_css_content_in('basic',
       'views/my_widget.rb' => {

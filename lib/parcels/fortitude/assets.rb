@@ -28,7 +28,7 @@ module Parcels
           end
         end
 
-        def _parcels_widget_class_css(this_widget_filename)
+        def _parcels_widget_class_css
           @_parcels_widget_class_css ||= ::Parcels::CssFragment.to_css(@_parcels_css_fragments || [ ])
         end
 

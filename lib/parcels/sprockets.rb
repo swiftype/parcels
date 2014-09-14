@@ -72,6 +72,17 @@ end
 
 ::Sprockets::DirectiveProcessor.class_eval do
   def process_require_parcels_directive(*args)
+    args = [ ::Parcels::Base::PARCELS_DEFAULT_SET_NAME ] if args.empty?
+    parcels = context.environment.parcels
+
+    args.each do |set_name|
+      set = parcels.set(set_name)
+      set.add_to_sprockets_context!(context)
+    end
+  end
+
+=begin
+  def process_require_parcels_directive(*args)
     parcels = context.environment.parcels
 
     parcels.view_paths.each do |view_path|
@@ -99,7 +110,7 @@ end
         filename = widget_set.file_for_widget_class(widget_class)
         logical_path = parcels.logical_path_for(filename)
 
-        if widget_class.respond_to?(:_parcels_widget_class_css) && (!(css = widget_class._parcels_widget_class_css(filename)).blank?)
+        if widget_class.respond_to?(:_parcels_widget_class_css) && (!(css = widget_class._parcels_widget_class_css).blank?)
           context.require_asset(logical_path)
         else
           context.depend_on_asset(logical_path)
@@ -116,4 +127,5 @@ end
     end
     "#{::Parcels::LOGICAL_PATH_PREFIX}/#{subpath}"
   end
+=end
 end
