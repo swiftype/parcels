@@ -1,7 +1,7 @@
 require 'active_support/core_ext/module/delegation'
 require 'fileutils'
 
-require 'parcels/fragments/fortitude_widget_fragment'
+require 'parcels/fortitude_inline_parcel'
 require 'parcels/utils/path_utils'
 
 module Parcels
@@ -32,7 +32,7 @@ module Parcels
     delegate :parcels, :root, :to => :set_definition
 
     EXTENSION_TO_FRAGMENT_CLASS_MAP   = {
-      '.rb'.freeze => ::Parcels::Fragments::FortitudeWidgetFragment
+      '.rb'.freeze => ::Parcels::FortitudeInlineParcel
     }.freeze
 
     ALL_EXTENSIONS                    = EXTENSION_TO_FRAGMENT_CLASS_MAP.keys.dup.freeze
