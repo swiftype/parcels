@@ -1,7 +1,7 @@
 require 'active_support'
 require 'active_support/concern'
 
-require 'parcels/css_fragment'
+require 'parcels/fragments/css_fragment'
 
 require 'sass'
 
@@ -28,7 +28,7 @@ module Parcels
         end
 
         def _parcels_widget_class_css
-          @_parcels_widget_class_css ||= ::Parcels::CssFragment.to_css(@_parcels_css_fragments || [ ])
+          @_parcels_widget_class_css ||= ::Parcels::Fragments::CssFragment.to_css(@_parcels_css_fragments || [ ])
         end
 
         def _parcels_wrapping_css_class_required?
@@ -57,7 +57,7 @@ module Parcels
 
           @_parcels_css_fragments ||= [ ]
           @_parcels_css_fragments += css_strings.map do |css_string|
-            ::Parcels::CssFragment.new(css_string, self, caller_file, caller_line, options)
+            ::Parcels::Fragments::CssFragment.new(css_string, self, caller_file, caller_line, options)
           end
 
           @_parcels_widget_class_css = nil
