@@ -4,20 +4,20 @@ require 'parcels/set'
 
 module Parcels
   class Index
-    def initialize(base)
-      @base = base
+    def initialize(environment)
+      @environment = environment
       @sets = { }
     end
 
-    delegate :root, :logical_path_for, :widget_roots, :to => :base
+    delegate :root, :logical_path_for, :widget_roots, :to => :environment
 
     def set(name)
-      sets[name] ||= ::Parcels::Set.new(base.set_definition(name))
+      sets[name] ||= ::Parcels::Set.new(environment.set_definition(name))
     end
 
     private
-    attr_reader :base, :sets
+    attr_reader :environment, :sets
 
-    delegate :sprockets_environment, :to => :base
+    delegate :sprockets_environment, :to => :environment
   end
 end

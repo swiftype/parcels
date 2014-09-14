@@ -1,7 +1,7 @@
 require 'parcels/set_definition'
 
 module Parcels
-  class Base
+  class Environment
     LOGICAL_PATH_PREFIX = "_parcels".freeze
     PARCELS_DEFAULT_SET_NAME = 'all'.freeze
 

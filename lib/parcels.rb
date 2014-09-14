@@ -3,7 +3,7 @@ require "parcels/version"
 require "parcels/rails"
 require "parcels/fortitude"
 require "parcels/sprockets"
-require "parcels/base"
+require "parcels/environment"
 
 module Parcels
 

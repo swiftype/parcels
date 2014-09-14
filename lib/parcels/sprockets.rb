@@ -53,7 +53,7 @@ end
 
 ::Sprockets::Environment.class_eval do
   def parcels
-    @parcels ||= ::Parcels::Base.new(self)
+    @parcels ||= ::Parcels::Environment.new(self)
   end
 
   def index_with_parcels
@@ -72,7 +72,7 @@ end
 
 ::Sprockets::DirectiveProcessor.class_eval do
   def process_require_parcels_directive(*args)
-    args = [ ::Parcels::Base::PARCELS_DEFAULT_SET_NAME ] if args.empty?
+    args = [ ::Parcels::Environment::PARCELS_DEFAULT_SET_NAME ] if args.empty?
     parcels = context.environment.parcels
 
     args.each do |set_name|
