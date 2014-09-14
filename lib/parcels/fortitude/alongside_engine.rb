@@ -25,7 +25,7 @@ module Parcels
         widget_filename += ".rb"
         widget_filename = File.join(File.dirname(context.pathname.to_s), widget_filename)
 
-        widget_class = ::Fortitude::Widget.widget_class_from_file(widget_filename, :root_dirs => parcels.view_paths)
+        widget_class = ::Fortitude::Widget.widget_class_from_file(widget_filename, :root_dirs => parcels.widget_roots)
         fragment = ::Parcels::CssFragment.new(File.read(context.pathname.to_s), widget_class, context.pathname.to_s, 1, { })
         fragment.to_css
       end

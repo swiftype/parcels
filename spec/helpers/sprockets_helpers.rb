@@ -4,7 +4,7 @@ module SprocketsHelpers
   end
 
   def sprockets_env(*args, &block)
-    if args.length > 0 || block
+    out = if args.length > 0 || block
       raise "Duplicate creation of sprockets_env? #{args.inspect}" if @sprockets_env
       args = [ this_example_root ] if args.length == 0
       @sprockets_env = new_sprockets_env(*args)
@@ -16,5 +16,8 @@ module SprocketsHelpers
         out
       end
     end
+
+    out.parcels.define_set!('all', File.join(this_example_root, 'views'))
+    out
   end
 end

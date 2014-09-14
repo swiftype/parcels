@@ -52,17 +52,6 @@ Please specify one of these names in your 'require_parcels' directive in your as
       out
     end
 
-    def logical_path_for(fragment_path)
-      fragment_path = File.expand_path(fragment_path, root)
-      view_path = view_paths.detect { |vp| fragment_path.start_with?(vp) }
-      unless view_path
-        raise "Fragment #{fragment_path.inspect} isn't under any of our view paths, which are: #{view_paths.inspect}"
-      end
-
-      subpath = fragment_path[(view_path.length + 1)..-1]
-      File.join(LOGICAL_PATH_PREFIX, subpath)
-    end
-
     def create_and_add_all_workaround_directories!
       all_set_definition_names.each do |set_definition_name|
         set_definition(set_definition_name).add_workaround_directory_to_sprockets!(sprockets_environment)
@@ -76,30 +65,6 @@ Please specify one of these names in your 'require_parcels' directive in your as
 
     def all_set_definition_names
       set_definitions.keys
-    end
-
-    def create_and_add_workaround_directory_if_needed!(view_path)
-      @workaround_directories_created[view_path] ||= begin
-        view_path = File.expand_path(view_path, root)
-        unless view_paths.include?(view_path)
-          raise "The specified view path, #{view_path.inspect}, is not any of our view paths: #{view_paths.inspect}"
-        end
-
-        workaround_directory = File.join(view_path, PARCELS_SPROCKETS_WORKAROUND_DIRECTORY_NAME)
-
-        unless sprockets_environment.paths.include?(workaround_directory)
-          sprockets_environment.prepend_path(workaround_directory)
-        end
-
-        FileUtils.mkdir_p(workaround_directory)
-        Dir.chdir(workaround_directory) do
-          unless File.symlink?(::Parcels::Base::LOGICAL_PATH_PREFIX)
-            FileUtils.ln_s("..", ::Parcels::Base::LOGICAL_PATH_PREFIX)
-          end
-        end
-
-        workaround_directory
-      end
     end
   end
 end

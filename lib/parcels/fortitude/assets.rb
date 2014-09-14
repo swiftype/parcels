@@ -21,7 +21,6 @@ module Parcels
         end
 
         def _parcels_widget_outer_element_class
-          # TODO: What are valid characters in a CSS class name?
           @_parcels_widget_outer_element_class ||= begin
             fragment = self.name.underscore.gsub(/[^A-Za-z0-9_]/, '_')
             "parcels_class_#{fragment}"

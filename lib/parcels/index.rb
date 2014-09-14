@@ -11,10 +11,6 @@ module Parcels
 
     delegate :root, :logical_path_for, :widget_roots, :to => :base
 
-    def view_paths
-      @view_paths ||= base.view_paths.dup.freeze
-    end
-
     def set(name)
       sets[name] ||= ::Parcels::Set.new(base.set_definition(name))
     end
