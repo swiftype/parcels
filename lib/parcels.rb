@@ -1,7 +1,7 @@
 require "sprockets"
 require "parcels/version"
-require "parcels/rails"
-require "parcels/fortitude"
+require "parcels/rails/rails_loader"
+require "parcels/fortitude/fortitude_loader"
 require "parcels/sprockets"
 require "parcels/environment"
 

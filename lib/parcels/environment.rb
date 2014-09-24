@@ -9,7 +9,6 @@ module Parcels
 
     def initialize(sprockets_environment)
       @sprockets_environment = sprockets_environment
-      @workaround_directories_created = { }
 
       @set_definitions = { }
 

@@ -1,5 +1,4 @@
 module ContentInHelpers
-
   def asset_source(asset_path, options = { })
     env = options[:sprockets_env] || sprockets_env
     asset = env.find_asset(asset_path)
@@ -99,9 +98,9 @@ module ContentInHelpers
   end
 
   def subpath_to_widget_class(subpath)
-    name = subpath
-    name = $1 if name =~ /^(.*)\.rb\s*$/i
-    name.camelize.constantize
+    full_path = File.join(this_example_root, subpath)
+    full_path += ".rb" unless full_path =~ /\.rb\s*$/i
+    Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => this_example_root)
   end
 
   def widget_outer_element_class_from_subpath(subpath)
@@ -170,5 +169,13 @@ module ContentInHelpers
   def widget_scoped(*css_selector_array)
     css_selector_array = css_selector_array.flatten.map(&:to_s)
     [ :_widget_scope ] + css_selector_array
+  end
+
+  def rendered_widget_content(widget_subpath, args = { })
+    widget_class = subpath_to_widget_class(widget_subpath)
+    html = widget_class.new(args).to_html
+    puts html
+    # doc = Nokogiri::
+    html
   end
 end

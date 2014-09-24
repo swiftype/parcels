@@ -1,9 +1,17 @@
 require 'fortitude'
 
+require 'active_support/concern'
+
 module Views; end
 
 module FileStructureHelpers
-  attr_reader :this_example
+  extend ActiveSupport::Concern
+
+  included do
+    after :each do
+      unload_all_classes!
+    end
+  end
 
   class SpecWidget < ::Fortitude::Widget
     doctype :html5
@@ -75,6 +83,30 @@ module FileStructureHelpers
       end
     end
 
+    def unload_all_classes!
+      subpaths = files.keys | widgets.keys
+
+      subpaths.each do |subpath|
+        next unless subpath =~ /\.rb$/i
+        full_path = File.join(spec.this_example_root, subpath)
+        widget_class = ::Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => spec.this_example_root)
+
+        if widget_class
+          parent = constant_name = nil
+
+          if widget_class.name =~ /^(.*)::([^:]+)$/i
+            parent = $1.constantize
+            constant_name = $2.to_sym
+          else
+            parent = ::Object
+            constant_name = widget_class.name.to_sym
+          end
+
+          parent.send(:remove_const, constant_name)
+        end
+      end
+    end
+
     private
     attr_reader :spec, :files, :widgets
   end
@@ -97,15 +129,15 @@ module FileStructureHelpers
   end
 
   def gem_root
-    @gem_root ||= extant_directory(File.dirname(File.dirname(__FILE__)))
+    per_example_data[:gem_root] ||= extant_directory(File.dirname(File.dirname(__FILE__)))
   end
 
   def tempdir_root
-    @tempdir_root ||= extant_directory(gem_root, 'tmp')
+    per_example_data[:tempdir_root] ||= extant_directory(gem_root, 'tmp')
   end
 
   def this_spec_name
-    @this_spec_name ||= begin
+    per_example_data[:this_spec_name] ||= begin
       name = self.class.name
       name = $1 if name =~ /::([^:]+)$/i
       name.strip.downcase.gsub(/[^A-Za-z0-9_]+/, '_')
@@ -113,20 +145,25 @@ module FileStructureHelpers
   end
 
   def this_spec_root
-    @this_spec_root ||= extant_directory(tempdir_root, this_spec_name)
+    per_example_data[:this_spec_root] ||= extant_directory(tempdir_root, this_spec_name)
   end
 
   def this_example_name
-    @this_example_name ||= this_example.metadata[:full_description].strip.downcase.gsub(/[^A-Za-z0-9_]+/, '_')
+    per_example_data[:this_example_name] ||= this_example.metadata[:full_description].strip.downcase.gsub(/[^A-Za-z0-9_]+/, '_')
   end
 
   def this_example_root
-    @this_example_root ||= clean_directory(this_spec_root, this_example_name)
+    per_example_data[:this_example_root] ||= clean_directory(this_spec_root, this_example_name)
   end
 
   def files(&block)
-    @file_definition ||= SpecFileSet.new(self)
-    @file_definition.instance_eval(&block)
-    @file_definition.create!
+    per_example_data[:file_definition] ||= SpecFileSet.new(self)
+    per_example_data[:file_definition].instance_eval(&block)
+    per_example_data[:file_definition].create!
+  end
+
+  def unload_all_classes!
+    fd = per_example_data[:file_definition]
+    fd.unload_all_classes! if fd
   end
 end
