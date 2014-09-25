@@ -8,7 +8,6 @@ module Parcels
 
       module ClassMethods
         def parcels_enabled?
-          $stderr.puts "parcels_enabled? on #{self}: #{@_parcels_enabled.inspect}"
           out = false
           out = true if superclass.respond_to?(:parcels_enabled?) && superclass.parcels_enabled?
           out = true if @_parcels_enabled
@@ -17,12 +16,12 @@ module Parcels
 
         def enable_parcels!
           raise "Already enabled on #{self}!" if @_parcels_enabled
-          $stderr.puts "ENABLING ON: #{self}"
 
           @_parcels_tag_methods_module = Module.new
           const_set(:ParcelsEnablingModule, @_parcels_tag_methods_module)
-          puts "INCLUDING ON: #{self}"
           self.include @_parcels_tag_methods_module
+
+          record_tag_emission true
 
           _parcels_ensure_all_tag_methods_overridden!
 
@@ -30,7 +29,6 @@ module Parcels
         end
 
         def tags_changed!(tags)
-          $stderr.puts "TAGS CHANGED ON #{self.name}"
           super
           _parcels_ensure_all_tag_methods_overridden! if parcels_enabled?
         end
@@ -45,17 +43,13 @@ module Parcels
         end
 
         def _parcels_ensure_all_tag_methods_overridden!
-          $stderr.puts "OVERRIDING ALL ON #{self.name}"
           tags.each do |tag_name, tag_object|
             done = _parcels_tag_method_overridden?(tag_name)
-            $stderr.puts "TAG #{tag_name}; done? #{done.inspect}"
             next if done
 
             tag_object.all_method_names.each do |tag_method_name|
-              $stderr.puts "Defining method #{tag_method_name.inspect} on #{@_parcels_tag_methods_module}"
               @_parcels_tag_methods_module.send(:define_method, tag_method_name) do |content_or_attributes = nil, attributes = nil, &block|
                 directly_inside = rendering_context.current_element_nesting.last
-                $stderr.puts "TAG #{tag_method_name}: directly_inside: #{directly_inside}"
                 if directly_inside.kind_of?(::Fortitude::Widget) && (css_wrapper_classes = directly_inside.class.try(:_parcels_widget_outer_element_classes))
                   if attributes || content_or_attributes.kind_of?(String)
                     super(content_or_attributes, self.class._parcels_add_wrapper_css_classes_to(attributes, css_wrapper_classes), &block)

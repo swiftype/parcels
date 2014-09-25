@@ -63,7 +63,6 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           options = css_strings.extract_options!
           if options.fetch(:wrap, true)
             _parcels_wrapping_css_class_required!
-            $stderr.puts "SET REQUIRED: #{_parcels_widget_outer_element_classes.inspect}"
           end
 
           caller_line = caller[0]

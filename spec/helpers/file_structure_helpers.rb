@@ -19,7 +19,11 @@ module FileStructureHelpers
     enable_parcels!
 
     def content
-      text "spec_widget #{self.class.name} contents!"
+      div do
+        p do
+          text "spec_widget #{self.class.name} contents!"
+        end
+      end
     end
   end
 
@@ -34,11 +38,21 @@ module FileStructureHelpers
       @css << css_text
     end
 
+    def content(content_text)
+      @content_text = content_text
+    end
+
     def source_text
       text = [ "class #{class_name} < ::#{superclass}" ]
+
       @css.each do |css_text|
         text += [ "  css <<-EOS", css_text, "EOS" ]
       end
+
+      if @content_text
+        text += [ "  def content", @content_text, "  end" ]
+      end
+
       text += [ "end" ]
       text.join("\n") + "\n"
     end
