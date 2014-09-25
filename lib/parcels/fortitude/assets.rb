@@ -15,7 +15,7 @@ module Parcels
           @_parcels_widget_outer_element_classes ||= begin
             out = [ ]
             out << _parcels_widget_outer_element_class if _parcels_wrapping_css_class_required?
-            out += superclass._parcels_widget_outer_element_classes if superclass.respond_to?(:_parcels_attributes_support_included?) && superclass._parcels_attributes_support_included?
+            out += superclass._parcels_widget_outer_element_classes if superclass.respond_to?(:parcels_enabled?) && superclass.parcels_enabled?
             out
           end
         end
