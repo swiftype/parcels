@@ -193,7 +193,7 @@ module ContentInHelpers
       if class_string
         class_string.split(/\s+/)
       else
-        nil
+        [ ]
       end
     else
       raise "Multiple elements matched #{xpath.inspect} from here: #{node}; they are: #{elements.inspect}"

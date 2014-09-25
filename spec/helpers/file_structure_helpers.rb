@@ -28,10 +28,12 @@ module FileStructureHelpers
   end
 
   class WidgetDefinition
-    def initialize(class_name, superclass)
+    def initialize(class_name, superclass, root_dir)
       @class_name = class_name
       @superclass = superclass
+      @root_dir = root_dir
       @css = [ ]
+      @requires = [ ]
     end
 
     def css(css_text)
@@ -42,8 +44,19 @@ module FileStructureHelpers
       @content_text = content_text
     end
 
+    def requires(*the_requires)
+      the_requires = Array(the_requires).flatten.uniq
+      @requires |= the_requires
+    end
+
     def source_text
-      text = [ "class #{class_name} < ::#{superclass}" ]
+      text = [ ]
+
+      @requires.each do |the_require|
+        text << "require '#{File.join(@root_dir, the_require)}'"
+      end
+
+      text << "class #{class_name} < ::#{superclass}"
 
       @css.each do |css_text|
         text += [ "  css <<-EOS", css_text, "EOS" ]
@@ -79,7 +92,7 @@ module FileStructureHelpers
       superclass = superclass.name if superclass.kind_of?(Class)
       subpath += ".rb" unless subpath =~ /\.rb$/i
 
-      widget_definition = WidgetDefinition.new(class_name, superclass)
+      widget_definition = WidgetDefinition.new(class_name, superclass, spec.this_example_root)
       widget_definition.instance_eval(&block)
 
       @widgets[subpath] = widget_definition
@@ -105,7 +118,7 @@ module FileStructureHelpers
       subpaths.each do |subpath|
         next unless subpath =~ /\.rb$/i
         full_path = File.join(spec.this_example_root, subpath)
-        widget_class = ::Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => spec.this_example_root)
+        widget_class = ::Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => spec.this_example_root) rescue nil
 
         if widget_class
           parent = constant_name = nil

@@ -22,8 +22,9 @@ module Parcels
 
         def _parcels_widget_outer_element_class
           @_parcels_widget_outer_element_class ||= begin
-            fragment = self.name.downcase.gsub(/[^A-Za-z0-9_]/, '_')
-            "parcels_class__#{fragment}"
+            class_suffix = self.name.gsub('::', '__').underscore.gsub(/[^A-Za-z0-9_]/, '_')
+
+            "parcels_class__#{class_suffix}"
           end
         end
 
