@@ -15,15 +15,15 @@ module Parcels
           @_parcels_widget_outer_element_classes ||= begin
             out = [ ]
             out << _parcels_widget_outer_element_class if _parcels_wrapping_css_class_required?
-            out += superclass._parcels_widget_outer_element_classes if superclass._parcels_attributes_support_included?
+            out += superclass._parcels_widget_outer_element_classes if superclass.respond_to?(:_parcels_attributes_support_included?) && superclass._parcels_attributes_support_included?
             out
           end
         end
 
         def _parcels_widget_outer_element_class
           @_parcels_widget_outer_element_class ||= begin
-            fragment = self.name.underscore.gsub(/[^A-Za-z0-9_]/, '_')
-            "parcels_class_#{fragment}"
+            fragment = self.name.downcase.gsub(/[^A-Za-z0-9_]/, '_')
+            "parcels_class__#{fragment}"
           end
         end
 
@@ -39,11 +39,31 @@ module Parcels
           @_parcels_wrapping_css_class_required = true
         end
 
+        def _parcels_add_wrapper_css_classes_to(attributes, wrapper_classes)
+          out = attributes || { }
+          key = out.key?('class') ? 'class' : :class
+          out[key] = Array(out[key]) + wrapper_classes
+          out
+        end
+
         def css(*css_strings)
+          unless parcels_enabled?
+            klass = self
+            superclasses = all_fortitude_superclasses
+
+            raise %{Before using this Parcels method, you must first enable Parcels on this class. Simply
+call 'enable_parcels!', a class method, on the base widget class you want to enable -- typically, this
+is your base Fortitude widget class.
+
+This class is #{klass.name};
+you may want to enable Parcels on any of its Fortitude superclasses, which are:
+#{superclasses.map(&:name).join("\n")}}
+          end
+
           options = css_strings.extract_options!
           if options.fetch(:wrap, true)
-            _parcels_ensure_attributes_support_included!
             _parcels_wrapping_css_class_required!
+            $stderr.puts "SET REQUIRED: #{_parcels_widget_outer_element_classes.inspect}"
           end
 
           caller_line = caller[0]

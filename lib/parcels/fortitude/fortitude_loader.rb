@@ -16,11 +16,11 @@ if defined?(::Fortitude)
   require 'parcels/fortitude/widget_engine'
   require 'parcels/fortitude/alongside_engine'
   require 'parcels/fortitude/assets'
-  require 'parcels/fortitude/without_attributes'
+  require 'parcels/fortitude/enabling'
 
   ::Fortitude::Widget.class_eval do
     include ::Parcels::Fortitude::Assets
-    include ::Parcels::Fortitude::WithoutAttributes
+    include ::Parcels::Fortitude::Enabling
   end
 
   ::Sprockets.register_engine '.rb', ::Parcels::Fortitude::WidgetEngine

@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 module ContentInHelpers
   def asset_source(asset_path, options = { })
     env = options[:sprockets_env] || sprockets_env
@@ -171,11 +173,12 @@ module ContentInHelpers
     [ :_widget_scope ] + css_selector_array
   end
 
-  def rendered_widget_content(widget_subpath, args = { })
+  def rendered_widget_content(widget_subpath, args = { }, options = { })
     widget_class = subpath_to_widget_class(widget_subpath)
     html = widget_class.new(args).to_html
-    puts html
-    # doc = Nokogiri::
-    html
+    out = Nokogiri::HTML(html)
+
+    out = out.xpath('/html/body/*') if options.fetch(:extract_body_contents, true)
+    out
   end
 end

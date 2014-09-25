@@ -16,6 +16,8 @@ module FileStructureHelpers
   class SpecWidget < ::Fortitude::Widget
     doctype :html5
 
+    enable_parcels!
+
     def content
       text "spec_widget #{self.class.name} contents!"
     end
