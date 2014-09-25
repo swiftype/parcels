@@ -106,7 +106,7 @@ module ContentInHelpers
   end
 
   def widget_outer_element_class_from_subpath(subpath)
-    ".#{subpath_to_widget_class(subpath)._parcels_widget_outer_element_class}"
+    "#{subpath_to_widget_class(subpath)._parcels_widget_outer_element_class}"
   end
 
   def expect_css_content_in(asset_path, expected_content)
@@ -129,7 +129,7 @@ module ContentInHelpers
         expected_css_selector_array = Array(expected_css_selector_array)
 
         if expected_css_selector_array[0] == :_widget_scope
-          expected_css_selector_array = [ widget_outer_element_class_from_subpath(expected_path) ] + expected_css_selector_array[1..-1]
+          expected_css_selector_array = [ ".#{widget_outer_element_class_from_subpath(expected_path)}" ] + expected_css_selector_array[1..-1]
         end
         expected_css_selector_array = expected_css_selector_array.map(&:to_s)
 
