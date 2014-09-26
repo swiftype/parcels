@@ -199,4 +199,14 @@ module ContentInHelpers
       raise "Multiple elements matched #{xpath.inspect} from here: #{node}; they are: #{elements.inspect}"
     end
   end
+
+  def expect_classes(doc, xpath, *class_list)
+    classes = classes_from(doc, xpath)
+
+    expect(classes.sort).to eq(class_list.flatten.sort)
+  end
+
+  def expect_wrapper_classes(doc, xpath, *subpaths)
+    expect_classes(doc, xpath, subpaths.flatten.map { |sp| widget_outer_element_class_from_subpath(sp) })
+  end
 end
