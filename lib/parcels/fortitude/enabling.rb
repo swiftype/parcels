@@ -17,11 +17,11 @@ module Parcels
         def enable_parcels!
           raise "Already enabled on #{self}!" if @_parcels_enabled
 
+          record_tag_emission true
+
           @_parcels_tag_methods_module = Module.new
           const_set(:ParcelsEnablingModule, @_parcels_tag_methods_module)
           self.include @_parcels_tag_methods_module
-
-          record_tag_emission true
 
           _parcels_ensure_all_tag_methods_overridden!
 

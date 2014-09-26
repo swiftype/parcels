@@ -19,11 +19,7 @@ module FileStructureHelpers
     enable_parcels!
 
     def content
-      div do
-        p do
-          text "spec_widget #{self.class.name} contents!"
-        end
-      end
+      p "spec_widget #{self.class.name} contents!"
     end
   end
 
@@ -34,6 +30,7 @@ module FileStructureHelpers
       @root_dir = root_dir
       @css = [ ]
       @requires = [ ]
+      @class_text = [ ]
     end
 
     def css(css_text)
@@ -42,6 +39,10 @@ module FileStructureHelpers
 
     def content(content_text)
       @content_text = content_text
+    end
+
+    def class_text(text)
+      @class_text << text
     end
 
     def requires(*the_requires)
@@ -57,6 +58,8 @@ module FileStructureHelpers
       end
 
       text << "class #{class_name} < ::#{superclass}"
+
+      text += @class_text
 
       @css.each do |css_text|
         text += [ "  css <<-EOS", css_text, "EOS" ]
