@@ -18,10 +18,14 @@ module Parcels
         @options = options
       end
 
+      def wrapping_css_class_required?
+        wrapped?
+      end
+
       def to_css
         out = css_string
 
-        if options.fetch(:wrap, true) && (wrapper_css_class = source.try(:_parcels_widget_outer_element_class))
+        if wrapped? && (wrapper_css_class = source.try(:_parcels_widget_outer_element_class))
           out = %{.#{wrapper_css_class} {
     #{out}
   }}
@@ -40,6 +44,10 @@ module Parcels
         out << ":#{line}" if line
         out << " */\n"
         out
+      end
+
+      def wrapped?
+        options.fetch(:wrap, true)
       end
     end
   end

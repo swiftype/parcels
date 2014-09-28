@@ -29,15 +29,11 @@ module Parcels
         end
 
         def _parcels_widget_class_css
-          @_parcels_widget_class_css ||= ::Parcels::Fragments::CssFragment.to_css(@_parcels_css_fragments || [ ])
+          @_parcels_widget_class_css ||= ::Parcels::Fragments::CssFragment.to_css(_parcels_inline_css_fragments)
         end
 
         def _parcels_wrapping_css_class_required?
-          @_parcels_wrapping_css_class_required
-        end
-
-        def _parcels_wrapping_css_class_required!
-          @_parcels_wrapping_css_class_required = true
+          _parcels_inline_css_fragments.detect { |f| f.wrapping_css_class_required? }
         end
 
         def _parcels_add_wrapper_css_classes_to(attributes, wrapper_classes)
@@ -45,6 +41,10 @@ module Parcels
           key = out.key?('class') ? 'class' : :class
           out[key] = Array(out[key]) + wrapper_classes
           out
+        end
+
+        def _parcels_inline_css_fragments
+          @_parcels_inline_css_fragments ||= [ ]
         end
 
         def css(*css_strings)
@@ -62,9 +62,6 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           end
 
           options = css_strings.extract_options!
-          if options.fetch(:wrap, true)
-            _parcels_wrapping_css_class_required!
-          end
 
           caller_line = caller[0]
           if caller_line =~ /^(.*)\s*:\s*(\d+)\s*:\s*in\s+/i
@@ -75,8 +72,8 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
             caller_line = nil
           end
 
-          @_parcels_css_fragments ||= [ ]
-          @_parcels_css_fragments += css_strings.map do |css_string|
+          @_parcels_inline_css_fragments ||= [ ]
+          @_parcels_inline_css_fragments += css_strings.map do |css_string|
             ::Parcels::Fragments::CssFragment.new(css_string, self, caller_file, caller_line, options)
           end
 
