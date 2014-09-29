@@ -161,11 +161,11 @@ module FileStructureHelpers
   end
 
   def gem_root
-    per_example_data[:gem_root] ||= extant_directory(File.dirname(File.dirname(__FILE__)))
+    per_example_data[:gem_root] ||= extant_directory(File.dirname(File.dirname(File.dirname(__FILE__))))
   end
 
   def tempdir_root
-    per_example_data[:tempdir_root] ||= extant_directory(gem_root, 'tmp')
+    per_example_data[:tempdir_root] ||= extant_directory(gem_root, 'tmp', 'spec')
   end
 
   def this_spec_name
