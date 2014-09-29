@@ -46,6 +46,10 @@ module Parcels
           end
         end
 
+        def _parcels_css_fragments
+          _parcels_alongside_css_fragments + _parcels_inline_css_fragments
+        end
+
         def _parcels_widget_outer_element_class
           @_parcels_widget_outer_element_class ||= begin
             class_suffix = self.name.gsub('::', '__').underscore.gsub(/[^A-Za-z0-9_]/, '_')
@@ -55,12 +59,11 @@ module Parcels
         end
 
         def _parcels_widget_class_css
-          @_parcels_widget_class_css ||= ::Parcels::Fragments::CssFragment.to_css(_parcels_inline_css_fragments)
+          @_parcels_widget_class_css ||= ::Parcels::Fragments::CssFragment.to_css(_parcels_css_fragments)
         end
 
         def _parcels_wrapping_css_class_required?
-          (_parcels_inline_css_fragments.detect { |f| f.wrapping_css_class_required? }) ||
-            (_parcels_alongside_css_fragments.detect { |f| f.wrapping_css_class_required? })
+          _parcels_css_fragments.detect { |f| f.wrapping_css_class_required? }
         end
 
         def _parcels_alongside_css_fragments

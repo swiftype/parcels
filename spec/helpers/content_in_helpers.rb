@@ -100,6 +100,7 @@ module ContentInHelpers
   end
 
   def subpath_to_widget_class(subpath)
+    subpath = $1 if subpath =~ %r{^(.*?)\.[^/]+$}i
     full_path = File.join(this_example_root, subpath)
     full_path += ".rb" unless full_path =~ /\.rb\s*$/i
     Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => this_example_root)
