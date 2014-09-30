@@ -26,6 +26,32 @@ describe "Parcels alongside files", :type => :system do
     end
   end
 
+  it "should combine an alongside file and inline CSS just fine" do
+    files {
+      file 'assets/basic.css', %{
+        //= require_parcels
+      }
+
+      widget 'views/my_widget' do
+        css %{
+          p { color: green; }
+        }
+      end
+
+      file 'views/my_widget.css', %{
+        div { color: blue; }
+      }
+    }
+
+    expect_css_content_in('basic',
+      'views/my_widget.css' => {
+        widget_scoped(:div) => 'color: blue'
+      },
+      'views/my_widget.rb' => {
+        widget_scoped(:p) => 'color: green'
+      })
+  end
+
   it "should not allow you to pick up the alongside file with a direct 'require'" do
     files {
       file 'assets/basic.css', %{
@@ -45,7 +71,7 @@ describe "Parcels alongside files", :type => :system do
     expect { css_content_in('one') }.to raise_error(::Sprockets::FileNotFound, %r{views/my_widget\.css}i)
   end
 
-  it "should allow you to pick up the alongside file with a 'require' using '_parcels/'" do
+  it "should allow you to pick up the alongside file with a 'require' using '_parcels/', and it should not be wrapped" do
     files {
       file 'assets/basic.css', %{
         //= require_parcels
