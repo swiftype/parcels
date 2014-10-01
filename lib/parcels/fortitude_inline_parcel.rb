@@ -7,6 +7,10 @@ module Parcels
       @full_path = full_path
     end
 
+    def to_s
+      "<#{self.class.name.demodulize} for #{widget_class}>"
+    end
+
     def add_to_sprockets_context!(context)
       if has_content?(context)
         context.require_asset(logical_path)
@@ -15,11 +19,11 @@ module Parcels
       end
     end
 
-    def tags
+    def tag
       widget_class
     end
 
-    def tags_that_must_come_after
+    def tags_that_must_come_before
       widget_class.all_fortitude_superclasses
     end
 

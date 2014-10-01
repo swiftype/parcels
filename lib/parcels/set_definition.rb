@@ -4,16 +4,16 @@ module Parcels
   class SetDefinition
     attr_reader :name, :root
 
-    def initialize(parcels, name, root = nil, &block)
+    def initialize(parcels_environment, name, root = nil, &block)
       @name = name
-      @parcels = parcels
+      @parcels_environment = parcels_environment
       self.root = root if root
 
       instance_eval(&block) if block
     end
 
     def root=(new_root)
-      @root = File.expand_path(new_root, parcels.root)
+      @root = File.expand_path(new_root, parcels_environment.root)
     end
 
     def add_workaround_directory_to_sprockets!(sprockets_environment)
@@ -23,10 +23,10 @@ module Parcels
       sprockets_environment.prepend_path(workaround_directory)
     end
 
-    delegate :widget_roots, :to => :parcels
+    delegate :widget_roots, :to => :parcels_environment
 
     private
-    attr_reader :parcels
+    attr_reader :parcels_environment
 
     PARCELS_WORKAROUND_DIRECTORY_NAME = ".parcels_sprockets_workaround".freeze
     PARCELS_LOGICAL_PATH_PREFIX       = "_parcels".freeze

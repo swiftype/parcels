@@ -2,6 +2,7 @@
 describe "Parcels dependency sorting", :type => :system do
   it "should sort superclasses before subclasses in the generated file" do
     sequence = (0..20).map { |i| rand(500) }.uniq
+    $stderr.puts "SEQUENCE: #{sequence}"
 
     files {
       file 'assets/basic.css', %{
