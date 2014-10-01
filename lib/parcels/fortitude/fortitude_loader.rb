@@ -13,10 +13,9 @@ rescue LoadError => le
 end
 
 if defined?(::Fortitude)
-  require 'parcels/fortitude/widget_engine'
-  require 'parcels/fortitude/alongside_engine'
   require 'parcels/fortitude/assets'
   require 'parcels/fortitude/enabling'
+  require 'parcels/fortitude/widget_engine'
 
   ::Fortitude::Widget.class_eval do
     include ::Parcels::Fortitude::Assets
@@ -24,5 +23,4 @@ if defined?(::Fortitude)
   end
 
   ::Sprockets.register_engine '.rb', ::Parcels::Fortitude::WidgetEngine
-  ::Sprockets.register_engine '.aln', ::Parcels::Fortitude::AlongsideEngine
 end
