@@ -58,7 +58,6 @@ module Parcels
       parcel_list = ::Parcels::DependencyParcelList.new
       parcel_list.add_parcels!(parcels.values)
       parcel_list.parcels_in_order.each do |parcel|
-        $stderr.puts "ADDING PARCEL: #{parcel}"
         parcel.add_to_sprockets_context!(context)
       end
     end

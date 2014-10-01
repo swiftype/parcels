@@ -39,16 +39,7 @@ module Parcels
     end
 
     def parcels_in_order
-      $stderr.puts "parcels_in_order:"
-      $stderr.puts "  tags:"
-      parcel_to_tag_map.each do |parcel, tag|
-        $stderr.puts "      #{parcel} -> #{tag}"
-      end
-      $stderr.puts "  tag to child tag map:"
-      tag_to_child_tag_map.each do |tag, child_tags|
-        $stderr.puts "      #{tag} -> #{child_tags}"
-      end
-      tsort
+      tsort.reverse # tsort puts children before parents; we want the exact opposite
     end
 
     include TSort
