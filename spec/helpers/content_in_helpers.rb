@@ -65,8 +65,9 @@ module ContentInHelpers
     file_to_content_map
   end
 
-  def css_content_in(asset_path)
-    out = { }
+  def data_for_css_content_in(asset_path)
+    data = { }
+    order = [ ]
 
     file_content_in(asset_path).each do |filename, file_data|
       this_css_content = [ ]
@@ -92,11 +93,20 @@ module ContentInHelpers
           raise "Don't know how to parse remaining content of #{filename}, which is:\n#{remaining_content}"
         end
 
-        out[filename] = file_data.merge(:css => this_css_content)
+        data[filename] = file_data.merge(:css => this_css_content)
+        order << { :filename => filename, :line => file_data[:line] }
       end
     end
 
-    out
+    { :data => data, :order => order }
+  end
+
+  def css_content_in(asset_path)
+    data_for_css_content_in(asset_path)[:data]
+  end
+
+  def css_content_order_in(asset_path)
+    data_for_css_content_in(asset_path)[:order]
   end
 
   def subpath_to_widget_class(subpath)
