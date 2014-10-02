@@ -2,9 +2,9 @@ module Parcels
   module Fragments
     class CssFragment
       class << self
-        def to_css(parcels_environment, fragments)
+        def to_css(parcels_environment, context, fragments)
           fragments = Array(fragments)
-          fragments.map { |f| f.to_css(parcels_environment) }.join("\n")
+          fragments.map { |f| f.to_css(parcels_environment, context) }.join("\n")
         end
       end
 
@@ -22,7 +22,7 @@ module Parcels
         wrapped?
       end
 
-      def to_css(parcels_environment)
+      def to_css(parcels_environment, context)
         out = css_string
 
         if wrapped? && (wrapper_css_class = source.try(:_parcels_widget_outer_element_class))
@@ -31,8 +31,12 @@ module Parcels
   }}
         end
 
-        engine = ::Sass::Engine.new(out, :syntax => :scss)
-        out = engine.render
+        engine = ::Sprockets.engines(".scss")
+        template = engine.new(file) { out }
+        out = template.render(context, {})
+
+        # engine = ::Sass::Engine.new(out, :syntax => :scss)
+        # out = engine.render
         header_comment + out
       end
 

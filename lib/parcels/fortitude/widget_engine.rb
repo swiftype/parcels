@@ -21,7 +21,7 @@ module Parcels
         widget_class = ::Fortitude::Widget.widget_class_from_file(context.pathname, :root_dirs => parcels_environment.widget_roots)
 
         if widget_class
-          widget_class._parcels_widget_class_css(parcels_environment)
+          widget_class._parcels_widget_class_css(parcels_environment, context)
         else
           ""
         end

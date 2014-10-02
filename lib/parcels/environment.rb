@@ -5,7 +5,7 @@ module Parcels
     LOGICAL_PATH_PREFIX = "_parcels".freeze
     PARCELS_DEFAULT_SET_NAME = 'all'.freeze
 
-    attr_reader :root, :widget_roots
+    attr_reader :root, :widget_roots, :sprockets_environment
 
     def initialize(sprockets_environment)
       @sprockets_environment = sprockets_environment
@@ -60,7 +60,7 @@ Please specify one of these names in your 'require_parcels' directive in your as
     private
     PARCELS_SPROCKETS_WORKAROUND_DIRECTORY_NAME = ".parcels-sprockets-workaround"
 
-    attr_reader :sprockets_environment, :set_definitions
+    attr_reader :set_definitions
 
     def all_set_definition_names
       set_definitions.keys

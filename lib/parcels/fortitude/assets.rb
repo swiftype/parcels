@@ -58,8 +58,8 @@ module Parcels
           end
         end
 
-        def _parcels_widget_class_css(parcels_environment)
-          ::Parcels::Fragments::CssFragment.to_css(parcels_environment, _parcels_css_fragments)
+        def _parcels_widget_class_css(parcels_environment, context)
+          ::Parcels::Fragments::CssFragment.to_css(parcels_environment, context, _parcels_css_fragments)
         end
 
         def _parcels_wrapping_css_class_required?

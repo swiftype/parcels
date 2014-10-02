@@ -27,9 +27,9 @@ module Parcels
       widget_class.all_fortitude_superclasses
     end
 
-    def to_css(parcels_environment)
+    def to_css(parcels_environment, context)
       if widget_class.respond_to?(:_parcels_widget_class_css) &&
-        (!(css = widget_class._parcels_widget_class_css(parcels_environment)).blank?)
+        (!(css = widget_class._parcels_widget_class_css(parcels_environment, context)).blank?)
         css
       end
     end
@@ -40,7 +40,7 @@ module Parcels
     delegate :widget_roots, :to => :set
 
     def has_content?(context, parcels_environment)
-      !! to_css(parcels_environment)
+      !! to_css(parcels_environment, context)
     end
 
     def set_root
