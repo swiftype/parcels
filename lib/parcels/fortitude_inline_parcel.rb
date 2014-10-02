@@ -11,8 +11,8 @@ module Parcels
       "<#{self.class.name.demodulize} for #{widget_class}>"
     end
 
-    def add_to_sprockets_context!(context)
-      if has_content?(context)
+    def add_to_sprockets_context!(context, parcels_environment)
+      if has_content?(context, parcels_environment)
         context.require_asset(logical_path)
       else
         context.depend_on_asset(logical_path)
@@ -27,9 +27,9 @@ module Parcels
       widget_class.all_fortitude_superclasses
     end
 
-    def to_css
+    def to_css(parcels_environment)
       if widget_class.respond_to?(:_parcels_widget_class_css) &&
-        (!(css = widget_class._parcels_widget_class_css).blank?)
+        (!(css = widget_class._parcels_widget_class_css(parcels_environment)).blank?)
         css
       end
     end
@@ -39,8 +39,8 @@ module Parcels
 
     delegate :widget_roots, :to => :set
 
-    def has_content?(context)
-      !! to_css
+    def has_content?(context, parcels_environment)
+      !! to_css(parcels_environment)
     end
 
     def set_root

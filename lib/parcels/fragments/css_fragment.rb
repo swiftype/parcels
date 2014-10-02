@@ -2,9 +2,9 @@ module Parcels
   module Fragments
     class CssFragment
       class << self
-        def to_css(fragments)
+        def to_css(parcels_environment, fragments)
           fragments = Array(fragments)
-          fragments.map(&:to_css).join("\n")
+          fragments.map { |f| f.to_css(parcels_environment) }.join("\n")
         end
       end
 
@@ -22,7 +22,7 @@ module Parcels
         wrapped?
       end
 
-      def to_css
+      def to_css(parcels_environment)
         out = css_string
 
         if wrapped? && (wrapper_css_class = source.try(:_parcels_widget_outer_element_class))

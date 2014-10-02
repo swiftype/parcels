@@ -73,11 +73,11 @@ end
 ::Sprockets::DirectiveProcessor.class_eval do
   def process_require_parcels_directive(*args)
     args = [ ::Parcels::Environment::PARCELS_DEFAULT_SET_NAME ] if args.empty?
-    parcels = context.environment.parcels
+    parcels_environment = context.environment.parcels
 
     args.each do |set_name|
-      set = parcels.set(set_name)
-      set.add_to_sprockets_context!(context)
+      set = parcels_environment.set(set_name)
+      set.add_to_sprockets_context!(context, parcels_environment)
     end
   end
 end

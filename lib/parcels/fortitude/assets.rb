@@ -58,8 +58,8 @@ module Parcels
           end
         end
 
-        def _parcels_widget_class_css
-          @_parcels_widget_class_css ||= ::Parcels::Fragments::CssFragment.to_css(_parcels_css_fragments)
+        def _parcels_widget_class_css(parcels_environment)
+          ::Parcels::Fragments::CssFragment.to_css(parcels_environment, _parcels_css_fragments)
         end
 
         def _parcels_wrapping_css_class_required?
@@ -125,8 +125,6 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           @_parcels_inline_css_fragments += css_strings.map do |css_string|
             ::Parcels::Fragments::CssFragment.new(css_string, self, caller_file, caller_line, options)
           end
-
-          @_parcels_widget_class_css = nil
         end
       end
     end

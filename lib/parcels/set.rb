@@ -14,9 +14,9 @@ module Parcels
       @parcels = { }
     end
 
-    def add_to_sprockets_context!(context)
+    def add_to_sprockets_context!(context, parcels_environment)
       return if sprockets_contexts_added_to[context]
-      do_add_to_sprockets_context!(context)
+      do_add_to_sprockets_context!(context, parcels_environment)
       sprockets_contexts_added_to[context] = true
     end
 
@@ -39,7 +39,7 @@ module Parcels
 
     ALL_EXTENSIONS                    = EXTENSION_TO_PARCEL_CLASS_MAP.keys.dup.freeze
 
-    def do_add_to_sprockets_context!(context)
+    def do_add_to_sprockets_context!(context, parcels_environment)
       return unless File.directory?(root)
 
       context.depend_on(root)
@@ -58,7 +58,7 @@ module Parcels
       parcel_list = ::Parcels::DependencyParcelList.new
       parcel_list.add_parcels!(parcels.values)
       parcel_list.parcels_in_order.each do |parcel|
-        parcel.add_to_sprockets_context!(context)
+        parcel.add_to_sprockets_context!(context, parcels_environment)
       end
     end
   end
