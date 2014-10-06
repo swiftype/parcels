@@ -44,11 +44,11 @@ describe "Parcels SASS features support", :type => :system do
         //= require_parcels
       }
 
-      file 'assets/one.css', %{
+      file 'assets/one.scss', %{
         $mycolor1: #feabcd;
       }
 
-      file 'views/two.css', %{
+      file 'views/two.scss', %{
         $mycolor2: #abcdef;
       }
 

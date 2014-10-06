@@ -83,9 +83,9 @@ module ContentInHelpers
         elsif remaining_content =~ %r{\A//([^\n])+(.*)\Z}mi
           this_css_content << $1
           remaining_content = $2
-        elsif remaining_content =~ /\A((?:\S+\s*)+)\s*\{\s*([^\}]+?)\s*\}\s*(.*)\Z/mi
-          selector = $1
-          rules = $2
+        elsif remaining_content =~ /\A((?:\S+[ \t]*)+)[ \t]*\{(?:\n\r)*[ \t]*([^\}]+?)[ \t]*\}[ \t]*(.*)\Z/mi
+          selector = $1.strip
+          rules = $2.strip
           remaining_content = $3
 
           this_css_content << ([ selector.split(/\s+/) ] + rules.split(/\s*\;\s*/mi))

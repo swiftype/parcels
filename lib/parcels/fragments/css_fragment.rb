@@ -23,20 +23,18 @@ module Parcels
       end
 
       def to_css(parcels_environment, context)
-        out = css_string
+        scss = css_string
 
         if wrapped? && (wrapper_css_class = source.try(:_parcels_widget_outer_element_class))
-          out = %{.#{wrapper_css_class} {
-    #{out}
+          scss = %{.#{wrapper_css_class} {
+    #{scss}
   }}
         end
 
         engine = ::Sprockets.engines(".scss")
-        template = engine.new(file) { out }
+        template = engine.new(file) { scss }
         out = template.render(context, {})
 
-        # engine = ::Sass::Engine.new(out, :syntax => :scss)
-        # out = engine.render
         header_comment + out
       end
 
