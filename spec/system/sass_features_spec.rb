@@ -69,5 +69,36 @@ describe "Parcels SASS features support", :type => :system do
       })
   end
 
-  it "should let you add to the asset search path and use that with @import"
+  it "should let you add to the asset search path and use that with @import" do
+    sprockets_env.append_path 'foobar'
+
+    files {
+      file 'assets/basic.css', %{
+        //= require_parcels
+      }
+
+      file 'assets/one.scss', %{
+        $mycolor1: #feabcd;
+      }
+
+      file 'foobar/two.scss', %{
+        $mycolor2: #abcdef;
+      }
+
+      widget 'views/my_widget' do
+        css %{
+          @import "one";
+          @import "two";
+          p { color: $mycolor1; }
+          div { color: $mycolor2; }
+        }
+      end
+    }
+
+    expect_css_content_in('basic',
+      'views/my_widget.rb' => {
+        widget_scoped(:p) => "color: #feabcd",
+        widget_scoped(:div) => "color: #abcdef"
+      })
+  end
 end
