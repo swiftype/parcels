@@ -31,15 +31,7 @@ module Parcels
   }}
         end
 
-        fake_pathname = file
-        fake_pathname = $1 if fake_pathname =~ %r{^(.*)/([^\.]+)[^/]+$}i
-        fake_pathname += ".css.scss"
-
-        if options[:engines]
-          fake_pathname += options[:engines]
-        end
-
-        asset_attributes = ::Sprockets::AssetAttributes.new(parcels_environment.sprockets_environment, fake_pathname)
+        asset_attributes = ::Sprockets::AssetAttributes.new(parcels_environment.sprockets_environment, synthetic_filename)
         processors = asset_attributes.processors
         out = process_with_processors(processors, context, scss)
 
@@ -60,6 +52,29 @@ module Parcels
         options.fetch(:wrap, true)
       end
 
+      def synthetic_filename
+        @synthetic_filename ||= begin
+          synthetic_name = File.basename(file)
+          synthetic_name = $1 if synthetic_name =~ /^([^\.]+)\./i
+          synthetic_name << ".css.scss"
+          synthetic_name << engines_as_extensions
+
+          File.join(File.dirname(file), synthetic_name)
+        end
+      end
+
+      def engines_as_extensions
+        @engines_as_extensions ||= begin
+          engines = options[:engines] || [ ]
+          out = Array(engines).flatten.map do |component|
+            component = component.to_s
+            component = ".#{component}" unless component =~ /^\./
+            component
+          end.join(".")
+          ".#{out}".gsub(/\.\.+/, '.')
+        end
+      end
+
       def process_with_processors(processors, context, data)
         result = data
 
@@ -69,22 +84,6 @@ module Parcels
         end
 
         result
-      end
-
-      def engine_specs
-        @engine_specs ||= begin
-          out = options[:engines]
-          out = Array(out).flatten.compact
-          out = out.map { |engine_spec| engine_spec.split(".") }.select { |e| ! e.blank? }.compact.map { |s| s.to_s.strip.downcase }
-          out = [ "scss" ] + out unless out[0] == "scss"
-          out
-        end
-      end
-
-      def engines
-        engine_specs.map do |s|
-          ::Sprockets.engines(".#{s}") || raise(ArgumentError, "No such engine #{s.inspect}; we have: #{::Sprockets.engines.keys.inspect}")
-        end
       end
     end
   end
