@@ -31,9 +31,17 @@ module Parcels
   }}
         end
 
-        engine = ::Sprockets.engines(".scss")
-        template = engine.new(file) { scss }
-        out = template.render(context, {})
+        fake_pathname = file
+        fake_pathname = $1 if fake_pathname =~ %r{^(.*)/([^\.]+)[^/]+$}i
+        fake_pathname += ".css.scss"
+
+        if options[:engines]
+          fake_pathname += options[:engines]
+        end
+
+        asset_attributes = ::Sprockets::AssetAttributes.new(parcels_environment.sprockets_environment, fake_pathname)
+        processors = asset_attributes.processors
+        out = process_with_processors(processors, context, scss)
 
         header_comment + out
       end
@@ -50,6 +58,33 @@ module Parcels
 
       def wrapped?
         options.fetch(:wrap, true)
+      end
+
+      def process_with_processors(processors, context, data)
+        result = data
+
+        processors.each do |processor|
+          template = processor.new(file) { result }
+          result = template.render(context, {})
+        end
+
+        result
+      end
+
+      def engine_specs
+        @engine_specs ||= begin
+          out = options[:engines]
+          out = Array(out).flatten.compact
+          out = out.map { |engine_spec| engine_spec.split(".") }.select { |e| ! e.blank? }.compact.map { |s| s.to_s.strip.downcase }
+          out = [ "scss" ] + out unless out[0] == "scss"
+          out
+        end
+      end
+
+      def engines
+        engine_specs.map do |s|
+          ::Sprockets.engines(".#{s}") || raise(ArgumentError, "No such engine #{s.inspect}; we have: #{::Sprockets.engines.keys.inspect}")
+        end
       end
     end
   end

@@ -33,8 +33,11 @@ module FileStructureHelpers
       @class_text = [ ]
     end
 
-    def css(css_text)
-      @css << css_text
+    def css(css_text, options = { })
+      @css << {
+        :text => css_text,
+        :options => options[:options]
+      }
     end
 
     def content(content_text)
@@ -61,8 +64,18 @@ module FileStructureHelpers
 
       text += @class_text
 
-      @css.each do |css_text|
-        text += [ "  css <<-EOS", css_text, "EOS" ]
+      @css.each do |data|
+        css_text = data[:text]
+        options = data[:options]
+
+        if options
+          text << "  css <<-EOS, #{options.inspect}"
+        else
+          text << "  css <<-EOS"
+        end
+
+        text << css_text
+        text << "EOS"
       end
 
       if @content_text
