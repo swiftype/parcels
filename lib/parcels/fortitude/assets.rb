@@ -96,6 +96,19 @@ module Parcels
           @_parcels_inline_css_fragments ||= [ ]
         end
 
+        def css_options(options)
+          raise ArgumentError, "You must pass a Hash to css_options, not: #{options.inspect}" unless options.kind_of?(Hash)
+          options.assert_valid_keys(:engines)
+
+          @_parcels_css_options = options
+        end
+
+        def _parcels_css_options
+          out = @_parcels_css_options
+          out ||= superclass._parcels_css_options if superclass.respond_to?(:_parcels_css_options)
+          out || { }
+        end
+
         def css(*css_strings)
           unless parcels_enabled?
             klass = self
@@ -123,7 +136,7 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
 
           @_parcels_inline_css_fragments ||= [ ]
           @_parcels_inline_css_fragments += css_strings.map do |css_string|
-            ::Parcels::Fragments::CssFragment.new(css_string, self, caller_file, caller_line, options)
+            ::Parcels::Fragments::CssFragment.new(css_string, self, caller_file, caller_line, _parcels_css_options.merge(options))
           end
         end
       end

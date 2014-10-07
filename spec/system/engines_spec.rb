@@ -9,6 +9,7 @@ describe "Parcels engines support", :type => :system do
         [ css_with_erb ]
       end
     end
+    let(:class_text) { nil }
 
     def expect_erb_not_processed
       expect_css_content_in('basic',
@@ -26,6 +27,7 @@ describe "Parcels engines support", :type => :system do
 
     before :each do
       the_css_arguments = css_arguments
+      the_class_text = class_text
 
       files {
         file 'assets/basic.css', %{
@@ -34,6 +36,10 @@ describe "Parcels engines support", :type => :system do
 
         widget 'views/my_widget' do
           css *the_css_arguments
+
+          if the_class_text
+            class_text the_class_text
+          end
         end
       }
     end
@@ -84,14 +90,51 @@ describe "Parcels engines support", :type => :system do
       end
     end
 
-    it "should allow overriding #css_engines to specify engines"
-    it "should have :engines take precedence over #css_engines"
-    it "should properly inherit #css_engines from superclasses"
+    context "when passed #css_options" do
+      let(:class_text) do
+        %{  css_options :engines => '.erb' }
+      end
+
+      it "should process engines as specified" do
+        expect_erb_processed
+      end
+
+      context "when also passed options directly" do
+        let(:css_options) { { :engines => [ ] } }
+
+        it "should let the passed options override the class-level ones" do
+          expect_erb_not_processed
+        end
+      end
+    end
+
+  end
+
+  it "should properly inherit #css_options from superclasses" do
+    files {
+      file 'assets/basic.css', %{
+        //= require_parcels
+      }
+
+      widget 'views/parent_widget' do
+        class_text %{  css_options :engines => '.erb'}
+      end
+
+      widget 'views/child_widget', :superclass => 'Views::ParentWidget' do
+        requires %{views/parent_widget}
+        css %{p { background-image: url("foo-<%= 7 * 3 %>"); }}
+      end
+    }
+
+    expect_css_content_in('basic',
+      'views/child_widget.rb' => {
+        widget_scoped(:p) => "background-image: url(\"foo-21\")"
+      })
   end
 
   context "alongside files" do
-    it "should use engines specified by #css_engines"
-    it "should properly inherit #css_engines from superclasses"
+    it "should use engines specified by #css_options"
+    it "should properly inherit #css_options from superclasses"
   end
 
   it "should support multiple Sprockets engines (stringification, then ERb)" do
