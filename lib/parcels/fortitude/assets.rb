@@ -69,7 +69,7 @@ module Parcels
         def _parcels_alongside_css_fragments
           @_parcels_alongside_css_fragments ||= _parcels_alongside_filenames.map do |filename|
             if File.exist?(filename)
-              ::Parcels::Fragments::CssFragment.new(File.read(filename), self, filename, 1, { })
+              ::Parcels::Fragments::CssFragment.new(File.read(filename), self, filename, 1, _parcels_css_options)
             end
           end.compact
         end

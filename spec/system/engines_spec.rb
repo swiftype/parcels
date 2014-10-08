@@ -133,8 +133,68 @@ describe "Parcels engines support", :type => :system do
   end
 
   context "alongside files" do
-    it "should use engines specified by #css_options"
-    it "should properly inherit #css_options from superclasses"
+    it "should not process ERb, by default" do
+      files {
+        file 'assets/basic.css', %{
+          //= require_parcels
+        }
+
+        widget 'views/my_widget'
+        file 'views/my_widget.css', %{
+          p { background-image: url("foo-<%= 7 * 3 %>"); }
+        }
+      }
+
+      expect_css_content_in('basic',
+        'views/my_widget.css' => {
+          widget_scoped(:p) => 'background-image: url("foo-<%= 7 * 3 %>")'
+        })
+    end
+
+    it "should use engines specified by #css_options" do
+      files {
+        file 'assets/basic.css', %{
+          //= require_parcels
+        }
+
+        widget 'views/my_widget' do
+          class_text %{  css_options :engines => '.erb'}
+        end
+        file 'views/my_widget.css', %{
+          p { background-image: url("foo-<%= 7 * 3 %>"); }
+        }
+      }
+
+      expect_css_content_in('basic',
+        'views/my_widget.css' => {
+          widget_scoped(:p) => 'background-image: url("foo-21")'
+        })
+    end
+
+    it "should properly inherit #css_options from superclasses" do
+      files {
+        file 'assets/basic.css', %{
+          //= require_parcels
+        }
+
+        widget 'views/parent_widget' do
+          class_text %{  css_options :engines => '.erb'}
+        end
+
+        widget 'views/child_widget', :superclass => 'Views::ParentWidget' do
+          requires %{views/parent_widget}
+        end
+
+        file 'views/child_widget.css', %{
+          p { background-image: url("foo-<%= 7 * 3 %>"); }
+        }
+      }
+
+      expect_css_content_in('basic',
+        'views/child_widget.css' => {
+          widget_scoped(:p) => "background-image: url(\"foo-21\")"
+        })
+    end
   end
 
   it "should support multiple Sprockets engines (stringification, then ERb)" do

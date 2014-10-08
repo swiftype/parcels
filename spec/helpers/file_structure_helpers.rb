@@ -109,7 +109,7 @@ module FileStructureHelpers
       subpath += ".rb" unless subpath =~ /\.rb$/i
 
       widget_definition = WidgetDefinition.new(class_name, superclass, spec.this_example_root)
-      widget_definition.instance_eval(&block)
+      widget_definition.instance_eval(&block) if block
 
       @widgets[subpath] = widget_definition
     end
