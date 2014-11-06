@@ -1,10 +1,11 @@
 describe "Parcels Rails basic support", :type => :rails do
   uses_rails_with_template :basic_rails_spec
 
-  it "should allow providing some very simple CSS" do
+  it "should at least have a working Rails server" do
     expect_match("simple_css", /hello, world/)
   end
 
+  it "should allow providing some very simple CSS"
   it "should use Rails' asset search path for Sass @import"
   it "should support other features of sass-rails"
   it "should configure its SASS engine the same way that Rails does"

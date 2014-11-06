@@ -16,6 +16,6 @@ RSpec.configure do |c|
   c.include ParcelsRailsHelpers, :type => :rails
 
   c.before(:each) do |example|
-    set_up_per_example_data!(example)
+    set_up_per_example_data!(example) if example.metadata[:type] == :system
   end
 end
