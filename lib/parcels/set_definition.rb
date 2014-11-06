@@ -5,7 +5,7 @@ module Parcels
     attr_reader :name, :root
 
     def initialize(parcels_environment, name, root = nil, &block)
-      @name = name
+      @name = name.to_sym
       @parcels_environment = parcels_environment
       self.root = root if root
 

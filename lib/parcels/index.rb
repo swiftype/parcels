@@ -9,7 +9,7 @@ module Parcels
       @sets = { }
     end
 
-    delegate :root, :logical_path_for, :widget_roots, :to => :environment
+    delegate :root, :root=, :logical_path_for, :widget_roots, :widget_roots=, :define_set!, :to => :environment
 
     def set(name)
       sets[name] ||= ::Parcels::Set.new(environment.set_definition(name))
