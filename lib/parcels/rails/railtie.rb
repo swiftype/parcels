@@ -3,7 +3,7 @@ require "parcels"
 module Parcels
   module Rails
     class Railtie < ::Rails::Railtie
-      config.after_initialize do
+      initializer :parcels, :after => :append_assets_path do |app|
         parcels = ::Rails.application.assets.parcels
 
         parcels.root = ::Rails.root
