@@ -10,8 +10,10 @@ describe "Parcels Rails basic support", :type => :rails do
   end
 
   it "should contain the CSS in application.css due to the 'require_parcels' directive" do
-    data = rails_server.get("assets/application.css")
-    expect(data).to match(/xxx/i)
+    expect_css_content_in([ rails_server, 'assets/application.css' ],
+      'views/basic_rails_spec/simple_css.rb' => {
+        widget_scoped(:p) => 'color: green'
+      })
   end
 
   it "should use Rails' asset search path for Sass @import"

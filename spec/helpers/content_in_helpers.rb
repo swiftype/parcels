@@ -2,13 +2,17 @@ require 'nokogiri'
 
 module ContentInHelpers
   def asset_source(asset_path, options = { })
-    env = options[:sprockets_env] || sprockets_env
-    asset = env.find_asset(asset_path)
-    unless asset
-      raise "We expected to have an asset called #{asset_path.inspect}, but got none"
-    end
+    if asset_path.kind_of?(Array)
+      asset_source = asset_path[0].get(asset_path[1])
+    else
+      env = options[:sprockets_env] || sprockets_env
+      asset = env.find_asset(asset_path)
+      unless asset
+        raise "We expected to have an asset called #{asset_path.inspect}, but got none"
+      end
 
-    asset.source
+      asset.source
+    end
   end
 
   FROM_LINE_REGEXP = %r{^\s*\/\*\s*From[\s'"]*([^'"]+?)\s*[\s'"]*:\s*(\d+)\s*\*/\s*$}i
@@ -18,6 +22,7 @@ module ContentInHelpers
     source = asset_source(asset_path)
     file_to_content_map = { }
 
+    $stderr.puts "asset_source for #{asset_path.inspect}:\n#{source}"
     remaining = source
     last_source_file = :head
     last_source_line = nil

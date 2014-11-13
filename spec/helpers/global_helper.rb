@@ -7,8 +7,9 @@ require 'helpers/parcels_rails_helpers'
 require 'oop_rails_server'
 
 RSpec.configure do |c|
+  c.include ContentInHelpers
+
   c.include FileStructureHelpers, :type => :system
-  c.include ContentInHelpers, :type => :system
   c.include SprocketsHelpers, :type => :system
   c.include PerExampleHelpers, :type => :system
 
