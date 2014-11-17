@@ -1,4 +1,9 @@
-::BasicRailsSpec::Application.configure do
+root_dir = File.basename(File.dirname(File.dirname(File.dirname(__FILE__))))
+module_name = root_dir.camelize
+app_outer_module = module_name.constantize
+app_class = app_outer_module.const_get(:Application)
+
+app_class.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
