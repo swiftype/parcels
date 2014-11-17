@@ -16,19 +16,24 @@ module ContentInHelpers
   end
 
   FROM_LINE_REGEXP = %r{^\s*\/\*\s*From[\s'"]*([^'"]+?)\s*[\s'"]*:\s*(\d+)\s*\*/\s*$}i
+  RAILS_ADDITIONAL_LOCATION_LINE_REGEXP = %r{\A\s*/\*\s*line\s+\d+\s*,\s*/.*\s*\*/\s*$}i
   BREAK_LINE_REGEXP = %r{^\s*//\s*===\s*BREAK\s*===\s*$}i
 
   def file_content_in(asset_path)
     source = asset_source(asset_path)
     file_to_content_map = { }
 
-    $stderr.puts "asset_source for #{asset_path.inspect}:\n#{source}"
     remaining = source
     last_source_file = :head
     last_source_line = nil
     loop do
       remaining = remaining.strip
       break if remaining.length == 0
+
+      if (rails_additional_location_line_regexp_match = RAILS_ADDITIONAL_LOCATION_LINE_REGEXP.match(remaining))
+        remaining = remaining[(rails_additional_location_line_regexp_match.end(0) + 1)..-1]
+        next
+      end
 
       from_line_match = FROM_LINE_REGEXP.match(remaining)
 
@@ -59,7 +64,12 @@ module ContentInHelpers
       end
 
       last_source_file = from_line_match.captures[0]
-      if last_source_file[0..(this_example_root.length - 1)] == this_example_root
+      if asset_path.kind_of?(Array)
+        rails_root = asset_path[0].rails_root
+        if last_source_file[0..(rails_root.length - 1)] == rails_root
+          last_source_file = last_source_file[(rails_root.length + 1)..-1]
+        end
+      elsif last_source_file[0..(this_example_root.length - 1)] == this_example_root
         last_source_file = last_source_file[(this_example_root.length + 1)..-1]
       end
 
@@ -125,6 +135,16 @@ module ContentInHelpers
     "#{subpath_to_widget_class(subpath)._parcels_widget_outer_element_class}"
   end
 
+  def widget_outer_element_class_from_rails_subpath(subpath)
+    if subpath =~ %r{^app/(.*)}i
+      after_app = $1
+      after_app = $1 if after_app =~ %r{^(.*)\.rb$}i
+      "parcels_class__#{after_app.gsub('/', '__').underscore}"
+    else
+      raise "don't know what to do with Rails subpath that doesn't start with 'app/': #{subpath}"
+    end
+  end
+
   def expect_css_content_in(asset_path, expected_content)
     actual_content = css_content_in(asset_path)
     remaining_content = actual_content.dup
@@ -145,7 +165,12 @@ module ContentInHelpers
         expected_css_selector_array = Array(expected_css_selector_array)
 
         if expected_css_selector_array[0] == :_widget_scope
-          expected_css_selector_array = [ ".#{widget_outer_element_class_from_subpath(expected_path)}" ] + expected_css_selector_array[1..-1]
+          outer_element_class = if asset_path.kind_of?(Array)
+              widget_outer_element_class_from_rails_subpath(expected_path)
+            else
+              widget_outer_element_class_from_subpath(expected_path)
+            end
+          expected_css_selector_array = [ ".#{outer_element_class}" ] + expected_css_selector_array[1..-1]
         end
         expected_css_selector_array = expected_css_selector_array.map(&:to_s)
 
