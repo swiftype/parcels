@@ -15,8 +15,44 @@ module FileStructureHelpers
     end
   end
 
-  def path(*path_components)
-    File.expand_path(File.join(*path_components))
+  def this_example_root
+    per_example_data[:this_example_root] ||= clean_directory(this_spec_root, this_example_name)
+  end
+
+  def files(&block)
+    per_example_data[:file_set_fixture] ||= ::Spec::Fixtures::FileSet.new(this_example_root)
+    per_example_data[:file_set_fixture].instance_eval(&block)
+    per_example_data[:file_set_fixture].create!
+  end
+
+  private
+  def unload_all_classes!
+    fd = per_example_data[:file_set_fixture]
+    fd.unload_all_classes! if fd
+  end
+
+  def this_example_name
+    per_example_data[:this_example_name] ||= this_example.metadata[:full_description].strip.downcase.gsub(/[^A-Za-z0-9_]+/, '_')
+  end
+
+  def this_spec_root
+    per_example_data[:this_spec_root] ||= extant_directory(tempdir_root, this_spec_name)
+  end
+
+  def this_spec_name
+    per_example_data[:this_spec_name] ||= begin
+      name = self.class.name
+      name = $1 if name =~ /::([^:]+)$/i
+      name.strip.downcase.gsub(/[^A-Za-z0-9_]+/, '_')
+    end
+  end
+
+  def gem_root
+    per_example_data[:gem_root] ||= extant_directory(File.dirname(File.dirname(File.dirname(__FILE__))))
+  end
+
+  def tempdir_root
+    per_example_data[:tempdir_root] ||= extant_directory(gem_root, 'tmp', 'spec')
   end
 
   def extant_directory(*path_components)
@@ -32,42 +68,7 @@ module FileStructureHelpers
     p
   end
 
-  def gem_root
-    per_example_data[:gem_root] ||= extant_directory(File.dirname(File.dirname(File.dirname(__FILE__))))
-  end
-
-  def tempdir_root
-    per_example_data[:tempdir_root] ||= extant_directory(gem_root, 'tmp', 'spec')
-  end
-
-  def this_spec_name
-    per_example_data[:this_spec_name] ||= begin
-      name = self.class.name
-      name = $1 if name =~ /::([^:]+)$/i
-      name.strip.downcase.gsub(/[^A-Za-z0-9_]+/, '_')
-    end
-  end
-
-  def this_spec_root
-    per_example_data[:this_spec_root] ||= extant_directory(tempdir_root, this_spec_name)
-  end
-
-  def this_example_name
-    per_example_data[:this_example_name] ||= this_example.metadata[:full_description].strip.downcase.gsub(/[^A-Za-z0-9_]+/, '_')
-  end
-
-  def this_example_root
-    per_example_data[:this_example_root] ||= clean_directory(this_spec_root, this_example_name)
-  end
-
-  def files(&block)
-    per_example_data[:file_set_fixture] ||= ::Spec::Fixtures::FileSet.new(this_example_root)
-    per_example_data[:file_set_fixture].instance_eval(&block)
-    per_example_data[:file_set_fixture].create!
-  end
-
-  def unload_all_classes!
-    fd = per_example_data[:file_set_fixture]
-    fd.unload_all_classes! if fd
+  def path(*path_components)
+    File.expand_path(File.join(*path_components))
   end
 end
