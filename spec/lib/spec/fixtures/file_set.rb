@@ -4,8 +4,8 @@ require 'spec/fixtures/widget_file'
 module Spec
   module Fixtures
     class FileSet
-      def initialize(spec)
-        @spec = spec
+      def initialize(root_dir)
+        @root_dir = root_dir
         @files = { }
         @widgets = { }
       end
@@ -21,7 +21,7 @@ module Spec
         superclass = superclass.name if superclass.kind_of?(Class)
         subpath += ".rb" unless subpath =~ /\.rb$/i
 
-        widget_definition = ::Spec::Fixtures::WidgetFile.new(class_name, superclass, spec.this_example_root)
+        widget_definition = ::Spec::Fixtures::WidgetFile.new(class_name, superclass, root_dir)
         widget_definition.instance_eval(&block) if block
 
         @widgets[subpath] = widget_definition
@@ -29,13 +29,13 @@ module Spec
 
       def create!
         files.each do |subpath, contents|
-          full_path = File.join(spec.this_example_root, subpath)
+          full_path = File.join(root_dir, subpath)
           FileUtils.mkdir_p(File.dirname(full_path))
           File.open(full_path, 'w') { |f| f << contents }
         end
 
         widgets.each do |subpath, definition|
-          full_path = File.join(spec.this_example_root, subpath)
+          full_path = File.join(root_dir, subpath)
           FileUtils.mkdir_p(File.dirname(full_path))
           File.open(full_path, 'w') { |f| f << definition.source_text }
         end
@@ -46,8 +46,8 @@ module Spec
 
         subpaths.each do |subpath|
           next unless subpath =~ /\.rb$/i
-          full_path = File.join(spec.this_example_root, subpath)
-          widget_class = ::Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => spec.this_example_root) rescue nil
+          full_path = File.join(root_dir, subpath)
+          widget_class = ::Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => root_dir) rescue nil
 
           if widget_class
             parent = constant_name = nil
@@ -66,7 +66,7 @@ module Spec
       end
 
       private
-      attr_reader :spec, :files, :widgets
+      attr_reader :root_dir, :files, :widgets
     end
   end
 end

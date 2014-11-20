@@ -61,13 +61,13 @@ module FileStructureHelpers
   end
 
   def files(&block)
-    per_example_data[:file_definition] ||= ::Spec::Fixtures::FileSet.new(self)
-    per_example_data[:file_definition].instance_eval(&block)
-    per_example_data[:file_definition].create!
+    per_example_data[:file_set_fixture] ||= ::Spec::Fixtures::FileSet.new(this_example_root)
+    per_example_data[:file_set_fixture].instance_eval(&block)
+    per_example_data[:file_set_fixture].create!
   end
 
   def unload_all_classes!
-    fd = per_example_data[:file_definition]
+    fd = per_example_data[:file_set_fixture]
     fd.unload_all_classes! if fd
   end
 end
