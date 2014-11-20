@@ -1,3 +1,5 @@
+$: << File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+
 require 'parcels'
 require 'helpers/file_structure_helpers'
 require 'helpers/content_in_helpers'

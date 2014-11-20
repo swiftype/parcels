@@ -13,7 +13,7 @@ describe "Parcels dependency sorting", :type => :system do
       creation_sequence.each do |cs|
         seq = sequence[cs]
         superclass_num = sequence[cs - 1] if cs > 0
-        superclass = superclass_num ? "Views::Widget#{superclass_num}" : ::FileStructureHelpers::SpecWidget
+        superclass = superclass_num ? "Views::Widget#{superclass_num}" : ::Spec::Fixtures::WidgetBase
 
         widget "views/widget_#{seq}", :superclass => superclass do
           css %{
