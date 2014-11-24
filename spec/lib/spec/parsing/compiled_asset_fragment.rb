@@ -1,24 +1,24 @@
 module Spec
   module Parsing
     class CompiledAssetFragment
-      attr_reader :filename, :line_number
+      attr_reader :filename, :line_number, :source
 
       def initialize(compiled_asset, filename, line_number)
         @compiled_asset = compiled_asset
         @filename = filename
         @line_number = line_number
-        @content = nil
+        @source = nil
       end
 
-      def <<(content)
-        if (effective_content = content.strip) && effective_content.length > 0
-          @content ||= ""
-          @content << effective_content
+      def <<(source)
+        if (effective_source = source.strip) && effective_source.length > 0
+          @source ||= ""
+          @source << effective_source
         end
       end
 
       private
-      attr_reader :compiled_asset, :content
+      attr_reader :compiled_asset
     end
   end
 end
