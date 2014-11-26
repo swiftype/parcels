@@ -60,6 +60,10 @@ module Spec
         true
       end
 
+      def to_s
+        "<ExpectedAsset at #{expected_subpath.inspect}>"
+      end
+
       private
       attr_reader :root_directory, :expected_subpath, :expected_rules
 
@@ -74,7 +78,7 @@ module Spec
       def parcels_selector_prefix
         @parcels_selector_prefix ||= begin
           out = expected_subpath.dup
-          out = $1 if out =~ /^(.*)(\.html)?\.rb$/i
+          out = $1 if out =~ /^(.*)(\.html\.rb|\.rb|\.css)$/i
           out = out.gsub('/', '__').gsub(/[^A-Za-z0-9_]/, '_')
           "parcels_class__#{out}"
         end

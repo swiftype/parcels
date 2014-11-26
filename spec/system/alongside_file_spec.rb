@@ -19,10 +19,11 @@ describe "Parcels alongside files", :type => :system do
     end
 
     it "should aggregate the contents of that file" do
-      expect_css_content_in('basic',
-        'views/my_widget.css' => {
-          widget_scoped(:p) => "color: red"
-        })
+      compiled_sprockets_asset('basic').should_match(file_assets do
+        asset 'views/my_widget.css' do
+          expect_wrapped_rule :p, 'color: red'
+        end
+      end)
     end
   end
 
@@ -43,13 +44,15 @@ describe "Parcels alongside files", :type => :system do
       }
     }
 
-    expect_css_content_in('basic',
-      'views/my_widget.css' => {
-        widget_scoped(:div) => 'color: blue'
-      },
-      'views/my_widget.rb' => {
-        widget_scoped(:p) => 'color: green'
-      })
+    compiled_sprockets_asset('basic').should_match(file_assets do
+      asset 'views/my_widget.css' do
+        expect_wrapped_rule :div, 'color: blue'
+      end
+
+      asset 'views/my_widget.rb' do
+        expect_wrapped_rule :p, 'color: green'
+      end
+    end)
   end
 
   it "should not allow you to pick up the alongside file with a direct 'require'" do

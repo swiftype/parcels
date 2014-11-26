@@ -18,6 +18,10 @@ module Spec
         asset.source if asset
       end
 
+      def to_s
+        "<SprocketsAsset '#{asset_path}'>"
+      end
+
       private
       attr_reader :sprockets_env, :asset_path
 

@@ -23,19 +23,32 @@ module Spec
         @fragments unless @fragments == :none
       end
 
-      def assert_matches!(expected_asset)
-        raise "No fragments!" unless fragments
-        fragments_matching = fragments.select { |f| expected_asset.applies_to_asset?(f) }
+      def to_s
+        "<CompiledAsset for #{raw_asset}>"
+      end
 
-        if fragments_matching.length == 0
-          raise "Expected match not found:\n  #{expected_asset}\nnot found in\n  #{self}"
-        elsif fragments_matching.length == 1
-          fragment = fragments_matching.first
-          unless expected_asset.asset_matches?(fragment)
-            raise "Asset mismatch for #{fragment.where_from}:\n  #{expected_asset.source}\ndoes not match\n  #{fragment.source}"
+      def should_match(expected_asset_set)
+        remaining_fragments = (fragments || [ ]).dup
+        remaining_fragments = remaining_fragments.select { |f| (f.source || "").strip.length > 0 }
+
+        expected_asset_set.expected_assets.each do |expected_asset|
+          matching_remaining_fragments = remaining_fragments.select { |f| expected_asset.applies_to_asset?(f) }
+
+          if matching_remaining_fragments.length == 0
+            raise "Expected match not found:\n  #{expected_asset}\nnot found in\n  #{self}"
+          elsif matching_remaining_fragments.length == 1
+            matching_remaining_fragment = matching_remaining_fragments.first
+            unless expected_asset.asset_matches?(matching_remaining_fragment)
+              raise "Asset mismatch for #{matching_remaining_fragment.where_from}:\n  #{expected_asset.source}\ndoes not match\n  #{matching_remaining_fragment.source}"
+            end
+            remaining_fragments.delete(matching_remaining_fragment)
+          elsif matching_remaining_fragments.length > 1
+            raise "Multiple fragments match:\n  #{expected_asset}\nin\n  #{self}:\n#{matching_remaining_fragments.join("\n")}"
           end
-        elsif fragments_matching.length > 1
-          raise "Multiple fragments match:\n  #{expected_asset}\nin\n  #{self}"
+        end
+
+        if (! expected_asset_set.allows_additional?) && (remaining_fragments.length > 0)
+          raise "Unexpected fragments found in\n  #{self}:\nThese were found just fine:\n  #{expected_asset_set}\nbut we also found:\n  #{remaining_fragments.join("\n  ")}"
         end
       end
 

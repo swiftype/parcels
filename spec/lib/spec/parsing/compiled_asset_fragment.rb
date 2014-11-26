@@ -21,6 +21,10 @@ module Spec
         end
       end
 
+      def to_s
+        "<CompiledAssetFragment: #{filename.inspect}, line #{line_number.inspect}>"
+      end
+
       private
       attr_reader :compiled_asset
     end
