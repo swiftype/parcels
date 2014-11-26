@@ -25,6 +25,11 @@ module FileStructureHelpers
     per_example_data[:file_set_fixture].create!
   end
 
+  def files_root(file_set_fixture = nil)
+    file_set_fixture ||= per_example_data[:file_set_fixture]
+    file_set_fixture.root_dir
+  end
+
   private
   def unload_all_classes!
     fd = per_example_data[:file_set_fixture]

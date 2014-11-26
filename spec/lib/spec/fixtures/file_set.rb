@@ -4,6 +4,8 @@ require 'spec/fixtures/widget_file'
 module Spec
   module Fixtures
     class FileSet
+      attr_reader :root_dir
+
       def initialize(root_dir)
         @root_dir = root_dir
         @files = { }
@@ -66,7 +68,7 @@ module Spec
       end
 
       private
-      attr_reader :root_dir, :files, :widgets
+      attr_reader :files, :widgets
     end
   end
 end

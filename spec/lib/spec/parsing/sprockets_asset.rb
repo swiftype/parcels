@@ -6,6 +6,10 @@ module Spec
         @asset_path = asset_path
       end
 
+      def where_from
+        "raw Sprockets asset '#{asset_path}'"
+      end
+
       def exists?
         !! asset
       end

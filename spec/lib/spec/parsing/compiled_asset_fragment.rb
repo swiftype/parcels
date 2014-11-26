@@ -10,6 +10,10 @@ module Spec
         @source = nil
       end
 
+      def where_from
+        "fragment at #{filename.inspect}, line #{line_number} from #{compiled_asset.where_from}"
+      end
+
       def <<(source)
         if (effective_source = source.strip) && effective_source.length > 0
           @source ||= ""

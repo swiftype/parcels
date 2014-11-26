@@ -7,6 +7,10 @@ module Spec
         @raw_asset = raw_asset
       end
 
+      def where_from
+        "compiled asset for #{raw_asset.where_from}"
+      end
+
       def fragments
         @fragments ||= begin
           if (raw_source = raw_asset.source)
@@ -17,6 +21,22 @@ module Spec
         end
 
         @fragments unless @fragments == :none
+      end
+
+      def assert_matches!(expected_asset)
+        raise "No fragments!" unless fragments
+        fragments_matching = fragments.select { |f| expected_asset.applies_to_asset?(f) }
+
+        if fragments_matching.length == 0
+          raise "Expected match not found:\n  #{expected_asset}\nnot found in\n  #{self}"
+        elsif fragments_matching.length == 1
+          fragment = fragments_matching.first
+          unless expected_asset.asset_matches?(fragment)
+            raise "Asset mismatch for #{fragment.where_from}:\n  #{expected_asset.source}\ndoes not match\n  #{fragment.source}"
+          end
+        elsif fragments_matching.length > 1
+          raise "Multiple fragments match:\n  #{expected_asset}\nin\n  #{self}"
+        end
       end
 
       private

@@ -7,6 +7,30 @@ module Spec
         @raw_asset = raw_asset
       end
 
+      def style_rules
+        @style_rules ||= begin
+          out = { }
+
+          parse_tree.each do |toplevel_parse_node|
+            if toplevel_parse_node[:node] == :style_rule
+              selector_node = toplevel_parse_node[:selector]
+              selector = selector_node[:value]
+              rules = [ ]
+
+              toplevel_parse_node[:children].each do |child|
+                if child[:node] == :property
+                  rules << "#{child[:name]}: #{child[:value]}"
+                end
+              end
+
+              out[selector] = rules if rules.length > 0
+            end
+          end
+
+          out
+        end
+      end
+
       private
       attr_reader :raw_asset
 
