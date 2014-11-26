@@ -71,7 +71,7 @@ describe "Parcels alongside files", :type => :system do
       }
     }
 
-    expect { css_content_in('one') }.to raise_error(::Sprockets::FileNotFound, %r{views/my_widget\.css}i)
+    expect { compiled_sprockets_asset('one').source }.to raise_error(::Sprockets::FileNotFound, %r{views/my_widget\.css}i)
   end
 
   it "should allow you to pick up the alongside file with a 'require' using '_parcels/', and it should not be wrapped" do
@@ -90,9 +90,10 @@ describe "Parcels alongside files", :type => :system do
       }
     }
 
-    expect_css_content_in('one',
-      :head => {
-        :p => 'color: red'
-      })
+    compiled_sprockets_asset('one').should_match(file_assets do
+      asset :head do
+        expect_rule :p, 'color: red'
+      end
+    end)
   end
 end

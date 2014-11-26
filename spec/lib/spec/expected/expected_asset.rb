@@ -27,6 +27,7 @@ module Spec
       end
 
       def expect_rules(selector, *rules)
+        selector = selector.to_s
         expected_rules[selector] ||= [ ]
         expected_rules[selector] += rules
       end
@@ -68,7 +69,13 @@ module Spec
       attr_reader :root_directory, :expected_subpath, :expected_rules
 
       def filename
-        @filename ||= File.join(root_directory, expected_subpath)
+        @filename ||= begin
+          if expected_subpath.kind_of?(Symbol)
+            expected_subpath
+          else
+            File.join(root_directory, expected_subpath)
+          end
+        end
       end
 
       def extra_rules_allowed?

@@ -14,7 +14,7 @@ module Spec
           parse_tree.each do |toplevel_parse_node|
             if toplevel_parse_node[:node] == :style_rule
               selector_node = toplevel_parse_node[:selector]
-              selector = selector_node[:value]
+              selector = selector_node[:value].to_s
               rules = [ ]
 
               toplevel_parse_node[:children].each do |child|

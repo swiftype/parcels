@@ -23,6 +23,10 @@ module Spec
         @fragments unless @fragments == :none
       end
 
+      def source
+        raw_asset.source
+      end
+
       def to_s
         "<CompiledAsset for #{raw_asset}>"
       end
