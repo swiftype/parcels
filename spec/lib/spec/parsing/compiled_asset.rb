@@ -1,12 +1,11 @@
+require 'spec/parsing/compiled_asset_fragment'
+
 module Spec
   module Parsing
     class CompiledAsset
       def initialize(raw_asset)
         @raw_asset = raw_asset
       end
-
-      private
-      attr_reader :raw_asset, :fragments
 
       def fragments
         @fragments ||= begin
@@ -20,6 +19,9 @@ module Spec
         @fragments unless @fragments == :none
       end
 
+      private
+      attr_reader :raw_asset
+
       FROM_LINE_REGEXP = %r{^\s*\/\*\s*From[\s'"]*([^'"]+?)\s*[\s'"]*:\s*(\d+)\s*\*/\s*$}i
       BREAK_LINE_REGEXP = %r{^\s*//\s*===\s*BREAK\s*===\s*$}i
 
@@ -32,9 +34,10 @@ module Spec
 
         while remaining && remaining.length > 0
           if (from_line_match = FROM_LINE_REGEXP.match(remaining))
-            current_fragment << remaining[0..(from_line_match.begin(0) - 1)]
+            current_fragment << remaining[0..(from_line_match.begin(0) - 1)] if from_line_match.begin(0) > 0
             current_fragment = ::Spec::Parsing::CompiledAssetFragment.new(
               self, from_line_match.captures[0], Integer(from_line_match.captures[1]))
+            out << current_fragment
             remaining = remaining[(from_line_match.end(0) + 1)..-1]
           else
             if (break_line_match = BREAK_LINE_REGEXP.match(remaining))
@@ -49,6 +52,8 @@ module Spec
             remaining = nil
           end
         end
+
+        out
       end
     end
   end
