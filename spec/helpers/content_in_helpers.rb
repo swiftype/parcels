@@ -218,7 +218,6 @@ module ContentInHelpers
     widget_class = subpath_to_widget_class(widget_subpath)
     html = widget_class.new(args).to_html
     out = Nokogiri::HTML(html)
-
     out = out.xpath('/html/body') if options.fetch(:extract_body_contents, true)
     out
   end

@@ -61,6 +61,15 @@ module Spec
         true
       end
 
+      def parcels_wrapping_class
+        @parcels_wrapping_class ||= begin
+          out = expected_subpath.dup
+          out = $1 if out =~ /^(.*)(\.html\.rb|\.rb|\.css)$/i
+          out = out.gsub('/', '__').gsub(/[^A-Za-z0-9_]/, '_')
+          "parcels_class__#{out}"
+        end
+      end
+
       def to_s
         "<ExpectedAsset at #{expected_subpath.inspect}>"
       end
@@ -82,17 +91,8 @@ module Spec
         !! @allow_extra_rules
       end
 
-      def parcels_selector_prefix
-        @parcels_selector_prefix ||= begin
-          out = expected_subpath.dup
-          out = $1 if out =~ /^(.*)(\.html\.rb|\.rb|\.css)$/i
-          out = out.gsub('/', '__').gsub(/[^A-Za-z0-9_]/, '_')
-          "parcels_class__#{out}"
-        end
-      end
-
       def wrap_selector(selector)
-        ".#{parcels_selector_prefix} #{selector}"
+        ".#{parcels_wrapping_class} #{selector}"
       end
     end
   end
