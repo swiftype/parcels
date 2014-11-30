@@ -17,4 +17,15 @@ module NewAssetHelpers
   def file_assets(&block)
     ::Spec::Expected::ExpectedAssetSet.new(files_root, &block)
   end
+
+  def render_file_asset(subpath, args = { }, options = { })
+    subpath = $1 if subpath =~ %r{^(.*?)\.[^/]+$}i
+    full_path = File.join(files_root, subpath)
+    full_path += ".rb" unless full_path =~ /\.rb\s*$/i
+    widget_class = Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => files_root)
+    html = widget_class.new(args).to_html
+    out = Nokogiri::HTML(html)
+    out = out.xpath('/html/body') if options.fetch(:extract_body_contents, true)
+    out
+  end
 end
