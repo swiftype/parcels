@@ -17,8 +17,4 @@ module NewAssetHelpers
   def file_assets(&block)
     ::Spec::Expected::ExpectedAssetSet.new(files_root, &block)
   end
-
-  def expect_file_asset_in(compiled_asset_name, subpath, &block)
-    compiled_sprockets_asset(compiled_asset_name).assert_matches!(expected_file_asset(subpath, &block))
-  end
 end

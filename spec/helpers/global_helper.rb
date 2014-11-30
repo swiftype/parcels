@@ -12,6 +12,7 @@ require 'helpers/sprockets_helpers'
 require 'helpers/per_example_helpers'
 require 'helpers/parcels_rails_helpers'
 require 'helpers/new_asset_helpers'
+require 'helpers/new_rails_helpers'
 
 require 'oop_rails_server'
 
@@ -19,7 +20,8 @@ RSpec.configure do |c|
   c.include ContentInHelpers
   c.include PerExampleHelpers
   c.include FileStructureHelpers
-  c.include NewAssetHelpers
+  c.include NewAssetHelpers, :type => :system
+  c.include NewRailsHelpers, :type => :rails
 
   c.include SprocketsHelpers, :type => :system
 

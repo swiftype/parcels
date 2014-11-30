@@ -40,7 +40,7 @@ module Spec
           matching_remaining_fragments = remaining_fragments.select { |f| expected_asset.applies_to_asset?(f) }
 
           if matching_remaining_fragments.length == 0
-            raise "Expected match not found:\n  #{expected_asset}\nnot found in\n  #{self}"
+            raise "Expected match not found:\n  #{expected_asset}\nnot found in\n  #{self}; have these assets:\n    #{remaining_fragments.join("\n    ")}"
           elsif matching_remaining_fragments.length == 1
             matching_remaining_fragment = matching_remaining_fragments.first
 

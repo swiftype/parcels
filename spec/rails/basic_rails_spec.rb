@@ -6,14 +6,18 @@ describe "Parcels Rails basic support", :type => :rails do
   end
 
   it "should wrap a simple widget in a class" do
-    expect_match("simple_css", /<p class="parcels_class__views__basic_rails_spec__simple_css">hello, world<\/p>/)
+    expected_class = expected_rails_asset('views/basic_rails_spec/simple_css.rb').parcels_wrapping_class
+    expect_match("simple_css", /<p class="#{Regexp.escape(expected_class)}">hello, world<\/p>/)
   end
 
   it "should contain the CSS in application.css due to the 'require_parcels' directive" do
-    expect_css_content_in([ rails_server, 'assets/application.css' ],
-      'app/views/basic_rails_spec/simple_css.rb' => {
-        widget_scoped => 'color: green'
-      })
+    asset = compiled_rails_asset('application.css')
+
+    asset.should_match(rails_assets do
+      asset 'views/basic_rails_spec/simple_css.rb' do
+        expect_wrapped_rule nil, 'color: green'
+      end
+    end)
   end
 
   it "should use Rails' asset search path for Sass @import"

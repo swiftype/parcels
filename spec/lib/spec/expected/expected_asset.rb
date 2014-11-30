@@ -92,7 +92,11 @@ module Spec
       end
 
       def wrap_selector(selector)
-        ".#{parcels_wrapping_class} #{selector}"
+        if selector
+          ".#{parcels_wrapping_class} #{selector}"
+        else
+          ".#{parcels_wrapping_class}"
+        end
       end
     end
   end
