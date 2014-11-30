@@ -7,17 +7,23 @@ module Spec
         @compiled_asset = compiled_asset
         @filename = filename
         @line_number = line_number
-        @source = nil
+        @raw_source = nil
       end
 
       def where_from
         "fragment at #{filename.inspect}, line #{line_number} from #{compiled_asset.where_from}"
       end
 
+      def source
+        out = @raw_source
+        out = out.gsub(%r{/\*.*?\*/}mi, '') if out
+        out unless (! out) || (out.strip.length == 0)
+      end
+
       def <<(source)
         if (effective_source = source.strip) && effective_source.length > 0
-          @source ||= ""
-          @source << effective_source
+          @raw_source ||= ""
+          @raw_source << effective_source
         end
       end
 
