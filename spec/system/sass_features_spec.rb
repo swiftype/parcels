@@ -12,10 +12,11 @@ describe "Parcels SASS features support", :type => :system do
       end
     }
 
-    expect_css_content_in('basic',
-      'views/my_widget.rb' => {
-        widget_scoped(:p) => "color: #fff2f7"
-      })
+    compiled_sprockets_asset('basic').should_match(file_assets do
+      asset 'views/my_widget.rb' do
+        expect_wrapped_rule :p, 'color: #fff2f7'
+      end
+    end)
   end
 
   it "should allow using variables" do
@@ -32,10 +33,11 @@ describe "Parcels SASS features support", :type => :system do
       end
     }
 
-    expect_css_content_in('basic',
-      'views/my_widget.rb' => {
-        widget_scoped(:p) => "color: #feabcd"
-      })
+    compiled_sprockets_asset('basic').should_match(file_assets do
+      asset 'views/my_widget.rb' do
+        expect_wrapped_rule :p, 'color: #feabcd'
+      end
+    end)
   end
 
   it "should let you use @import, which should use the asset search path, by default" do
@@ -62,11 +64,12 @@ describe "Parcels SASS features support", :type => :system do
       end
     }
 
-    expect_css_content_in('basic',
-      'views/my_widget.rb' => {
-        widget_scoped(:p) => "color: #feabcd",
-        widget_scoped(:div) => "color: #abcdef"
-      })
+    compiled_sprockets_asset('basic').should_match(file_assets do
+      asset 'views/my_widget.rb' do
+        expect_wrapped_rule :p, 'color: #feabcd'
+        expect_wrapped_rule :div, 'color: #abcdef'
+      end
+    end)
   end
 
   it "should let you add to the asset search path and use that with @import" do
@@ -95,10 +98,11 @@ describe "Parcels SASS features support", :type => :system do
       end
     }
 
-    expect_css_content_in('basic',
-      'views/my_widget.rb' => {
-        widget_scoped(:p) => "color: #feabcd",
-        widget_scoped(:div) => "color: #abcdef"
-      })
+    compiled_sprockets_asset('basic').should_match(file_assets do
+      asset 'views/my_widget.rb' do
+        expect_wrapped_rule :p, 'color: #feabcd'
+        expect_wrapped_rule :div, 'color: #abcdef'
+      end
+    end)
   end
 end
