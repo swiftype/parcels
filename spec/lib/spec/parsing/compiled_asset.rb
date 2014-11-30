@@ -43,7 +43,7 @@ module Spec
           elsif matching_remaining_fragments.length == 1
             matching_remaining_fragment = matching_remaining_fragments.first
             unless expected_asset.asset_matches?(matching_remaining_fragment)
-              raise "Asset mismatch for #{matching_remaining_fragment.where_from}:\n  #{expected_asset.source}\ndoes not match\n  #{matching_remaining_fragment.source}"
+              raise "Asset mismatch for #{matching_remaining_fragment.where_from}: expected\n  #{expected_asset.source}\ndoes not match actual\n  #{matching_remaining_fragment.source}"
             end
             remaining_fragments.delete(matching_remaining_fragment)
           elsif matching_remaining_fragments.length > 1

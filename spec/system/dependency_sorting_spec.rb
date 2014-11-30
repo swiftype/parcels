@@ -15,32 +15,31 @@ describe "Parcels dependency sorting", :type => :system do
         superclass_num = sequence[cs - 1] if cs > 0
         superclass = superclass_num ? "Views::Widget#{superclass_num}" : ::Spec::Fixtures::WidgetBase
 
-        widget "views/widget_#{seq}", :superclass => superclass do
+        widget "views/widget#{seq}", :superclass => superclass do
           css %{
             p { color: #0000#{'%02d' % seq}; }
           }
         end
 
-        file   "views/widget_#{seq}.css", %{
+        file   "views/widget#{seq}.css", %{
           div { color: #FFFF#{'%02d' % seq}; }
         }
       end
     }
 
-    sequence.each { |s| require File.join(this_example_root, "views/widget_#{s}") }
+    sequence.each { |s| require File.join(this_example_root, "views/widget#{s}") }
 
-    expected_content = { }
+    compiled_sprockets_asset('basic').should_match(file_assets do
+      sequence.each do |seq|
+        asset "views/widget#{seq}.css" do
+          expect_wrapped_rule :div, "color: #FFFF#{'%02d' % seq}"
+        end
 
-    sequence.each do |seq|
-      expected_content["views/widget_#{seq}.css"] = {
-        widget_scoped(:div) => "color: #FFFF#{'%02d' % seq}"
-      }
-      expected_content["views/widget_#{seq}.rb"] = {
-        widget_scoped(:p) => "color: #0000#{'%02d' % seq}"
-      }
-    end
-
-    expect_css_content_in('basic', expected_content)
+        asset "views/widget#{seq}.rb" do
+          expect_wrapped_rule :p, "color: #0000#{'%02d' % seq}"
+        end
+      end
+    end)
 
 
     actual_order = [ ]
@@ -49,10 +48,10 @@ describe "Parcels dependency sorting", :type => :system do
     order.each_with_index do |order_data, index|
       filename = order_data[:filename]
 
-      if filename =~ %r{^views/widget_(\d+)\.rb$}i
+      if filename =~ %r{^views/widget(\d+)\.rb$}i
         num = Integer($1)
         actual_order << [ num, :rb ]
-      elsif filename =~ %r{^views/widget_(\d+)\.css$}i
+      elsif filename =~ %r{^views/widget(\d+)\.css$}i
         num = Integer($1)
         actual_order << [ num, :css ]
       else
