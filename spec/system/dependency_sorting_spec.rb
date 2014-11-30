@@ -29,8 +29,10 @@ describe "Parcels dependency sorting", :type => :system do
 
     sequence.each { |s| require File.join(this_example_root, "views/widget#{s}") }
 
-    compiled_sprockets_asset('basic').should_match(file_assets do
+    compiled_sprockets_asset('basic').should_match((file_assets do
       sequence.each do |seq|
+        # It's important that we keep .css before .rb here -- because we want CSS in the .rb file (_i.e._, directly
+        # in the widget class itself) to take priority over CSS in the .css alongside file.
         asset "views/widget#{seq}.css" do
           expect_wrapped_rule :div, "color: #FFFF#{'%02d' % seq}"
         end
@@ -39,29 +41,6 @@ describe "Parcels dependency sorting", :type => :system do
           expect_wrapped_rule :p, "color: #0000#{'%02d' % seq}"
         end
       end
-    end)
-
-
-    actual_order = [ ]
-
-    order = css_content_order_in('basic')
-    order.each_with_index do |order_data, index|
-      filename = order_data[:filename]
-
-      if filename =~ %r{^views/widget(\d+)\.rb$}i
-        num = Integer($1)
-        actual_order << [ num, :rb ]
-      elsif filename =~ %r{^views/widget(\d+)\.css$}i
-        num = Integer($1)
-        actual_order << [ num, :css ]
-      else
-        raise "Got unexpected ordering data: filename is #{filename.inspect}"
-      end
-    end
-
-    expected_order = [ ]
-    sequence.each { |s| expected_order += [ [ s, :css ], [ s, :rb ] ] }
-
-    expect(actual_order).to eq(expected_order)
+    end), :ordered => true)
   end
 end
