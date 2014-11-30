@@ -12,17 +12,19 @@ describe "Parcels engines support", :type => :system do
     let(:class_text) { nil }
 
     def expect_erb_not_processed
-      expect_css_content_in('basic',
-        'views/my_widget.rb' => {
-          widget_scoped(:p) => "background-image: url(\"foo-<%= 3 * 7 %>\")"
-        })
+      compiled_sprockets_asset('basic').should_match(file_assets do
+        asset 'views/my_widget.rb' do
+          expect_wrapped_rule :p, 'background-image: url("foo-<%= 3 * 7 %>")'
+        end
+      end)
     end
 
     def expect_erb_processed
-      expect_css_content_in('basic',
-        'views/my_widget.rb' => {
-          widget_scoped(:p) => "background-image: url(\"foo-21\")"
-        })
+      compiled_sprockets_asset('basic').should_match(file_assets do
+        asset 'views/my_widget.rb' do
+          expect_wrapped_rule :p, 'background-image: url("foo-21")'
+        end
+      end)
     end
 
     before :each do
@@ -126,10 +128,11 @@ describe "Parcels engines support", :type => :system do
       end
     }
 
-    expect_css_content_in('basic',
-      'views/child_widget.rb' => {
-        widget_scoped(:p) => "background-image: url(\"foo-21\")"
-      })
+    compiled_sprockets_asset('basic').should_match(file_assets do
+      asset 'views/child_widget.rb' do
+        expect_wrapped_rule :p, 'background-image: url("foo-21")'
+      end
+    end)
   end
 
   context "alongside files" do
@@ -145,10 +148,11 @@ describe "Parcels engines support", :type => :system do
         }
       }
 
-      expect_css_content_in('basic',
-        'views/my_widget.css' => {
-          widget_scoped(:p) => 'background-image: url("foo-<%= 7 * 3 %>")'
-        })
+      compiled_sprockets_asset('basic').should_match(file_assets do
+        asset 'views/my_widget.css' do
+          expect_wrapped_rule :p, 'background-image: url("foo-<%= 7 * 3 %>")'
+        end
+      end)
     end
 
     it "should use engines specified by #css_options" do
@@ -165,10 +169,11 @@ describe "Parcels engines support", :type => :system do
         }
       }
 
-      expect_css_content_in('basic',
-        'views/my_widget.css' => {
-          widget_scoped(:p) => 'background-image: url("foo-21")'
-        })
+      compiled_sprockets_asset('basic').should_match(file_assets do
+        asset 'views/my_widget.css' do
+          expect_wrapped_rule :p, 'background-image: url("foo-21")'
+        end
+      end)
     end
 
     it "should properly inherit #css_options from superclasses" do
@@ -190,10 +195,11 @@ describe "Parcels engines support", :type => :system do
         }
       }
 
-      expect_css_content_in('basic',
-        'views/child_widget.css' => {
-          widget_scoped(:p) => "background-image: url(\"foo-21\")"
-        })
+      compiled_sprockets_asset('basic').should_match(file_assets do
+        asset 'views/child_widget.css' do
+          expect_wrapped_rule :p, 'background-image: url("foo-21")'
+        end
+      end)
     end
   end
 
@@ -210,10 +216,11 @@ describe "Parcels engines support", :type => :system do
       end
     }
 
-    expect_css_content_in('basic',
-      'views/my_widget.rb' => {
-        widget_scoped(:p) => "background-image: url(\"21\")"
-      })
+    compiled_sprockets_asset('basic').should_match(file_assets do
+      asset 'views/my_widget.rb' do
+        expect_wrapped_rule :p, 'background-image: url("21")'
+      end
+    end)
   end
 
   it "should support multiple Sprockets engines (ERb, then stringification)" do
@@ -229,9 +236,10 @@ describe "Parcels engines support", :type => :system do
       end
     }
 
-    expect_css_content_in('basic',
-      'views/my_widget.rb' => {
-        widget_scoped(:p) => "background-image: url(\"<%= 7 * 3 %>\")"
-      })
+    compiled_sprockets_asset('basic').should_match(file_assets do
+      asset 'views/my_widget.rb' do
+        expect_wrapped_rule :p, 'background-image: url("<%= 7 * 3 %>")'
+      end
+    end)
   end
 end
