@@ -27,6 +27,48 @@ describe "Parcels alongside files", :type => :system do
     end
   end
 
+  context "with a widget ending in .rb and an alongside file ending in .html.css" do
+    before :each do
+      files {
+        file 'assets/basic.css', %{
+          //= require_parcels
+        }
+
+        widget('views/my_widget') { }
+        file   'views/my_widget.html.css', %{
+          p { color: red; }
+        }
+      }
+    end
+
+    it "should not aggregate that alongside file" do
+      compiled_sprockets_asset('basic').should_match(file_assets do
+        asset_must_not_be_present 'views/my_widget.html.css'
+      end)
+    end
+  end
+
+  context "with a widget ending in .html.rb and an alongside file ending in .css" do
+    before :each do
+      files {
+        file 'assets/basic.css', %{
+          //= require_parcels
+        }
+
+        widget('views/my_widget.html') { }
+        file   'views/my_widget.css', %{
+          p { color: red; }
+        }
+      }
+    end
+
+    it "should not aggregate that alongside file" do
+      compiled_sprockets_asset('basic').should_match(file_assets do
+        asset_must_not_be_present 'views/my_widget.css'
+      end)
+    end
+  end
+
   context "with a widget ending in .html.rb, and an alongside file ending in .html.css" do
     before :each do
       files {
