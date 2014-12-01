@@ -27,11 +27,15 @@ class DevelopmentModeRailsSpecController < ApplicationController
     # nothing here
   end
 
-  def adding_import_file
+  def changing_import_file
     # nothing here
   end
 
-  def changing_import_file
+  def adding_widget
+    # nothing here
+  end
+
+  def removing_widget
     # nothing here
   end
 end

@@ -172,4 +172,66 @@ describe "Parcels Rails development-mode support", :type => :rails do
       allow_additional_assets!
     end)
   end
+
+  it "should allow changing an implicitly-imported file, and respect that change"
+
+  it "should allow adding a widget, along with an alongside file" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset_must_not_be_present('views/development_mode_rails_spec/added_widget.rb')
+      asset_must_not_be_present('views/development_mode_rails_spec/added_widget.css')
+      allow_additional_assets!
+    end)
+
+    add_at_path('app/views/development_mode_rails_spec/added_widget.rb', <<-EOS)
+class Views::DevelopmentModeRailsSpec::AddedWidget < Views::Widgets::Base
+  css %{
+    p { color: blue; }
+  }
+
+  def content
+    p "nothing here"
+  end
+end
+EOS
+    add_at_path('app/views/development_mode_rails_spec/added_widget.css', <<-EOS)
+div { color: purple; }
+EOS
+
+    sleep 1
+
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/added_widget.rb' do
+        expect_wrapped_rule :p, 'color: blue'
+      end
+
+      asset 'views/development_mode_rails_spec/added_widget.css' do
+        expect_wrapped_rule :div, 'color: purple'
+      end
+
+      allow_additional_assets!
+    end)
+  end
+
+  it "should allow removing a widget, along with an alongside file" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/removing_widget.rb' do
+        expect_wrapped_rule :p, 'color: cyan'
+      end
+
+      asset 'views/development_mode_rails_spec/removing_widget.css' do
+        expect_wrapped_rule :div, 'color: green'
+      end
+
+      allow_additional_assets!
+    end)
+
+    remove_at_path('app/views/development_mode_rails_spec/removing_widget.rb')
+    remove_at_path('app/views/development_mode_rails_spec/removing_widget.css')
+
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset_must_not_be_present('views/development_mode_rails_spec/removing_widget.rb')
+      asset_must_not_be_present('views/development_mode_rails_spec/removing_widget.css')
+      allow_additional_assets!
+    end)
+  end
 end
