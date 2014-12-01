@@ -48,7 +48,7 @@ describe "Parcels alongside files", :type => :system do
 
     it "should aggregate the contents of that file" do
       compiled_sprockets_asset('basic').should_match(file_assets do
-        asset 'views/my_widget.rb.css' do
+        asset 'views/my_widget.html.css' do
           expect_wrapped_rule :p, 'color: red'
         end
       end)

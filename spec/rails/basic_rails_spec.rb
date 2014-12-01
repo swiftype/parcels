@@ -20,6 +20,9 @@ describe "Parcels Rails basic support", :type => :rails do
     end)
   end
 
+  it "should support both inline and alongside CSS on a .rb widget"
+  it "should support both inline and alongside CSS on a .html.rb widget"
+
   it "should allow precompiling assets with 'rake'" do
     rails_server.run_command_in_rails_root!("rake assets:precompile")
 
