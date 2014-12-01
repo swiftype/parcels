@@ -37,7 +37,22 @@ describe "Parcels Rails SASS support", :type => :rails do
     end)
   end
 
-  it "should support other features of sass-rails"
+  it "should support other features of sass-rails" do
+    asset = compiled_rails_asset('application.css')
+
+    asset.should_match(rails_assets do
+      asset 'views/sass_rails_spec/other_features.rb' do
+        expect_wrapped_rule :p, 'color: #050709'
+      end
+
+      asset 'views/sass_rails_spec/other_features.css' do
+        expect_wrapped_rule :div, 'color: #040608'
+      end
+
+      allow_additional_assets!
+    end)
+  end
+
   it "should configure its SASS engine the same way that Rails does"
   it "should let you add SASS imports in a sane, shared location, and make them available wherever"
 end
