@@ -66,7 +66,7 @@ describe "Parcels Rails development-mode support", :type => :rails do
 
   it "should allow adding inline CSS for a widget" do
     compiled_rails_asset('application.css').should_match(rails_assets do
-      # nothing here yet
+      asset_must_not_be_present('views/development_mode_rails_spec/adding_inline_css.rb')
       allow_additional_assets!
     end)
 
@@ -91,7 +91,7 @@ describe "Parcels Rails development-mode support", :type => :rails do
     substitute_at_path('app/views/development_mode_rails_spec/removing_inline_css.rb', 'css %{p { color: magenta; }}', '# NO MORE CSS!')
 
     compiled_rails_asset('application.css').should_match(rails_assets do
-      # nothing here yet
+      asset_must_not_be_present('views/development_mode_rails_spec/removing_inline_css.rb')
       allow_additional_assets!
     end)
   end

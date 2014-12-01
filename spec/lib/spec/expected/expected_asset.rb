@@ -1,12 +1,12 @@
 require 'spec/parsing/parsed_css_asset'
-require 'awesome_print'
+
+require 'spec/expected/base_expected_asset'
 
 module Spec
   module Expected
-    class ExpectedAsset
+    class ExpectedAsset < BaseExpectedAsset
       def initialize(root_directory, expected_subpath, &block)
-        @root_directory = root_directory
-        @expected_subpath = expected_subpath
+        super(root_directory, expected_subpath)
 
         @expected_rules = { }
         @allow_extra_rules = false
@@ -43,9 +43,8 @@ module Spec
         @allow_extra_rules = true
       end
 
-
       def should_match(remaining_assets)
-        matching_remaining_assets = remaining_assets.select { |f| applies_to_asset?(f) }
+        matching_remaining_assets = applicable_assets_from(remaining_assets)
 
         if matching_remaining_assets.length == 0
           raise "Expected match not found:\n  #{self}\nnot found in these assets:\n    #{remaining_assets.join("\n    ")}"
@@ -62,9 +61,6 @@ module Spec
         end
       end
 
-
-
-
       def parcels_wrapping_class
         @parcels_wrapping_class ||= begin
           out = expected_subpath.dup
@@ -74,22 +70,8 @@ module Spec
         end
       end
 
-      def to_s
-        "<ExpectedAsset at #{expected_subpath.inspect}>"
-      end
-
       private
-      attr_reader :root_directory, :expected_subpath, :expected_rules
-
-      def filename
-        @filename ||= begin
-          if expected_subpath.kind_of?(Symbol)
-            expected_subpath
-          else
-            File.join(root_directory, expected_subpath)
-          end
-        end
-      end
+      attr_reader :expected_rules
 
       def extra_rules_allowed?
         !! @allow_extra_rules
@@ -101,10 +83,6 @@ module Spec
         else
           ".#{parcels_wrapping_class}"
         end
-      end
-
-      def applies_to_asset?(asset)
-        asset.filename == filename
       end
 
       def asset_matches?(asset)

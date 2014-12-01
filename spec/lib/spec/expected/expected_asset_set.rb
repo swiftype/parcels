@@ -1,4 +1,5 @@
 require 'spec/expected/expected_asset'
+require 'spec/expected/must_not_be_present_asset'
 
 module Spec
   module Expected
@@ -13,6 +14,11 @@ module Spec
 
       def asset(subpath, &block)
         expected_asset = Spec::Expected::ExpectedAsset.new(root_directory, subpath, &block)
+        @expected_assets << expected_asset
+      end
+
+      def asset_must_not_be_present(subpath)
+        expected_asset = Spec::Expected::MustNotBePresentAsset.new(root_directory, subpath)
         @expected_assets << expected_asset
       end
 
