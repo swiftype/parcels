@@ -11,6 +11,10 @@ describe "Parcels basic operations", :type => :system do
             p { color: red; }
           }
         end
+
+        file 'views/my_widget.css', %{
+          div { color: blue; }
+        }
       }
     end
 
@@ -18,6 +22,10 @@ describe "Parcels basic operations", :type => :system do
       compiled_sprockets_asset('basic').should_match(file_assets do
         asset 'views/my_widget.rb' do
           expect_wrapped_rule :p, 'color: red'
+        end
+
+        asset 'views/my_widget.css' do
+          expect_wrapped_rule :div, 'color: blue'
         end
       end)
     end
@@ -40,6 +48,10 @@ describe "Parcels basic operations", :type => :system do
             p { color: red; }
           }
         end
+
+        file 'views/my_widget.html.css', %{
+          div { color: blue; }
+        }
       }
     end
 
@@ -47,6 +59,10 @@ describe "Parcels basic operations", :type => :system do
       compiled_sprockets_asset('basic').should_match(file_assets do
         asset 'views/my_widget.html.rb' do
           expect_wrapped_rule :p, 'color: red'
+        end
+
+        asset 'views/my_widget.html.css' do
+          expect_wrapped_rule :div, 'color: blue'
         end
       end)
     end
