@@ -64,7 +64,7 @@ module Spec
       def parcels_wrapping_class
         @parcels_wrapping_class ||= begin
           out = expected_subpath.dup
-          out = $1 if out =~ /^(.*)(\.html\.rb|\.rb|\.css)$/i
+          out = $1 if out =~ /^(.*?)\.([^\/]+)$/i
           out = out.gsub('/', '__').gsub(/[^A-Za-z0-9_]/, '_')
           "parcels_class__#{out}"
         end

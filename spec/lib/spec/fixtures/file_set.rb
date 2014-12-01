@@ -18,7 +18,13 @@ module Spec
       end
 
       def widget(subpath, options = { }, &block)
-        class_name = options[:class_name] || subpath.camelize
+        class_name = options[:class_name]
+        class_name ||= begin
+          out = subpath
+          out = $1 if out =~ /^(.*)(\.[A-Z0-9_]+)+$/i
+          out = out.camelize
+          out
+        end
         superclass = options[:superclass] || ::Spec::Fixtures::WidgetBase
         superclass = superclass.name if superclass.kind_of?(Class)
         subpath += ".rb" unless subpath =~ /\.rb$/i

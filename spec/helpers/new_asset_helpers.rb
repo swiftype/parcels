@@ -19,7 +19,7 @@ module NewAssetHelpers
   end
 
   def render_file_asset(subpath, args = { }, options = { })
-    subpath = $1 if subpath =~ %r{^(.*?)\.[^/]+$}i
+    subpath = $1 if subpath =~ %r{^(.*?)\.rb$}i
     full_path = File.join(files_root, subpath)
     full_path += ".rb" unless full_path =~ /\.rb\s*$/i
     widget_class = Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => files_root)
