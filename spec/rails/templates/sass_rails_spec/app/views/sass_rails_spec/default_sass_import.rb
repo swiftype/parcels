@@ -9,6 +9,6 @@ class Views::SassRailsSpec::DefaultSassImport < Views::Widgets::Base
   }
 
   def content
-    text "Rails asset paths:\n  #{Rails.application.config.assets.paths.join("\n  ")}"
+    text "hello, world"
   end
 end

@@ -16,12 +16,27 @@ describe "Parcels Rails SASS support", :type => :rails do
         expect_wrapped_rule :h2, 'color: #12abcd'
         expect_wrapped_rule :h3, 'color: #13abcd'
       end
-    end)
 
-    expect_match("default_sass_import", /XXX/)
+      allow_additional_assets!
+    end)
   end
 
-  it "should let you change Rails' asset search path, and use that for Sass @import"
+  it "should let you change Rails' asset search path, and use that for Sass @import" do
+    asset = compiled_rails_asset('application.css')
+
+    asset.should_match(rails_assets do
+      asset 'views/sass_rails_spec/added_asset_path.rb' do
+        expect_wrapped_rule :p, 'color: #a0b1c2'
+      end
+
+      asset 'views/sass_rails_spec/added_asset_path.css' do
+        expect_wrapped_rule :div, 'color: #a0b1c2'
+      end
+
+      allow_additional_assets!
+    end)
+  end
+
   it "should support other features of sass-rails"
   it "should configure its SASS engine the same way that Rails does"
   it "should let you add SASS imports in a sane, shared location, and make them available wherever"
