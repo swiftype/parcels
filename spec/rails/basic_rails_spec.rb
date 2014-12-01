@@ -31,7 +31,12 @@ describe "Parcels Rails basic support", :type => :rails do
     end)
   end
 
-  it "should not pick up alongside files if there is no corresponding widget class"
+  it "should not pick up alongside files if there is no corresponding widget class" do
+    compiled_rails_asset('application.css') do
+      asset_must_not_be_present('views/basic_rails_spec/no_corresponding_widget.css')
+      allow_additional_assets!
+    end
+  end
 
   it "should use Rails' asset search path for Sass @import"
   it "should let you change Rails' asset search path, and use that for Sass @import"
