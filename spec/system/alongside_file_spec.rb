@@ -125,5 +125,24 @@ describe "Parcels alongside files", :type => :system do
     end)
   end
 
-  it "should not pick up alongside files if there is no corresponding widget class"
+  it "should not pick up alongside files if there is no corresponding widget class" do
+    files {
+      file 'assets/basic.css', %{
+        //= require_parcels
+      }
+
+      file   'views/my_widget.css', %{
+        p { color: red; }
+      }
+
+      file   'views/another_widget.html.css', %{
+        div { color: green; }
+      }
+    }
+
+    compiled_sprockets_asset('one').should_match(file_assets do
+      asset_must_not_be_present 'views/my_widget.css'
+      asset_must_not_be_present 'views/another_widget.css'
+    end)
+  end
 end
