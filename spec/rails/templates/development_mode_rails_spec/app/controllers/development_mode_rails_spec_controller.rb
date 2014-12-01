@@ -26,4 +26,8 @@ class DevelopmentModeRailsSpecController < ApplicationController
   def removing_alongside_css
     # nothing here
   end
+
+  def adding_import_file
+    # nothing here
+  end
 end
