@@ -1,0 +1,6 @@
+@import "eleven";
+@import "twelve";
+@import "thirteen";
+h1 { color: $mycolor11; }
+h2 { color: $mycolor12; }
+h3 { color: $mycolor13; }

@@ -1,7 +1,7 @@
 describe "Parcels Rails SASS support", :type => :rails do
   uses_rails_with_template :sass_rails_spec
 
-  it "should use Rails' asset search path for Sass @import in inline CSS" do
+  it "should use Rails' asset search path for Sass @import in inline CSS and alongside CSS" do
     asset = compiled_rails_asset('application.css')
 
     asset.should_match(rails_assets do
@@ -9,6 +9,12 @@ describe "Parcels Rails SASS support", :type => :rails do
         expect_wrapped_rule :p, 'color: #afedcb'
         expect_wrapped_rule :div, 'color: #0b1c2d'
         expect_wrapped_rule :span, 'color: #9a8b7c'
+      end
+
+      asset 'views/sass_rails_spec/default_sass_import.css' do
+        expect_wrapped_rule :h1, 'color: #11abcd'
+        expect_wrapped_rule :h2, 'color: #12abcd'
+        expect_wrapped_rule :h3, 'color: #13abcd'
       end
     end)
 
