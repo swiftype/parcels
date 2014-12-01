@@ -173,6 +173,34 @@ describe "Parcels Rails development-mode support", :type => :rails do
     end)
   end
 
-  it "should allow changing a file used by @import"
+  it "should allow changing a file used by @import" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/changing_import_file.rb' do
+        expect_wrapped_rule :p, 'color: #123456'
+      end
+
+      asset 'views/development_mode_rails_spec/changing_import_file.css' do
+        expect_wrapped_rule :div, 'color: #234567'
+      end
+
+      allow_additional_assets!
+    end)
+
+    substitute_at_path('app/assets/stylesheets/changingone.scss', '123456', '456789')
+    substitute_at_path('app/assets/stylesheets/changingtwo.scss', '234567', '567890')
+
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/changing_import_file.rb' do
+        expect_wrapped_rule :p, 'color: #456789'
+      end
+
+      asset 'views/development_mode_rails_spec/changing_import_file.css' do
+        expect_wrapped_rule :div, 'color: #567890'
+      end
+
+      allow_additional_assets!
+    end)
+  end
+
   it "should allow removing a file used by @import"
 end

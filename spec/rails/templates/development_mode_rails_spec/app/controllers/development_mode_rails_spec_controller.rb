@@ -30,4 +30,8 @@ class DevelopmentModeRailsSpecController < ApplicationController
   def adding_import_file
     # nothing here
   end
+
+  def changing_import_file
+    # nothing here
+  end
 end
