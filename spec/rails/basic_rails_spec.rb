@@ -20,7 +20,18 @@ describe "Parcels Rails basic support", :type => :rails do
     end)
   end
 
-  it "should allow precompiling assets with 'rake'"
+  it "should allow precompiling assets with 'rake'" do
+    rails_server.run_command_in_rails_root!("rake assets:precompile")
+
+    asset = precompiled_rails_asset('application.css')
+    asset.should_match(rails_assets do
+      asset 'views/basic_rails_spec/simple_css.rb' do
+        expect_wrapped_rule nil, 'color: green'
+      end
+    end)
+  end
+
+  it "should not pick up alongside files if there is no corresponding widget class"
 
   it "should use Rails' asset search path for Sass @import"
   it "should let you change Rails' asset search path, and use that for Sass @import"
