@@ -18,4 +18,12 @@ class DevelopmentModeRailsSpecController < ApplicationController
   def removing_inline_css
     # nothing here
   end
+
+  def adding_alongside_css
+    # nothing here
+  end
+
+  def removing_alongside_css
+    # nothing here
+  end
 end

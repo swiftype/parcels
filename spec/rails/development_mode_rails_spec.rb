@@ -1,3 +1,5 @@
+require 'fileutils'
+
 describe "Parcels Rails development-mode support", :type => :rails do
   uses_rails_with_template :development_mode_rails_spec, :rails_env => :development
 
@@ -26,6 +28,20 @@ describe "Parcels Rails development-mode support", :type => :rails do
 
     File.open(path, 'w') { |f| f << new_contents }
     sleep 1
+  end
+
+  def add_at_path(subpath, what)
+    path = File.join(rails_server.rails_root, subpath)
+    raise "Path should not exist, but does: #{path.inspect}" if File.exist?(path)
+
+    FileUtils.mkdir_p(File.dirname(path))
+    File.open(path, 'w') { |f| f << what }
+  end
+
+  def remove_at_path(subpath)
+    path = File.join(rails_server.rails_root, subpath)
+    raise "Path should exist, but doesn't: #{path.inspect}" unless File.exist?(path)
+    File.delete(path)
   end
 
   it "should allow changing inline CSS for a widget" do
@@ -96,8 +112,37 @@ describe "Parcels Rails development-mode support", :type => :rails do
     end)
   end
 
-  it "should allow adding alongside CSS for a widget"
-  it "should allow removing alongside CSS for a widget"
+  it "should allow adding alongside CSS for a widget" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset_must_not_be_present('views/development_mode_rails_spec/adding_alongside_css.css')
+      allow_additional_assets!
+    end)
+
+    add_at_path('app/views/development_mode_rails_spec/adding_alongside_css.css', "p { color: cyan; }")
+
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/adding_alongside_css.css' do
+        expect_wrapped_rule :p, 'color: cyan'
+      end
+      allow_additional_assets!
+    end)
+  end
+
+  it "should allow removing alongside CSS for a widget" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/removing_alongside_css.css' do
+        expect_wrapped_rule :p, 'color: yellow'
+      end
+      allow_additional_assets!
+    end)
+
+    remove_at_path('app/views/development_mode_rails_spec/removing_alongside_css.css')
+
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset_must_not_be_present('views/development_mode_rails_spec/removing_alongside_css.css')
+      allow_additional_assets!
+    end)
+  end
 
   it "should allow adding a file used by @import"
   it "should allow changing a file used by @import"

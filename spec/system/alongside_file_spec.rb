@@ -96,4 +96,6 @@ describe "Parcels alongside files", :type => :system do
       end
     end)
   end
+
+  it "should not pick up alongside files if there is no corresponding widget class"
 end
