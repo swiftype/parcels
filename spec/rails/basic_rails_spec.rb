@@ -17,11 +17,37 @@ describe "Parcels Rails basic support", :type => :rails do
       asset 'views/basic_rails_spec/simple_css.rb' do
         expect_wrapped_rule nil, 'color: green'
       end
+      allow_additional_assets!
     end)
   end
 
-  it "should support both inline and alongside CSS on a .rb widget"
-  it "should support both inline and alongside CSS on a .html.rb widget"
+  it "should support both inline and alongside CSS on a .rb widget" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/basic_rails_spec/alongside_and_inline.rb' do
+        expect_wrapped_rule :p, 'color: green'
+      end
+
+      asset 'views/basic_rails_spec/alongside_and_inline.css' do
+        expect_wrapped_rule :div, 'color: blue'
+      end
+
+      allow_additional_assets!
+    end)
+  end
+
+  it "should support both inline and alongside CSS on a .html.rb widget" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/basic_rails_spec/alongside_and_inline_html.html.rb' do
+        expect_wrapped_rule :p, 'color: yellow'
+      end
+
+      asset 'views/basic_rails_spec/alongside_and_inline_html.html.css' do
+        expect_wrapped_rule :div, 'color: purple'
+      end
+
+      allow_additional_assets!
+    end)
+  end
 
   it "should allow precompiling assets with 'rake'" do
     rails_server.run_command_in_rails_root!("rake assets:precompile")
@@ -31,6 +57,7 @@ describe "Parcels Rails basic support", :type => :rails do
       asset 'views/basic_rails_spec/simple_css.rb' do
         expect_wrapped_rule nil, 'color: green'
       end
+      allow_additional_assets!
     end)
   end
 
