@@ -43,23 +43,27 @@ module Spec
         @allow_extra_rules = true
       end
 
-      def applies_to_asset?(asset)
-        asset.filename == filename
-      end
 
-      def asset_matches?(asset)
-        parsed_asset = ::Spec::Parsing::ParsedCssAsset.new(asset)
+      def should_match(remaining_assets)
+        matching_remaining_assets = remaining_assets.select { |f| applies_to_asset?(f) }
 
-        actual_rules = parsed_asset.style_rules.dup
+        if matching_remaining_assets.length == 0
+          raise "Expected match not found:\n  #{self}\nnot found in these assets:\n    #{remaining_assets.join("\n    ")}"
+        elsif matching_remaining_assets.length == 1
+          matching_remaining_asset = matching_remaining_assets.first
 
-        expected_rules.each do |expected_selector, expected_rules_for_this_selector|
-          actual_rules_for_this_selector = actual_rules[expected_selector]
-          return false unless actual_rules_for_this_selector
-          return false unless actual_rules_for_this_selector == expected_rules_for_this_selector
+          unless asset_matches?(matching_remaining_asset)
+            raise "Asset mismatch for #{matching_remaining_asset.where_from}: expected\n  #{source}\ndoes not match actual\n  #{matching_remaining_asset.source}"
+          end
+
+          [ matching_remaining_asset ]
+        elsif matching_remaining_assets.length > 1
+          raise "Multiple assets match:\n  #{self}\nin:\n#{matching_remaining_assets.join("\n")}"
         end
-
-        true
       end
+
+
+
 
       def parcels_wrapping_class
         @parcels_wrapping_class ||= begin
@@ -97,6 +101,24 @@ module Spec
         else
           ".#{parcels_wrapping_class}"
         end
+      end
+
+      def applies_to_asset?(asset)
+        asset.filename == filename
+      end
+
+      def asset_matches?(asset)
+        parsed_asset = ::Spec::Parsing::ParsedCssAsset.new(asset)
+
+        actual_rules = parsed_asset.style_rules.dup
+
+        expected_rules.each do |expected_selector, expected_rules_for_this_selector|
+          actual_rules_for_this_selector = actual_rules[expected_selector]
+          return false unless actual_rules_for_this_selector
+          return false unless actual_rules_for_this_selector == expected_rules_for_this_selector
+        end
+
+        true
       end
     end
   end

@@ -37,21 +37,10 @@ module Spec
 
         found_indices = [ ]
         expected_asset_set.expected_assets.each do |expected_asset|
-          matching_remaining_fragments = remaining_fragments.select { |f| expected_asset.applies_to_asset?(f) }
-
-          if matching_remaining_fragments.length == 0
-            raise "Expected match not found:\n  #{expected_asset}\nnot found in\n  #{self}; have these assets:\n    #{remaining_fragments.join("\n    ")}"
-          elsif matching_remaining_fragments.length == 1
-            matching_remaining_fragment = matching_remaining_fragments.first
-
-            unless expected_asset.asset_matches?(matching_remaining_fragment)
-              raise "Asset mismatch for #{matching_remaining_fragment.where_from}: expected\n  #{expected_asset.source}\ndoes not match actual\n  #{matching_remaining_fragment.source}"
-            end
-
-            found_indices << fragments.index(matching_remaining_fragment)
-            remaining_fragments.delete(matching_remaining_fragment)
-          elsif matching_remaining_fragments.length > 1
-            raise "Multiple fragments match:\n  #{expected_asset}\nin\n  #{self}:\n#{matching_remaining_fragments.join("\n")}"
+          matched_fragments = expected_asset.should_match(remaining_fragments)
+          matched_fragments.each do |matched_fragment|
+            found_indices << fragments.index(matched_fragment)
+            remaining_fragments.delete(matched_fragment)
           end
         end
 
