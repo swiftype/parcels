@@ -64,8 +64,38 @@ describe "Parcels Rails development-mode support", :type => :rails do
     end)
   end
 
-  it "should allow adding inline CSS for a widget"
-  it "should allow removing inline CSS for a widget"
+  it "should allow adding inline CSS for a widget" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      # nothing here yet
+      allow_additional_assets!
+    end)
+
+    substitute_at_path('app/views/development_mode_rails_spec/adding_inline_css.rb', '# CSS_WILL_GO_HERE', "css %{p { color: yellow } }")
+
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/adding_inline_css.rb' do
+        expect_wrapped_rule :p, 'color: yellow'
+      end
+      allow_additional_assets!
+    end)
+  end
+
+  it "should allow removing inline CSS for a widget" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/removing_inline_css.rb' do
+        expect_wrapped_rule :p, 'color: magenta'
+      end
+      allow_additional_assets!
+    end)
+
+    substitute_at_path('app/views/development_mode_rails_spec/removing_inline_css.rb', 'css %{p { color: magenta; }}', '# NO MORE CSS!')
+
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      # nothing here yet
+      allow_additional_assets!
+    end)
+  end
+
   it "should allow adding alongside CSS for a widget"
   it "should allow removing alongside CSS for a widget"
 
