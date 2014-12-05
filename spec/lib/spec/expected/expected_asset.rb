@@ -47,7 +47,11 @@ module Spec
         matching_remaining_assets = applicable_assets_from(remaining_assets)
 
         if matching_remaining_assets.length == 0
-          raise "Expected match not found:\n  #{self}\nnot found in these assets:\n    #{remaining_assets.join("\n    ")}"
+          message = "Expected match not found:\n  #{self}\nnot found in these assets:"
+          remaining_assets.each do |remaining_asset|
+            message << "\n\n    #{remaining_asset}:\n        #{remaining_asset.source}\n"
+          end
+          raise message
         elsif matching_remaining_assets.length == 1
           matching_remaining_asset = matching_remaining_assets.first
 

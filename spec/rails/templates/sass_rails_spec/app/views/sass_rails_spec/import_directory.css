@@ -1,0 +1,3 @@
+@import "the_import_dir_2/*";
+span { color: $the_import_dir_2_color_1; }
+section { color: $the_import_dir_2_color_2; }

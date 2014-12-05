@@ -46,3 +46,23 @@ end
 
   alias_method_chain :format_extension, :parcels
 end
+
+::Sprockets::SassImporter.class_eval do
+  if defined?(::Sprockets::SassImporter::GLOB)
+    def find_relative_with_parcels(name, base, options)
+      if name =~ ::Sprockets::SassImporter::GLOB# && _parcels_is_under_parcels_root?(base)
+        parcels = context.environment.parcels
+
+        imports = nil
+        options[:load_paths].each do |load_path|
+          imports = glob_imports(name, Pathname.new(load_path.to_s + "/dummy"), :load_paths => [ load_path ])
+          return imports if imports
+        end
+      end
+
+      return find_relative_without_parcels(name, base, options)
+    end
+
+    alias_method_chain :find_relative, :parcels
+  end
+end

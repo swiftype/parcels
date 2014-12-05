@@ -16,6 +16,11 @@ module Parcels
       self.widget_roots = [ self.root ]
     end
 
+    def is_underneath_root?(filename)
+      filename = File.expand_path(filename)
+      @root && filename.length > @root.length && filename[0..(@root.length - 1)] == @root
+    end
+
     def root=(new_root)
       @root = File.expand_path(new_root)
     end
