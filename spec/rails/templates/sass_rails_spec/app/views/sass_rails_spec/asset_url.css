@@ -1,0 +1,2 @@
+span { background: url(image-url('baz/quux.jpg')); }
+section { background: url(asset-data-url('quux/foo.png')); }

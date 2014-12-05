@@ -61,7 +61,11 @@ module Spec
 
           [ matching_remaining_asset ]
         elsif matching_remaining_assets.length > 1
-          raise "Multiple assets match:\n  #{self}\nin:\n#{matching_remaining_assets.join("\n")}"
+          message = "Multiple assets match:\n  #{self}\nin:"
+          matching_remaining_assets.each do |matching_remaining_asset|
+            message << "\n\n    #{matching_remaining_asset}:\n        #{matching_remaining_asset.source}\n"
+          end
+          raise message
         end
       end
 

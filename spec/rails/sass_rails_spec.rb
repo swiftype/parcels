@@ -71,7 +71,41 @@ describe "Parcels Rails SASS support", :type => :rails do
     end)
   end
 
-  it "should support 'asset-path', 'asset-url', 'image-url', 'asset-data-url', etc."
+  it "should also allow you to import entire directories of files, relative to the view itself, using 'import \"foo/*\"" do
+    asset = compiled_rails_asset('application.css')
+
+    asset.should_match(rails_assets do
+      asset 'views/sass_rails_spec/import_view_relative_directory.rb' do
+        expect_wrapped_rule :p, 'color: #1a1a1a'
+        expect_wrapped_rule :div, 'color: #2a2a2a'
+      end
+
+      asset 'views/sass_rails_spec/import_view_relative_directory.css' do
+        expect_wrapped_rule :span, 'color: #1b1b1b'
+        expect_wrapped_rule :section, 'color: #2b2b2b'
+      end
+
+      allow_additional_assets!
+    end)
+  end
+
+  it "should support 'asset-path', 'asset-url', 'image-url', 'asset-data-url', etc." do
+    asset = compiled_rails_asset('application.css')
+
+    asset.should_match(rails_assets do
+      asset 'views/sass_rails_spec/asset_url.rb' do
+        expect_wrapped_rule :p, 'background: url(xxx)'
+        expect_wrapped_rule :div, 'background: url(yyy)'
+      end
+
+      asset 'views/sass_rails_spec/asset_url.css' do
+        expect_wrapped_rule :span, 'background: url(zzz)'
+        expect_wrapped_rule :section, 'background: url(aaa)'
+      end
+
+      allow_additional_assets!
+    end)
+  end
 
   it "should let you add SASS imports in a sane, shared location, and make them available wherever"
 end

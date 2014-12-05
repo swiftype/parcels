@@ -14,4 +14,12 @@ class SassRailsSpecController < ApplicationController
   def import_directory
     # nothing here
   end
+
+  def import_view_relative_directory
+    # nothing here
+  end
+
+  def asset_url
+    # nothing here
+  end
 end

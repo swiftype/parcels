@@ -1,0 +1,3 @@
+@import "vr_import_dir_2/*";
+span { color: $vr_import_dir_2_color_1; }
+section { color: $vr_import_dir_2_color_2; }
