@@ -22,6 +22,10 @@ module Parcels
         wrapped?
       end
 
+      def to_s
+        "<#{self.class.name.demodulize}: from '#{file}', line #{line}>"
+      end
+
       def to_css(parcels_environment, context)
         scss = css_string
 

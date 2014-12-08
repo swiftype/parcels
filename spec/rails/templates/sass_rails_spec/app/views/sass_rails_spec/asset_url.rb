@@ -1,7 +1,7 @@
-class Views::SassRailsSpec::ImportDirectory < Views::Widgets::Base
+class Views::SassRailsSpec::AssetUrl < Views::Widgets::Base
   css %{
     p { background: url(asset-path('foo/bar.jpg')); }
-    div { background: url(asset-url('bar/baz.png')); }
+    div { background: asset-url('bar/baz.png'); }
   }
 
   def content
