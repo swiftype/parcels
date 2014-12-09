@@ -7,6 +7,7 @@ module Spec
         @root_dir = root_dir
         @css = [ ]
         @css_prefix_text = nil
+        @css_prefix_block = nil
         @requires = [ ]
         @class_text = [ ]
       end
@@ -20,6 +21,10 @@ module Spec
 
       def parcels_css_prefix(css_prefix_text)
         @css_prefix_text = css_prefix_text
+      end
+
+      def parcels_css_prefix_block(css_prefix_block)
+        @css_prefix_block = css_prefix_block
       end
 
       def content(content_text)
@@ -46,8 +51,10 @@ module Spec
 
         text += @class_text
 
-        if @css_prefix_text
-          text += [ "  def self.parcels_css_prefix", "    out = <<-EOS", @css_prefix_text, "EOS", "    out", "  end" ]
+        if @css_prefix_block
+          text += [ "  parcels_css_prefix #{@css_prefix_block}" ]
+        elsif @css_prefix_text
+          text += [ "  parcels_css_prefix <<-EOS", @css_prefix_text, "EOS" ]
         end
 
         @css.each do |data|

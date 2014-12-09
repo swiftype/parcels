@@ -68,7 +68,7 @@ module Parcels
 
         def _parcels_alongside_css_fragments
           @_parcels_alongside_css_fragments ||= begin
-            options = { :prefix => parcels_css_prefix }.merge(_parcels_css_options)
+            options = { :prefix => _parcels_get_css_prefix }.merge(_parcels_css_options)
             _parcels_alongside_filenames.map do |filename|
               if File.exist?(filename)
                 ::Parcels::Fragments::CssFragment.new(File.read(filename), self, filename, 1, options)
@@ -126,7 +126,7 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
 #{superclasses.map(&:name).join("\n")}}
           end
 
-          options = { :prefix => parcels_css_prefix }
+          options = { :prefix => _parcels_get_css_prefix }
           options.merge!(css_strings.extract_options!)
 
           caller_line = caller[0]
@@ -144,8 +144,27 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           end
         end
 
-        def parcels_css_prefix
-          nil
+        def parcels_css_prefix(prefix = nil, &block)
+          if (prefix && block)
+            raise ArgumentError, "You can supply either a String or a block, but not both; you passed: #{prefix.inspect} and #{block.inspect}"
+          end
+
+          if (prefix != nil) && (! prefix.kind_of?(String))
+            raise ArgumentError, "Invalid prefix (must be a String, or nil): #{prefix.inspect}"
+          end
+
+          @_parcels_css_prefix = prefix || block
+        end
+
+        def _parcels_get_css_prefix
+          out = @_parcels_css_prefix
+
+          if out.respond_to?(:call)
+            superclass_prefix = superclass._parcels_get_css_prefix if superclass.respond_to?(:_parcels_get_css_prefix)
+            out = out.call(self, superclass_prefix)
+          end
+
+          out
         end
       end
     end
