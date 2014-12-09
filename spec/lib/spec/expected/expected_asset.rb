@@ -101,7 +101,25 @@ module Spec
         expected_rules.each do |expected_selector, expected_rules_for_this_selector|
           actual_rules_for_this_selector = actual_rules[expected_selector]
           return false unless actual_rules_for_this_selector
-          return false unless actual_rules_for_this_selector == expected_rules_for_this_selector
+
+          matches = (actual_rules_for_this_selector.length == expected_rules_for_this_selector.length)
+          if matches
+            actual_rules_for_this_selector.each_with_index do |actual_rule, index|
+              expected_rule = expected_rules_for_this_selector[index]
+
+              this_matches = if expected_rule.kind_of?(String)
+                actual_rule == expected_rule
+              elsif expected_rule.kind_of?(Regexp)
+                actual_rule =~ expected_rule
+              else
+                false
+              end
+
+              matches &&= this_matches
+            end
+          end
+
+          return false unless matches
         end
 
         true

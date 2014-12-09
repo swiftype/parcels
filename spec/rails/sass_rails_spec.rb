@@ -94,13 +94,13 @@ describe "Parcels Rails SASS support", :type => :rails do
 
     asset.should_match(rails_assets do
       asset 'views/sass_rails_spec/asset_url.rb' do
-        expect_wrapped_rule :p, 'background: url(xxx)'
-        expect_wrapped_rule :div, 'background: url(yyy)'
+        expect_wrapped_rule :p, 'background: url("/foo/bar.jpg")'
+        expect_wrapped_rule :div, 'background: url(/bar/baz.png)'
       end
 
       asset 'views/sass_rails_spec/asset_url.css' do
-        expect_wrapped_rule :span, 'background: url(zzz)'
-        expect_wrapped_rule :section, 'background: url(aaa)'
+        expect_wrapped_rule :span, 'background: url(/images/baz/quux.jpg)'
+        expect_wrapped_rule :section, /^background:\s+url\(data:image\/png;base64,/
       end
 
       allow_additional_assets!

@@ -1,2 +1,2 @@
-span { background: url(image-url('baz/quux.jpg')); }
-section { background: url(asset-data-url('quux/foo.png')); }
+span { background: image-url('baz/quux.jpg'); }
+section { background: asset-data-url('quux/foo.png'); }
