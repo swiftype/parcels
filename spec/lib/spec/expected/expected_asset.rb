@@ -117,9 +117,15 @@ module Spec
 
               matches &&= this_matches
             end
+
+            actual_rules.delete(expected_selector)
           end
 
           return false unless matches
+        end
+
+        if actual_rules.length > 0 && (! extra_rules_allowed?)
+          return false
         end
 
         true
