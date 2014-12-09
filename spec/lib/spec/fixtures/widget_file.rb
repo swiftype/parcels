@@ -6,6 +6,7 @@ module Spec
         @superclass = superclass
         @root_dir = root_dir
         @css = [ ]
+        @css_prefix_text = nil
         @requires = [ ]
         @class_text = [ ]
       end
@@ -15,6 +16,10 @@ module Spec
           :text => css_text,
           :options => options[:options]
         }
+      end
+
+      def parcels_css_prefix(css_prefix_text)
+        @css_prefix_text = css_prefix_text
       end
 
       def content(content_text)
@@ -40,6 +45,10 @@ module Spec
         text << "class #{class_name} < ::#{superclass}"
 
         text += @class_text
+
+        if @css_prefix_text
+          text += [ "  def self.parcels_css_prefix", "    out = <<-EOS", @css_prefix_text, "EOS", "    out", "  end" ]
+        end
 
         @css.each do |data|
           css_text = data[:text]

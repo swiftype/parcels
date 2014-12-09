@@ -9,7 +9,7 @@ module Parcels
       end
 
       def initialize(css_string, source, file, line, options)
-        options.assert_valid_keys(:engines, :wrap)
+        options.assert_valid_keys(:engines, :wrap, :prefix)
 
         @css_string = css_string
         @source = source
@@ -23,7 +23,7 @@ module Parcels
       end
 
       def to_s
-        "<#{self.class.name.demodulize}: from '#{file}', line #{line}>"
+        "<#{self.class.name.demodulize}: from '#{file}', line #{line}, options #{options.inspect}>"
       end
 
       def to_css(parcels_environment, context)
@@ -33,6 +33,14 @@ module Parcels
           scss = %{.#{wrapper_css_class} {
     #{scss}
   }}
+        end
+
+        if options[:prefix]
+          if options[:prefix].kind_of?(String)
+            scss = "#{options[:prefix]}\n\n#{scss}"
+          else
+            raise "You supplied a parcels_css_prefix (or a :prefix option) that wasn't a String, but, rather: #{options[:prefix].inspect}"
+          end
         end
 
         asset_attributes = ::Sprockets::AssetAttributes.new(parcels_environment.sprockets_environment, synthetic_filename)

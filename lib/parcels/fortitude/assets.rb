@@ -67,9 +67,12 @@ module Parcels
         end
 
         def _parcels_alongside_css_fragments
-          @_parcels_alongside_css_fragments ||= _parcels_alongside_filenames.map do |filename|
-            if File.exist?(filename)
-              ::Parcels::Fragments::CssFragment.new(File.read(filename), self, filename, 1, _parcels_css_options)
+          @_parcels_alongside_css_fragments ||= begin
+            options = { :prefix => parcels_css_prefix }.merge(_parcels_css_options)
+            _parcels_alongside_filenames.map do |filename|
+              if File.exist?(filename)
+                ::Parcels::Fragments::CssFragment.new(File.read(filename), self, filename, 1, options)
+              end
             end
           end.compact
         end
@@ -123,7 +126,8 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
 #{superclasses.map(&:name).join("\n")}}
           end
 
-          options = css_strings.extract_options!
+          options = { :prefix => parcels_css_prefix }
+          options.merge!(css_strings.extract_options!)
 
           caller_line = caller[0]
           if caller_line =~ /^(.*)\s*:\s*(\d+)\s*:\s*in\s+/i
@@ -138,6 +142,10 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           @_parcels_inline_css_fragments += css_strings.map do |css_string|
             ::Parcels::Fragments::CssFragment.new(css_string, self, caller_file, caller_line, _parcels_css_options.merge(options))
           end
+        end
+
+        def parcels_css_prefix
+          nil
         end
       end
     end
