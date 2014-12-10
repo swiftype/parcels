@@ -18,7 +18,7 @@ module Parcels
 
       def evaluate(context, locals, &block)
         parcels_environment = context.environment.parcels
-        widget_class = ::Fortitude::Widget.widget_class_from_file(context.pathname, :root_dirs => parcels_environment.widget_roots)
+        widget_class = parcels_environment.widget_class_from_file(context.pathname)
 
         if widget_class
           widget_class._parcels_widget_class_css(parcels_environment, context)

@@ -17,7 +17,8 @@ module SprocketsHelpers
       end
     end
 
-    out.parcels.define_set!('all', File.join(this_example_root, 'views'))
+    # out.parcels.define_set!('all', File.join(this_example_root, 'views'))
+    out.parcels.add_widget_tree!(File.join(this_example_root, 'views'))
     out
   end
 end

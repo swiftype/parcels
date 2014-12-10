@@ -1,19 +1,17 @@
 require 'active_support/core_ext/module/delegation'
 
+require 'parcels/fortitude_inline_parcel'
+require 'parcels/dependency_parcel_list'
+
 module Parcels
-  class SetDefinition
-    attr_reader :name, :root
+  class WidgetTree
+    attr_reader :root, :parcels_environment
 
-    def initialize(parcels_environment, name, root = nil, &block)
-      @name = name.to_sym
+    def initialize(parcels_environment, root)
       @parcels_environment = parcels_environment
-      self.root = root if root
+      @root = File.expand_path(root, parcels_environment.root)
 
-      instance_eval(&block) if block
-    end
-
-    def root=(new_root)
-      @root = File.expand_path(new_root, parcels_environment.root)
+      @sprockets_contexts_added_to = { }
     end
 
     def add_workaround_directory_to_sprockets!(sprockets_environment)
@@ -23,10 +21,57 @@ module Parcels
       sprockets_environment.prepend_path(workaround_directory)
     end
 
-    delegate :widget_roots, :to => :parcels_environment
+    def logical_path_for_full_path(full_path)
+      File.join(PARCELS_LOGICAL_PATH_PREFIX, ::Parcels::Utils::PathUtils.path_under(full_path, root))
+    end
+
+    def add_all_widgets_to_sprockets_context!(sprockets_context)
+      if @sprockets_contexts_added_to[sprockets_context]
+        raise "double add to sprockets context: #{sprockets_context.inspect}"
+      end
+
+      do_add_to_sprockets_context!(sprockets_context)
+
+      @sprockets_contexts_added_to[sprockets_context] = true
+    end
+
+    # delegate :widget_roots, :to => :parcels_environment
 
     private
-    attr_reader :parcels_environment
+    EXTENSION_TO_PARCEL_CLASS_MAP   = {
+      '.rb'.freeze => ::Parcels::FortitudeInlineParcel
+    }.freeze
+
+    ALL_EXTENSIONS                    = EXTENSION_TO_PARCEL_CLASS_MAP.keys.dup.freeze
+
+    def do_add_to_sprockets_context!(sprockets_context)
+      return unless File.directory?(root)
+
+      sprockets_context.depend_on(root)
+
+      all_parcels = [ ]
+
+      Find.find(root) do |path|
+        full_path = File.expand_path(path, root)
+        next unless File.file?(full_path)
+
+        extension = File.extname(full_path).strip.downcase
+        if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
+          parcel = klass.new(self, full_path)
+          # all_parcels[full_path] = parcel
+          all_parcels << parcel
+        end
+      end
+
+      parcel_list = ::Parcels::DependencyParcelList.new
+      parcel_list.add_parcels!(all_parcels)
+      parcel_list.parcels_in_order.each do |parcel|
+        parcel.add_to_sprockets_context!(sprockets_context)
+      end
+    end
+
+
+
 
     PARCELS_WORKAROUND_DIRECTORY_NAME = ".parcels_sprockets_workaround".freeze
     PARCELS_LOGICAL_PATH_PREFIX       = "_parcels".freeze

@@ -1,74 +1,43 @@
-require 'parcels/set_definition'
+require 'parcels/widget_tree'
 
 module Parcels
   class Environment
-    LOGICAL_PATH_PREFIX = "_parcels".freeze
-    PARCELS_DEFAULT_SET_NAME = 'all'.freeze
+    attr_reader :sprockets_environment
 
-    attr_reader :root, :widget_roots, :sprockets_environment
+    delegate :root, :to => :sprockets_environment
 
     def initialize(sprockets_environment)
       @sprockets_environment = sprockets_environment
-
-      @set_definitions = { }
-
-      self.root = sprockets_environment.root
-      self.widget_roots = [ self.root ]
+      @widget_trees = [ ]
     end
 
     def is_underneath_root?(filename)
       filename = File.expand_path(filename)
-      @root && filename.length > @root.length && filename[0..(@root.length - 1)] == @root
+      filename.length > root.length && filename[0..(root.length - 1)] == root
     end
 
-    def root=(new_root)
-      @root = File.expand_path(new_root)
-    end
-
-    def widget_roots=(new_widget_roots)
-      new_widget_roots = Array(new_widget_roots)
-      new_widget_roots = new_widget_roots.compact.map { |d| File.expand_path(d, self.root) }.uniq
-      @widget_roots = new_widget_roots.freeze
-    end
-
-    def define_set!(set_definition_name, *args, &block)
-      set_definition_name = set_definition_name.to_sym
-      set_definitions[set_definition_name] = ::Parcels::SetDefinition.new(self, set_definition_name, *args, &block)
-    end
-
-    def set_definition(set_definition_name)
-      set_definition_name = set_definition_name.to_sym
-      out = set_definitions[set_definition_name]
-      unless out
-        if set_definition_name == PARCELS_DEFAULT_SET_NAME
-          raise %{Parcels has no set defined named #{set_definition_name.inspect}.
-It does have definitions for: #{set_definitions.keys.inspect}.
-This probably means you didn't pass the name of a set to your 'require_parcels' directive,
-and you haven't defined a set named '#{PARCELS_DEFAULT_SET_NAME}'.
-Either define a set with that name (using define_set!), or pass the name of a set
-that is defined to your 'require_parcels' directive.}
-        else
-          raise %{Parcels has no set defined named #{set_definition_name.inspect}.
-It does have definitions for: #{set_definitions.keys.inspect}.
-Please specify one of these names in your 'require_parcels' directive in your asset.}
-        end
+    def add_widget_tree!(widget_tree_root)
+      widget_tree_root = File.expand_path(widget_tree_root, root)
+      unless widget_trees.detect { |wt| wt.root == widget_tree_root }
+        widget_trees << WidgetTree.new(self, widget_tree_root)
       end
-      out
+    end
+
+    def widget_class_from_file(pathname)
+      ::Fortitude::Widget.widget_class_from_file(pathname, :root_dirs => widget_trees.map(&:root))
     end
 
     def create_and_add_all_workaround_directories!
-      all_set_definition_names.each do |set_definition_name|
-        set_definition(set_definition_name).add_workaround_directory_to_sprockets!(sprockets_environment)
+      widget_trees.each do |widget_tree|
+        widget_tree.add_workaround_directory_to_sprockets!(sprockets_environment)
       end
     end
 
-    private
-    PARCELS_SPROCKETS_WORKAROUND_DIRECTORY_NAME = ".parcels-sprockets-workaround"
-
-    attr_reader :set_definitions
-
-    def all_set_definition_names
-      set_definitions.keys
+    def add_all_widgets_to!(sprockets_context)
+      widget_trees.each { |wt| wt.add_all_widgets_to_sprockets_context!(sprockets_context) }
     end
+
+    private
+    attr_reader :widget_trees
   end
 end

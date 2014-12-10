@@ -6,15 +6,15 @@ module Parcels
       initializer :parcels, :after => :append_assets_path do |app|
         parcels = ::Rails.application.assets.parcels
 
-        parcels.root = ::Rails.root
-        parcels.widget_roots = ::Rails.application.config.autoload_paths
+        # parcels.root = ::Rails.root
+        # parcels.widget_roots = ::Rails.application.config.autoload_paths
 
-
-        sets_defined = { }
 
         ::ApplicationController.view_paths.map(&:to_s).each do |view_path|
           view_path = File.expand_path(view_path)
+          parcels.add_widget_tree!(view_path)
 
+=begin
           set_name = File.basename(view_path).to_sym
           set_name = :all if view_path == File.expand_path(File.join(::Rails.root, 'app', 'views'))
 
@@ -28,6 +28,7 @@ module Parcels
             sets_defined[set_name] = view_path
             $stderr.puts "Defining set: #{set_name.inspect} for #{view_path.inspect}"
           end
+=end
         end
       end
     end

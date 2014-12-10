@@ -27,13 +27,15 @@ end
 
 ::Sprockets::DirectiveProcessor.class_eval do
   def process_require_parcels_directive(*args)
-    args = [ ::Parcels::Environment::PARCELS_DEFAULT_SET_NAME ] if args.empty?
+    # args = [ ::Parcels::Environment::PARCELS_DEFAULT_SET_NAME ] if args.empty?
     parcels_environment = context.environment.parcels
 
-    args.each do |set_name|
-      set = parcels_environment.set(set_name)
-      set.add_to_sprockets_context!(context, parcels_environment)
-    end
+    parcels_environment.add_all_widgets_to!(context)
+
+    # args.each do |set_name|
+    #   set = parcels_environment.set(set_name)
+    #   set.add_to_sprockets_context!(context, parcels_environment)
+    # end
   end
 end
 
@@ -52,9 +54,8 @@ end
     def find_relative_with_parcels(name, base, options)
       parcels = context.environment.parcels
 
+      $stderr.puts "parcels.is_underneath_root?(#{base.inspect}) -> #{parcels.is_underneath_root?(base).inspect} (for #{parcels.root.inspect})"
       if name =~ ::Sprockets::SassImporter::GLOB && parcels.is_underneath_root?(base)
-        parcels = context.environment.parcels
-
         imports = nil
         options[:load_paths].each do |load_path|
           imports = glob_imports(name, Pathname.new(File.join(load_path.to_s, "dummy")), :load_paths => [ load_path ])
