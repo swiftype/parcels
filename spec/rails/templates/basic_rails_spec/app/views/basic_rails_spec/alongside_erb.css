@@ -1,0 +1,1 @@
+p { background-image: url("foo-<%= 3 * 7 %>"); }

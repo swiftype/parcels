@@ -69,6 +69,24 @@ describe "Parcels Rails basic support", :type => :rails do
   end
 
   it "should, by default, use the other features of the asset pipeline, like compression, just like Rails does"
-  it "should allow using ERb in CSS if desired"
+
+  it "should allow using ERb in inline CSS if desired" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/basic_rails_spec/inline_erb.rb' do
+        expect_wrapped_rule :p, 'background-image: url("foo-21")'
+      end
+      allow_additional_assets!
+    end)
+  end
+
+  it "should allow using ERb in alongside CSS if desired" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/basic_rails_spec/alongside_erb.css' do
+        expect_wrapped_rule :p, 'background-image: url("foo-21")'
+      end
+      allow_additional_assets!
+    end)
+  end
+
   it "should allow using other asset-pipeline engines (extensions) if desired"
 end

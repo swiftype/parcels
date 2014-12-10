@@ -6,4 +6,12 @@ class BasicRailsSpecController < ApplicationController
   def alongside_and_inline
     # nothing here
   end
+
+  def inline_erb
+    # nothing here
+  end
+
+  def alongside_erb
+    # nothing here
+  end
 end
