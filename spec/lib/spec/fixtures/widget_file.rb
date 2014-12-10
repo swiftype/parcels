@@ -8,6 +8,8 @@ module Spec
         @css = [ ]
         @css_prefix_text = nil
         @css_prefix_block = nil
+        @sets = nil
+        @sets_set = false
         @requires = [ ]
         @class_text = [ ]
       end
@@ -25,6 +27,12 @@ module Spec
 
       def css_prefix_block(css_prefix_block)
         @css_prefix_block = css_prefix_block
+      end
+
+      def sets(*sets)
+        @sets = sets
+        @sets = nil if @sets == [ nil ]
+        @sets_set = true
       end
 
       def content(content_text)
@@ -50,6 +58,14 @@ module Spec
         text << "class #{class_name} < ::#{superclass}"
 
         text += @class_text
+
+        if @sets_set
+          if @sets.kind_of?(Array)
+            text << "  parcels_sets #{@sets.map { |s| s.inspect }.join(", ")}"
+          else
+            text << "  parcels_sets #{@sets.inspect}"
+          end
+        end
 
         if @css_prefix_block
           text += [ "  css_prefix #{@css_prefix_block}" ]

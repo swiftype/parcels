@@ -156,6 +156,10 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           @_parcels_css_prefix = prefix || block
         end
 
+        def parcels_sets(*set_names)
+          @_parcels_sets = set_names
+        end
+
         def _parcels_get_css_prefix
           _parcels_get_css_prefix_for_class(self)
         end
