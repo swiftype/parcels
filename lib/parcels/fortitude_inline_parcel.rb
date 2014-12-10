@@ -13,6 +13,14 @@ module Parcels
       "<#{self.class.name.demodulize} for #{widget_class}>"
     end
 
+    def included_in_any_set?(set_names)
+      if set_names.length == 0
+        true
+      else
+        (widget_class._parcels_get_sets & set_names).length > 0
+      end
+    end
+
     def add_to_sprockets_context!(sprockets_context)
       if has_content?(sprockets_context)
         sprockets_context.require_asset(logical_path)

@@ -27,7 +27,7 @@ module Parcels
       File.join(PARCELS_LOGICAL_PATH_PREFIX, ::Parcels::Utils::PathUtils.path_under(full_path, root))
     end
 
-    def add_all_widgets_to_sprockets_context!(sprockets_context)
+    def add_all_widgets_to_sprockets_context!(sprockets_context, set_names)
       return unless root_exists?
       sprockets_context.depend_on(root)
 
@@ -39,7 +39,8 @@ module Parcels
 
         extension = File.extname(full_path).strip.downcase
         if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
-          all_parcels << klass.new(self, full_path)
+          parcel = klass.new(self, full_path)
+          all_parcels << parcel if parcel.included_in_any_set?(set_names)
         end
       end
 

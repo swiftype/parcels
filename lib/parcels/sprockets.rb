@@ -23,8 +23,8 @@ end
 end
 
 ::Sprockets::DirectiveProcessor.class_eval do
-  def process_require_parcels_directive(*args)
-    context.environment.parcels.add_all_widgets_to!(context)
+  def process_require_parcels_directive(*set_names)
+    context.environment.parcels.add_all_widgets_to!(context, set_names.map(&:to_sym))
   end
 end
 

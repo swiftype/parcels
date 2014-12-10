@@ -33,8 +33,8 @@ module Parcels
       end
     end
 
-    def add_all_widgets_to!(sprockets_context)
-      widget_trees.each { |wt| wt.add_all_widgets_to_sprockets_context!(sprockets_context) }
+    def add_all_widgets_to!(sprockets_context, set_names)
+      widget_trees.each { |wt| wt.add_all_widgets_to_sprockets_context!(sprockets_context, set_names) }
     end
 
     private

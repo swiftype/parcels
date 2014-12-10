@@ -156,8 +156,33 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           @_parcels_css_prefix = prefix || block
         end
 
-        def parcels_sets(*set_names)
-          @_parcels_sets = set_names
+        def parcels_sets(*set_names, &block)
+          if set_names.length > 0 && block
+            raise ArgumentError, "You can specify either a set name or a block, but not both; you passed: #{set_names.inspect} and #{block.inspect}"
+          end
+
+          if set_names == [ nil ]
+            @_parcels_sets = [ ]
+          else
+            @_parcels_sets = block || set_names.map(&:to_sym)
+          end
+        end
+
+        def _parcels_get_sets
+          _parcels_get_sets_for_class(self)
+        end
+
+        def _parcels_get_sets_for_class(klass)
+          if @_parcels_sets
+            out = @_parcels_sets
+            out = out.call(klass) if out.respond_to?(:call)
+            out = Array(out).map(&:to_sym)
+            out
+          elsif superclass.respond_to?(:_parcels_get_sets_for_class)
+            superclass._parcels_get_sets_for_class(klass)
+          else
+            nil
+          end
         end
 
         def _parcels_get_css_prefix
@@ -170,7 +195,7 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
             out = out.call(klass) if out.respond_to?(:call)
             out
           elsif superclass.respond_to?(:_parcels_get_css_prefix_for_class)
-            superclass._parcels_get_css_prefix_for_class(self)
+            superclass._parcels_get_css_prefix_for_class(klass)
           else
             nil
           end
