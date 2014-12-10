@@ -166,5 +166,45 @@ end
         end
       end)
     end
+
+    it "should put in just that one set if that's what you ask for" do
+      compiled_sprockets_asset('two').should_match(file_assets do
+        asset 'views/parent_widget.rb' do
+          expect_wrapped_rule :p, 'color: red'
+        end
+
+        asset 'views/widget_one.rb' do
+          expect_wrapped_rule :div, 'color: green'
+        end
+
+        asset 'views/widget_one.css' do
+          expect_wrapped_rule :'div.a', 'color: green'
+        end
+
+        asset 'views/widget_three.rb' do
+          expect_wrapped_rule :em, 'color: yellow'
+        end
+
+        asset 'views/widget_three.css' do
+          expect_wrapped_rule :'em.a', 'color: yellow'
+        end
+
+        asset 'views/widget_five.rb' do
+          expect_wrapped_rule :h1, 'color: magenta'
+        end
+
+        asset 'views/widget_five.css' do
+          expect_wrapped_rule :'h1.a', 'color: magenta'
+        end
+
+        asset 'views/widget_seven.rb' do
+          expect_wrapped_rule :h3, 'color: white'
+        end
+
+        asset 'views/widget_seven.css' do
+          expect_wrapped_rule :'h3.a', 'color: white'
+        end
+      end)
+    end
   end
 end
