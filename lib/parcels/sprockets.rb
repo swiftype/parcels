@@ -1,9 +1,6 @@
 require 'active_support'
 require 'active_support/core_ext/string'
 
-require 'find'
-require 'tsort'
-
 require "parcels/index"
 
 ::Sprockets::Environment.class_eval do
@@ -27,15 +24,7 @@ end
 
 ::Sprockets::DirectiveProcessor.class_eval do
   def process_require_parcels_directive(*args)
-    # args = [ ::Parcels::Environment::PARCELS_DEFAULT_SET_NAME ] if args.empty?
-    parcels_environment = context.environment.parcels
-
-    parcels_environment.add_all_widgets_to!(context)
-
-    # args.each do |set_name|
-    #   set = parcels_environment.set(set_name)
-    #   set.add_to_sprockets_context!(context, parcels_environment)
-    # end
+    context.environment.parcels.add_all_widgets_to!(context)
   end
 end
 
@@ -54,7 +43,6 @@ end
     def find_relative_with_parcels(name, base, options)
       parcels = context.environment.parcels
 
-      $stderr.puts "parcels.is_underneath_root?(#{base.inspect}) -> #{parcels.is_underneath_root?(base).inspect} (for #{parcels.root.inspect})"
       if name =~ ::Sprockets::SassImporter::GLOB && parcels.is_underneath_root?(base)
         imports = nil
         options[:load_paths].each do |load_path|

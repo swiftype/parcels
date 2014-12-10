@@ -3,6 +3,8 @@ require 'active_support/core_ext/module/delegation'
 require 'parcels/fortitude_inline_parcel'
 require 'parcels/dependency_parcel_list'
 
+require 'find'
+
 module Parcels
   class WidgetTree
     attr_reader :root, :parcels_environment
@@ -26,27 +28,7 @@ module Parcels
     end
 
     def add_all_widgets_to_sprockets_context!(sprockets_context)
-      if @sprockets_contexts_added_to[sprockets_context]
-        raise "double add to sprockets context: #{sprockets_context.inspect}"
-      end
-
-      do_add_to_sprockets_context!(sprockets_context)
-
-      @sprockets_contexts_added_to[sprockets_context] = true
-    end
-
-    # delegate :widget_roots, :to => :parcels_environment
-
-    private
-    EXTENSION_TO_PARCEL_CLASS_MAP   = {
-      '.rb'.freeze => ::Parcels::FortitudeInlineParcel
-    }.freeze
-
-    ALL_EXTENSIONS                    = EXTENSION_TO_PARCEL_CLASS_MAP.keys.dup.freeze
-
-    def do_add_to_sprockets_context!(sprockets_context)
-      return unless File.directory?(root)
-
+      return unless root_exists?
       sprockets_context.depend_on(root)
 
       all_parcels = [ ]
@@ -57,9 +39,7 @@ module Parcels
 
         extension = File.extname(full_path).strip.downcase
         if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
-          parcel = klass.new(self, full_path)
-          # all_parcels[full_path] = parcel
-          all_parcels << parcel
+          all_parcels << klass.new(self, full_path)
         end
       end
 
@@ -70,8 +50,12 @@ module Parcels
       end
     end
 
+    private
+    EXTENSION_TO_PARCEL_CLASS_MAP   = {
+      '.rb'.freeze => ::Parcels::FortitudeInlineParcel
+    }.freeze
 
-
+    ALL_EXTENSIONS                    = EXTENSION_TO_PARCEL_CLASS_MAP.keys.dup.freeze
 
     PARCELS_WORKAROUND_DIRECTORY_NAME = ".parcels_sprockets_workaround".freeze
     PARCELS_LOGICAL_PATH_PREFIX       = "_parcels".freeze
