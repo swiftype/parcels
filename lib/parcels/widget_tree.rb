@@ -35,7 +35,10 @@ module Parcels
 
       Find.find(root) do |path|
         full_path = File.expand_path(path, root)
-        next unless File.file?(full_path)
+        stat = File.stat(full_path)
+
+        sprockets_context.depend_on(path) if stat.directory?
+        next unless stat.file?
 
         extension = File.extname(full_path).strip.downcase
         if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
