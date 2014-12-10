@@ -39,7 +39,7 @@ module Parcels
           if options[:prefix].kind_of?(String)
             scss = "#{options[:prefix]}\n\n#{scss}"
           else
-            raise "You supplied a parcels_css_prefix (or a :prefix option) that wasn't a String, but, rather: #{options[:prefix].inspect}"
+            raise "You supplied a css_prefix (or a :prefix option) that wasn't a String, but, rather: #{options[:prefix].inspect}"
           end
         end
 

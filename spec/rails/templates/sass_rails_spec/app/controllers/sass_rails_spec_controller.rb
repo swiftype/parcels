@@ -22,4 +22,8 @@ class SassRailsSpecController < ApplicationController
   def asset_url
     # nothing here
   end
+
+  def shared_imports
+    # nothing here
+  end
 end

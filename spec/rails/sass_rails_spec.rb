@@ -107,5 +107,16 @@ describe "Parcels Rails SASS support", :type => :rails do
     end)
   end
 
-  it "should let you add SASS imports in a sane, shared location, and make them available wherever"
+  it "should let you add SASS imports in a sane, shared location, and make them available wherever" do
+    asset = compiled_rails_asset('application.css')
+
+    asset.should_match(rails_assets do
+      asset 'views/sass_rails_spec/shared_imports.rb' do
+        expect_wrapped_rule :p, 'color: #a1a1a1'
+        expect_wrapped_rule :div, 'color: #b2b2b2'
+      end
+
+      allow_additional_assets!
+    end)
+  end
 end

@@ -19,11 +19,11 @@ module Spec
         }
       end
 
-      def parcels_css_prefix(css_prefix_text)
+      def css_prefix(css_prefix_text)
         @css_prefix_text = css_prefix_text
       end
 
-      def parcels_css_prefix_block(css_prefix_block)
+      def css_prefix_block(css_prefix_block)
         @css_prefix_block = css_prefix_block
       end
 
@@ -52,9 +52,9 @@ module Spec
         text += @class_text
 
         if @css_prefix_block
-          text += [ "  parcels_css_prefix #{@css_prefix_block}" ]
+          text += [ "  css_prefix #{@css_prefix_block}" ]
         elsif @css_prefix_text
-          text += [ "  parcels_css_prefix <<-EOS", @css_prefix_text, "EOS" ]
+          text += [ "  css_prefix <<-EOS", @css_prefix_text, "EOS" ]
         end
 
         @css.each do |data|

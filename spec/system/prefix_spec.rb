@@ -7,7 +7,7 @@ describe "Parcels CSS prefix", :type => :system do
         }
 
         widget 'views/my_widget' do
-          parcels_css_prefix "$mycolor1: #abcdef;\n$mycolor2: #fedcba;"
+          css_prefix "$mycolor1: #abcdef;\n$mycolor2: #fedcba;"
 
           css %{
             p { color: $mycolor1; }
@@ -41,6 +41,35 @@ describe "Parcels CSS prefix", :type => :system do
     end
   end
 
+  context "with a parent CSS prefix" do
+    before :each do
+      files {
+        file 'assets/basic.css', %{
+          //= require_parcels
+        }
+
+        widget 'views/parent_widget' do
+          css_prefix "$mycolor1: #abcdef;"
+        end
+
+        widget 'views/child_widget', :superclass => 'Views::ParentWidget' do
+          requires %{views/parent_widget}
+          css %{
+            div { color: $mycolor1; }
+          }
+        end
+      }
+    end
+
+    it "should apply that prefix to the child" do
+      compiled_sprockets_asset('basic').should_match(file_assets do
+        asset 'views/child_widget.rb' do
+          expect_wrapped_rule :div, 'color: #abcdef'
+        end
+      end)
+    end
+  end
+
   context "with a CSS prefix as a block, and a superclass with one, too" do
     before :each do
       files {
@@ -49,15 +78,15 @@ describe "Parcels CSS prefix", :type => :system do
         }
 
         widget 'views/parent_widget' do
-          parcels_css_prefix_block %{do |klass, superclass_prefix|
-  "p::before { content: \\"parent: \#{klass.name}, \#{superclass_prefix}\\"; }"
+          css_prefix_block %{do |klass|
+  "p::before { content: \\"parent: \#{klass.name}\\"; }"
 end}
         end
 
         widget 'views/child_widget', :superclass => 'Views::ParentWidget' do
           requires %{views/parent_widget}
-          parcels_css_prefix_block %{do |klass, superclass_prefix|
-  "p::after { content: \\"child: \#{klass.name}, \#{superclass_prefix.gsub(/"/, '_')}\\"; }"
+          css_prefix_block %{do |klass|
+  "p::after { content: \\"child: \#{klass.name}\\"; }"
 end}
 
           css %{
@@ -70,7 +99,7 @@ end}
     it "should supply the prefixes correctly" do
       compiled_sprockets_asset('basic').should_match(file_assets do
         asset 'views/child_widget.rb' do
-          expect_rule 'p::after', 'content: "child: Views::ChildWidget, p::before { content: _parent: Views::ParentWidget, _; }"'
+          expect_rule 'p::after', 'content: "child: Views::ChildWidget"'
           expect_wrapped_rule :div, 'color: green'
         end
       end)

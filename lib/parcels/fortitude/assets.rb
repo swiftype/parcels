@@ -144,7 +144,7 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           end
         end
 
-        def parcels_css_prefix(prefix = nil, &block)
+        def css_prefix(prefix = nil, &block)
           if (prefix && block)
             raise ArgumentError, "You can supply either a String or a block, but not both; you passed: #{prefix.inspect} and #{block.inspect}"
           end
@@ -157,14 +157,19 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
         end
 
         def _parcels_get_css_prefix
-          out = @_parcels_css_prefix
+          _parcels_get_css_prefix_for_class(self)
+        end
 
-          if out.respond_to?(:call)
-            superclass_prefix = superclass._parcels_get_css_prefix if superclass.respond_to?(:_parcels_get_css_prefix)
-            out = out.call(self, superclass_prefix)
+        def _parcels_get_css_prefix_for_class(klass)
+          if @_parcels_css_prefix
+            out = @_parcels_css_prefix
+            out = out.call(klass) if out.respond_to?(:call)
+            out
+          elsif superclass.respond_to?(:_parcels_get_css_prefix_for_class)
+            superclass._parcels_get_css_prefix_for_class(self)
+          else
+            nil
           end
-
-          out
         end
       end
     end

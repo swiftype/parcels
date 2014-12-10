@@ -38,4 +38,8 @@ class DevelopmentModeRailsSpecController < ApplicationController
   def removing_widget
     # nothing here
   end
+
+  def changing_prefix_imported_file
+    # nothing here
+  end
 end

@@ -173,7 +173,33 @@ describe "Parcels Rails development-mode support", :type => :rails do
     end)
   end
 
-  it "should allow changing an implicitly-imported file, and respect that change"
+  it "should allow changing a file imported via the CSS prefix, and respect that change" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/changing_prefix_imported_file.rb' do
+        expect_wrapped_rule :p, 'color: #abcdef'
+      end
+
+      asset 'views/development_mode_rails_spec/changing_prefix_imported_file.css' do
+        expect_wrapped_rule :div, 'color: #abcdef'
+      end
+
+      allow_additional_assets!
+    end)
+
+    substitute_at_path('app/assets/stylesheets/import_dir/import_dir_ss_1.scss', 'abcdef', 'fedcba')
+
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/development_mode_rails_spec/changing_prefix_imported_file.rb' do
+        expect_wrapped_rule :p, 'color: #fedcba'
+      end
+
+      asset 'views/development_mode_rails_spec/changing_prefix_imported_file.css' do
+        expect_wrapped_rule :div, 'color: #fedcba'
+      end
+
+      allow_additional_assets!
+    end)
+  end
 
   it "should allow adding a widget, along with an alongside file" do
     compiled_rails_asset('application.css').should_match(rails_assets do
