@@ -168,20 +168,20 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           end
         end
 
-        def _parcels_get_sets
-          _parcels_get_sets_for_class(self)
+        def _parcels_get_sets(defining_file_path)
+          _parcels_get_sets_for_class(self, defining_file_path)
         end
 
-        def _parcels_get_sets_for_class(klass)
+        def _parcels_get_sets_for_class(klass, defining_file_path)
           if @_parcels_sets
             out = @_parcels_sets
-            out = out.call(klass) if out.respond_to?(:call)
+            out = out.call(klass, defining_file_path) if out.respond_to?(:call)
             out = Array(out).map(&:to_sym)
             out
           elsif superclass.respond_to?(:_parcels_get_sets_for_class)
-            superclass._parcels_get_sets_for_class(klass)
+            superclass._parcels_get_sets_for_class(klass, defining_file_path)
           else
-            nil
+            [ ]
           end
         end
 

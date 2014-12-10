@@ -17,7 +17,8 @@ module Parcels
       if set_names.length == 0
         true
       else
-        (widget_class._parcels_get_sets & set_names).length > 0
+        result = (widget_class._parcels_get_sets(full_path) & set_names)
+        result.length > 0
       end
     end
 

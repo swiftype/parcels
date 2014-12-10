@@ -82,9 +82,11 @@ describe "Parcels sets", :type => :system do
         widget 'views/widget_six', :superclass => 'Views::ParentWidget' do
           requires %{views/parent_widget}
           css %{h2 { color: black; }}
-          sets_block %{do |klass|
+          sets_block %{do |klass, filename|
   if klass.name =~ /seven/i
     [ :aaa, :bbb ]
+  elsif filename =~ /widget_eight/i
+    :aaa
   else
     :bbb
   end
@@ -103,6 +105,15 @@ end
 
         file 'views/widget_seven.css', %{
           h3.a { color: white; }
+        }
+
+        widget 'views/widget_eight', :superclass => 'Views::WidgetSix' do
+          requires %{views/widget_six}
+          css %{h4 { color: red; }}
+        end
+
+        file 'views/widget_eight.css', %{
+          h4.a { color: red; }
         }
       }
     end
@@ -168,6 +179,14 @@ end
         asset 'views/widget_seven.css' do
           expect_wrapped_rule :'h3.a', 'color: white'
         end
+
+        asset 'views/widget_eight.rb' do
+          expect_wrapped_rule :h4, 'color: red'
+        end
+
+        asset 'views/widget_eight.css' do
+          expect_wrapped_rule :'h4.a', 'color: red'
+        end
       end)
     end
 
@@ -207,6 +226,14 @@ end
 
         asset 'views/widget_seven.css' do
           expect_wrapped_rule :'h3.a', 'color: white'
+        end
+
+        asset 'views/widget_eight.rb' do
+          expect_wrapped_rule :h4, 'color: red'
+        end
+
+        asset 'views/widget_eight.css' do
+          expect_wrapped_rule :'h4.a', 'color: red'
         end
       end)
     end
@@ -300,6 +327,14 @@ end
         asset 'views/widget_seven.css' do
           expect_wrapped_rule :'h3.a', 'color: white'
         end
+
+        asset 'views/widget_eight.rb' do
+          expect_wrapped_rule :h4, 'color: red'
+        end
+
+        asset 'views/widget_eight.css' do
+          expect_wrapped_rule :'h4.a', 'color: red'
+        end
       end)
     end
 
@@ -355,6 +390,14 @@ end
 
         asset 'views/widget_seven.css' do
           expect_wrapped_rule :'h3.a', 'color: white'
+        end
+
+        asset 'views/widget_eight.rb' do
+          expect_wrapped_rule :h4, 'color: red'
+        end
+
+        asset 'views/widget_eight.css' do
+          expect_wrapped_rule :'h4.a', 'color: red'
         end
       end)
     end
