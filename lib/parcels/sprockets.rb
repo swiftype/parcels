@@ -24,6 +24,11 @@ end
 
 ::Sprockets::DirectiveProcessor.class_eval do
   def process_require_parcels_directive(*set_names)
+    set_names = set_names.map do |set_name|
+      set_name = set_name.to_s.strip
+      set_name = $1 if set_name =~ /,?(.*?),?$/i
+      set_name.strip.to_sym
+    end
     context.environment.parcels.add_all_widgets_to!(context, set_names.map(&:to_sym))
   end
 end

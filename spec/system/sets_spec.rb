@@ -15,7 +15,11 @@ describe "Parcels sets", :type => :system do
         }
 
         file 'assets/four.css', %{
-          //= require_parcels aaa, bbb
+          //= require_parcels aaa bbb
+        }
+
+        file 'assets/five.css', %{
+          //= require_parcels  aaa,   bbb
         }
 
         widget 'views/parent_widget' do
@@ -195,6 +199,154 @@ end
 
         asset 'views/widget_five.css' do
           expect_wrapped_rule :'h1.a', 'color: magenta'
+        end
+
+        asset 'views/widget_seven.rb' do
+          expect_wrapped_rule :h3, 'color: white'
+        end
+
+        asset 'views/widget_seven.css' do
+          expect_wrapped_rule :'h3.a', 'color: white'
+        end
+      end)
+    end
+
+    it "should put in just the other set if that's what you ask for" do
+      compiled_sprockets_asset('three').should_match(file_assets do
+        asset 'views/widget_two.rb' do
+          expect_wrapped_rule :span, 'color: blue'
+        end
+
+        asset 'views/widget_two.css' do
+          expect_wrapped_rule :'span.a', 'color: blue'
+        end
+
+        asset 'views/widget_three.rb' do
+          expect_wrapped_rule :em, 'color: yellow'
+        end
+
+        asset 'views/widget_three.css' do
+          expect_wrapped_rule :'em.a', 'color: yellow'
+        end
+
+        asset 'views/widget_six.rb' do
+          expect_wrapped_rule :h2, 'color: black'
+        end
+
+        asset 'views/widget_six.css' do
+          expect_wrapped_rule :'h2.a', 'color: black'
+        end
+
+        asset 'views/widget_seven.rb' do
+          expect_wrapped_rule :h3, 'color: white'
+        end
+
+        asset 'views/widget_seven.css' do
+          expect_wrapped_rule :'h3.a', 'color: white'
+        end
+      end)
+    end
+
+    it "should let you separate set names with a comma, and still work fine" do
+      compiled_sprockets_asset('five').should_match(file_assets do
+        asset 'views/parent_widget.rb' do
+          expect_wrapped_rule :p, 'color: red'
+        end
+
+        asset 'views/widget_one.rb' do
+          expect_wrapped_rule :div, 'color: green'
+        end
+
+        asset 'views/widget_one.css' do
+          expect_wrapped_rule :'div.a', 'color: green'
+        end
+
+        asset 'views/widget_two.rb' do
+          expect_wrapped_rule :span, 'color: blue'
+        end
+
+        asset 'views/widget_two.css' do
+          expect_wrapped_rule :'span.a', 'color: blue'
+        end
+
+        asset 'views/widget_three.rb' do
+          expect_wrapped_rule :em, 'color: yellow'
+        end
+
+        asset 'views/widget_three.css' do
+          expect_wrapped_rule :'em.a', 'color: yellow'
+        end
+
+        asset 'views/widget_five.rb' do
+          expect_wrapped_rule :h1, 'color: magenta'
+        end
+
+        asset 'views/widget_five.css' do
+          expect_wrapped_rule :'h1.a', 'color: magenta'
+        end
+
+        asset 'views/widget_six.rb' do
+          expect_wrapped_rule :h2, 'color: black'
+        end
+
+        asset 'views/widget_six.css' do
+          expect_wrapped_rule :'h2.a', 'color: black'
+        end
+
+        asset 'views/widget_seven.rb' do
+          expect_wrapped_rule :h3, 'color: white'
+        end
+
+        asset 'views/widget_seven.css' do
+          expect_wrapped_rule :'h3.a', 'color: white'
+        end
+      end)
+    end
+
+    it "should put in both sets if you ask, but not things with no sets at all" do
+      compiled_sprockets_asset('four').should_match(file_assets do
+        asset 'views/parent_widget.rb' do
+          expect_wrapped_rule :p, 'color: red'
+        end
+
+        asset 'views/widget_one.rb' do
+          expect_wrapped_rule :div, 'color: green'
+        end
+
+        asset 'views/widget_one.css' do
+          expect_wrapped_rule :'div.a', 'color: green'
+        end
+
+        asset 'views/widget_two.rb' do
+          expect_wrapped_rule :span, 'color: blue'
+        end
+
+        asset 'views/widget_two.css' do
+          expect_wrapped_rule :'span.a', 'color: blue'
+        end
+
+        asset 'views/widget_three.rb' do
+          expect_wrapped_rule :em, 'color: yellow'
+        end
+
+        asset 'views/widget_three.css' do
+          expect_wrapped_rule :'em.a', 'color: yellow'
+        end
+
+        asset 'views/widget_five.rb' do
+          expect_wrapped_rule :h1, 'color: magenta'
+        end
+
+        asset 'views/widget_five.css' do
+          expect_wrapped_rule :'h1.a', 'color: magenta'
+        end
+
+        asset 'views/widget_six.rb' do
+          expect_wrapped_rule :h2, 'color: black'
+        end
+
+        asset 'views/widget_six.css' do
+          expect_wrapped_rule :'h2.a', 'color: black'
         end
 
         asset 'views/widget_seven.rb' do
