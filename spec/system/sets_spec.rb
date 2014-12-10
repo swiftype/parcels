@@ -74,6 +74,32 @@ describe "Parcels sets", :type => :system do
         file 'views/widget_five.css', %{
           h1.a { color: magenta; }
         }
+
+        widget 'views/widget_six', :superclass => 'Views::ParentWidget' do
+          requires %{views/parent_widget}
+          css %{h2 { color: black; }}
+          sets_block %{do |klass|
+  if klass.name =~ /seven/i
+    [ :aaa, :bbb ]
+  else
+    :bbb
+  end
+end
+}
+        end
+
+        file 'views/widget_six.css', %{
+          h2.a { color: black; }
+        }
+
+        widget 'views/widget_seven', :superclass => 'Views::WidgetSix' do
+          requires %{views/widget_six}
+          css %{h3 { color: white; }}
+        end
+
+        file 'views/widget_seven.css', %{
+          h3.a { color: white; }
+        }
       }
     end
 
@@ -121,6 +147,22 @@ describe "Parcels sets", :type => :system do
 
         asset 'views/widget_five.css' do
           expect_wrapped_rule :'h1.a', 'color: magenta'
+        end
+
+        asset 'views/widget_six.rb' do
+          expect_wrapped_rule :h2, 'color: black'
+        end
+
+        asset 'views/widget_six.css' do
+          expect_wrapped_rule :'h2.a', 'color: black'
+        end
+
+        asset 'views/widget_seven.rb' do
+          expect_wrapped_rule :h3, 'color: white'
+        end
+
+        asset 'views/widget_seven.css' do
+          expect_wrapped_rule :'h3.a', 'color: white'
         end
       end)
     end

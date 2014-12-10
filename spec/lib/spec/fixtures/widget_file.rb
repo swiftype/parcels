@@ -35,6 +35,10 @@ module Spec
         @sets_set = true
       end
 
+      def sets_block(sets_block)
+        @sets_block = sets_block
+      end
+
       def content(content_text)
         @content_text = content_text
       end
@@ -59,7 +63,9 @@ module Spec
 
         text += @class_text
 
-        if @sets_set
+        if @sets_block
+          text += [ "  parcels_sets #{@sets_block}" ]
+        elsif @sets_set
           if @sets.kind_of?(Array)
             text << "  parcels_sets #{@sets.map { |s| s.inspect }.join(", ")}"
           else
