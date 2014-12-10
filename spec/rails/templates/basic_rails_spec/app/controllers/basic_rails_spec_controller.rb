@@ -14,4 +14,8 @@ class BasicRailsSpecController < ApplicationController
   def alongside_erb
     # nothing here
   end
+
+  def multiple_engines
+    # nothing here
+  end
 end
