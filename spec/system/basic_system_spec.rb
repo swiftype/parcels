@@ -12,7 +12,7 @@ describe "Parcels basic operations", :type => :system do
           }
         end
 
-        file 'views/my_widget.css', %{
+        file 'views/my_widget.pcss', %{
           div { color: blue; }
         }
       }
@@ -24,7 +24,7 @@ describe "Parcels basic operations", :type => :system do
           expect_wrapped_rule :p, 'color: red'
         end
 
-        asset 'views/my_widget.css' do
+        asset 'views/my_widget.pcss' do
           expect_wrapped_rule :div, 'color: blue'
         end
       end)

@@ -62,6 +62,14 @@ module Parcels
           ::Parcels::Fragments::CssFragment.to_css(parcels_environment, context, _parcels_css_fragments)
         end
 
+        def _parcels_widget_class_inline_css(parcels_environment, context)
+          ::Parcels::Fragments::CssFragment.to_css(parcels_environment, context, _parcels_inline_css_fragments)
+        end
+
+        def _parcels_widget_class_alongside_css(parcels_environment, context)
+          ::Parcels::Fragments::CssFragment.to_css(parcels_environment, context, _parcels_alongside_css_fragments)
+        end
+
         def _parcels_wrapping_css_class_required?
           _parcels_css_fragments.detect { |f| f.wrapping_css_class_required? }
         end
@@ -82,7 +90,7 @@ module Parcels
 
           _parcels_class_definition_files.each do |filename|
             filename = $1 if filename =~ /^(.*)\.rb$/i
-            out << "#{filename}.css"
+            out << "#{filename}.pcss"
           end
 
           out.select { |f| File.file?(f) }

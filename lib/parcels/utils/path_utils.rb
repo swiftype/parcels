@@ -14,6 +14,22 @@ module Parcels
             raise Errno::ENOENT, %{Path #{path.inspect} is not underneath directory #{under_what.inspect}.}
           end
         end
+
+        def widget_class_for_alongside_file(alongside_file)
+          directory = File.dirname(alongside_file)
+          basename = File.basename(alongside_file)
+          basename = $1 if basename =~ /^(.+?)\./
+
+          entries = Dir.entries(directory).select { |e| e =~ /^#{Regexp.escape(basename)}\./ && e =~ /\.rb$/i }
+          entries = entries.sort_by(&:length)
+          entry = entries[-1]
+
+          unless entry
+            raise Errno::ENOENT, "No widget class in #{directory.inspect} corresponding to #{basename.inspect}? Have: #{entries.inspect}"
+          end
+
+          File.join(directory, entry)
+        end
       end
     end
   end

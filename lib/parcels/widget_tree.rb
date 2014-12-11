@@ -1,6 +1,7 @@
 require 'active_support/core_ext/module/delegation'
 
 require 'parcels/fortitude_inline_parcel'
+require 'parcels/fortitude_alongside_parcel'
 require 'parcels/dependency_parcel_list'
 
 require 'find'
@@ -45,8 +46,10 @@ module Parcels
         next unless stat.file?
 
         extension = File.extname(full_path).strip.downcase
+        $stderr.puts "Examining: #{full_path}"
         if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
           parcel = klass.new(self, full_path)
+          $stderr.puts "Parcel: #{parcel}"
           all_parcels << parcel if parcel.included_in_any_set?(set_names)
         end
       end
@@ -60,7 +63,8 @@ module Parcels
 
     private
     EXTENSION_TO_PARCEL_CLASS_MAP   = {
-      '.rb'.freeze => ::Parcels::FortitudeInlineParcel
+      '.rb'.freeze => ::Parcels::FortitudeInlineParcel,
+      '.pcss'.freeze => ::Parcels::FortitudeAlongsideParcel
     }.freeze
 
     ALL_EXTENSIONS                    = EXTENSION_TO_PARCEL_CLASS_MAP.keys.dup.freeze

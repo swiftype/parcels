@@ -7,7 +7,7 @@ describe "Parcels alongside files", :type => :system do
         }
 
         widget('views/my_widget') { }
-        file   'views/my_widget.css', %{
+        file   'views/my_widget.pcss', %{
           p { color: red; }
         }
       }
@@ -19,8 +19,10 @@ describe "Parcels alongside files", :type => :system do
     end
 
     it "should aggregate the contents of that file" do
-      compiled_sprockets_asset('basic').should_match(file_assets do
-        asset 'views/my_widget.css' do
+      asset = compiled_sprockets_asset('basic')
+      $stderr.puts "SOURCE: #{asset.source.inspect}"
+      asset.should_match(file_assets do
+        asset 'views/my_widget.pcss' do
           expect_wrapped_rule :p, 'color: red'
         end
       end)
@@ -69,7 +71,7 @@ describe "Parcels alongside files", :type => :system do
     end
   end
 
-  context "with a widget ending in .html.rb, and an alongside file ending in .html.css" do
+  context "with a widget ending in .html.rb, and an alongside file ending in .html.pcss" do
     before :each do
       files {
         file 'assets/basic.css', %{
@@ -77,7 +79,7 @@ describe "Parcels alongside files", :type => :system do
         }
 
         widget('views/my_widget.html') { }
-        file   'views/my_widget.html.css', %{
+        file   'views/my_widget.html.pcss', %{
           p { color: red; }
         }
       }
@@ -90,7 +92,7 @@ describe "Parcels alongside files", :type => :system do
 
     it "should aggregate the contents of that file" do
       compiled_sprockets_asset('basic').should_match(file_assets do
-        asset 'views/my_widget.html.css' do
+        asset 'views/my_widget.html.pcss' do
           expect_wrapped_rule :p, 'color: red'
         end
       end)
@@ -109,13 +111,13 @@ describe "Parcels alongside files", :type => :system do
         }
       end
 
-      file 'views/my_widget.css', %{
+      file 'views/my_widget.pcss', %{
         div { color: blue; }
       }
     }
 
     compiled_sprockets_asset('basic').should_match(file_assets do
-      asset 'views/my_widget.css' do
+      asset 'views/my_widget.pcss' do
         expect_wrapped_rule :div, 'color: blue'
       end
 
@@ -132,16 +134,16 @@ describe "Parcels alongside files", :type => :system do
       }
 
       file 'assets/one.css', %{
-        //= require 'views/my_widget.css'
+        //= require 'views/my_widget.pcss'
       }
 
       widget('views/my_widget') { }
-      file   'views/my_widget.css', %{
+      file   'views/my_widget.pcss', %{
         p { color: red; }
       }
     }
 
-    expect { compiled_sprockets_asset('one').source }.to raise_error(::Sprockets::FileNotFound, %r{views/my_widget\.css}i)
+    expect { compiled_sprockets_asset('one').source }.to raise_error(::Sprockets::FileNotFound, %r{views/my_widget\.pcss}i)
   end
 
   it "should allow you to pick up the alongside file with a 'require' using '_parcels/', and it should not be wrapped" do
@@ -151,11 +153,11 @@ describe "Parcels alongside files", :type => :system do
       }
 
       file 'assets/one.css', %{
-        //= require '_parcels/my_widget.css'
+        //= require '_parcels/my_widget.pcss'
       }
 
       widget('views/my_widget') { }
-      file   'views/my_widget.css', %{
+      file   'views/my_widget.pcss', %{
         p { color: red; }
       }
     }
@@ -173,18 +175,18 @@ describe "Parcels alongside files", :type => :system do
         //= require_parcels
       }
 
-      file   'views/my_widget.css', %{
+      file   'views/my_widget.pcss', %{
         p { color: red; }
       }
 
-      file   'views/another_widget.html.css', %{
+      file   'views/another_widget.html.pcss', %{
         div { color: green; }
       }
     }
 
     compiled_sprockets_asset('one').should_match(file_assets do
-      asset_must_not_be_present 'views/my_widget.css'
-      asset_must_not_be_present 'views/another_widget.css'
+      asset_must_not_be_present 'views/my_widget.pcss'
+      asset_must_not_be_present 'views/another_widget.pcss'
     end)
   end
 end

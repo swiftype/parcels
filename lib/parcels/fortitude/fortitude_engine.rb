@@ -2,7 +2,7 @@ require 'tilt'
 
 module Parcels
   module Fortitude
-    class WidgetEngine < Tilt::Template
+    class FortitudeEngine < Tilt::Template
       self.default_mime_type = 'text/css'
 
       def self.engine_initialized?
@@ -21,10 +21,14 @@ module Parcels
         widget_class = parcels_environment.widget_class_from_file(context.pathname)
 
         if widget_class
-          widget_class._parcels_widget_class_inline_css(parcels_environment, context)
+          css_from_widget_class(widget_class, parcels_environment, context)
         else
           ""
         end
+      end
+
+      def css_from_widget_class(widget_class, parcels_environment, context)
+        raise "must implement in #{self.class.name}"
       end
     end
   end

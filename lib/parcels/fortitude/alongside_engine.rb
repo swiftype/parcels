@@ -2,7 +2,7 @@ require 'tilt'
 
 module Parcels
   module Fortitude
-    class WidgetEngine < Tilt::Template
+    class AlongsideEngine < Tilt::Template
       self.default_mime_type = 'text/css'
 
       def self.engine_initialized?
@@ -18,10 +18,11 @@ module Parcels
 
       def evaluate(context, locals, &block)
         parcels_environment = context.environment.parcels
-        widget_class = parcels_environment.widget_class_from_file(context.pathname)
+        widget_file = ::Parcels::Utils::PathUtils.widget_class_for_alongside_file(context.pathname)
+        widget_class = parcels_environment.widget_class_from_file(widget_file)
 
         if widget_class
-          widget_class._parcels_widget_class_inline_css(parcels_environment, context)
+          widget_class._parcels_widget_class_alongside_css(parcels_environment, context)
         else
           ""
         end
