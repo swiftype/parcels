@@ -5,7 +5,7 @@ describe "Parcels Rails development-mode support", :type => :rails do
 
   it "should include all parcels in application.css if you ask it to" do
     compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/basic_widget_with_inline_and_alongside_parcels.css' do
+      asset 'views/development_mode_rails_spec/basic_widget_with_inline_and_alongside_parcels.pcss' do
         expect_wrapped_rule :div, 'color: blue'
       end
 
@@ -17,6 +17,39 @@ describe "Parcels Rails development-mode support", :type => :rails do
     end)
   end
 
+  def wait_until_passes(options = { }, &block)
+    timeout = options[:timeout] || 3.seconds
+    interval = options[:interval] || 0.5.seconds
+
+    timeout_time = Time.now + timeout
+    passed = false
+    attempt_count = 0
+    last_exception = nil
+
+    while (! passed) && (Time.now < timeout_time)
+      begin
+        block.call
+        passed = true
+      rescue Interrupt => i
+        raise
+      rescue => e
+        # failed
+        # $stderr.puts "block failed, now sleeping, remaining #{timeout_time - Time.now} seconds"
+        attempt_count += 1
+        last_exception = e
+        sleep interval
+      end
+    end
+
+    unless passed
+      raise "Block failed, even after #{attempt_count} tries and #{timeout} seconds! Last exception was:\n#{e.message} (#{e.class.name}):\n    #{e.backtrace.join("\n    ")}"
+    end
+  end
+
+  def sleep_before_change
+    sleep 1
+  end
+
   def substitute_at_path(subpath, from_what, to_what)
     path = File.join(rails_server.rails_root, subpath)
     contents = File.read(path)
@@ -26,13 +59,16 @@ describe "Parcels Rails development-mode support", :type => :rails do
       raise "This spec is broken; we were looking for #{from_what.inspect}, but contents are:\n#{contents}"
     end
 
+    sleep_before_change
+
     File.open(path, 'w') { |f| f << new_contents }
-    sleep 1
   end
 
   def add_at_path(subpath, what)
     path = File.join(rails_server.rails_root, subpath)
     raise "Path should not exist, but does: #{path.inspect}" if File.exist?(path)
+
+    sleep_before_change
 
     FileUtils.mkdir_p(File.dirname(path))
     File.open(path, 'w') { |f| f << what }
@@ -41,6 +77,9 @@ describe "Parcels Rails development-mode support", :type => :rails do
   def remove_at_path(subpath)
     path = File.join(rails_server.rails_root, subpath)
     raise "Path should exist, but doesn't: #{path.inspect}" unless File.exist?(path)
+
+    sleep_before_change
+
     File.delete(path)
   end
 
@@ -54,30 +93,34 @@ describe "Parcels Rails development-mode support", :type => :rails do
 
     substitute_at_path('app/views/development_mode_rails_spec/changing_inline_css.rb', 'color: green', 'color: red')
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/changing_inline_css.rb' do
-        expect_wrapped_rule :p, 'color: red'
-      end
-      allow_additional_assets!
-    end)
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset 'views/development_mode_rails_spec/changing_inline_css.rb' do
+          expect_wrapped_rule :p, 'color: red'
+        end
+        allow_additional_assets!
+      end)
+    end
   end
 
   it "should allow changing alongside CSS for a widget" do
     compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/changing_alongside_css.css' do
+      asset 'views/development_mode_rails_spec/changing_alongside_css.pcss' do
         expect_wrapped_rule :p, 'color: blue'
       end
       allow_additional_assets!
     end)
 
-    substitute_at_path('app/views/development_mode_rails_spec/changing_alongside_css.css', 'color: blue', 'color: purple')
+    substitute_at_path('app/views/development_mode_rails_spec/changing_alongside_css.pcss', 'color: blue', 'color: purple')
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/changing_alongside_css.css' do
-        expect_wrapped_rule :p, 'color: purple'
-      end
-      allow_additional_assets!
-    end)
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset 'views/development_mode_rails_spec/changing_alongside_css.pcss' do
+          expect_wrapped_rule :p, 'color: purple'
+        end
+        allow_additional_assets!
+      end)
+    end
   end
 
   it "should allow adding inline CSS for a widget" do
@@ -88,12 +131,14 @@ describe "Parcels Rails development-mode support", :type => :rails do
 
     substitute_at_path('app/views/development_mode_rails_spec/adding_inline_css.rb', '# CSS_WILL_GO_HERE', "css %{p { color: yellow } }")
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/adding_inline_css.rb' do
-        expect_wrapped_rule :p, 'color: yellow'
-      end
-      allow_additional_assets!
-    end)
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset 'views/development_mode_rails_spec/adding_inline_css.rb' do
+          expect_wrapped_rule :p, 'color: yellow'
+        end
+        allow_additional_assets!
+      end)
+    end
   end
 
   it "should allow removing inline CSS for a widget" do
@@ -106,42 +151,48 @@ describe "Parcels Rails development-mode support", :type => :rails do
 
     substitute_at_path('app/views/development_mode_rails_spec/removing_inline_css.rb', 'css %{p { color: magenta; }}', '# NO MORE CSS!')
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset_must_not_be_present('views/development_mode_rails_spec/removing_inline_css.rb')
-      allow_additional_assets!
-    end)
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset_must_not_be_present('views/development_mode_rails_spec/removing_inline_css.rb')
+        allow_additional_assets!
+      end)
+    end
   end
 
   it "should allow adding alongside CSS for a widget" do
     compiled_rails_asset('application.css').should_match(rails_assets do
-      asset_must_not_be_present('views/development_mode_rails_spec/adding_alongside_css.css')
+      asset_must_not_be_present('views/development_mode_rails_spec/adding_alongside_css.pcss')
       allow_additional_assets!
     end)
 
-    add_at_path('app/views/development_mode_rails_spec/adding_alongside_css.css', "p { color: cyan; }")
+    add_at_path('app/views/development_mode_rails_spec/adding_alongside_css.pcss', "p { color: cyan; }")
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/adding_alongside_css.css' do
-        expect_wrapped_rule :p, 'color: cyan'
-      end
-      allow_additional_assets!
-    end)
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset 'views/development_mode_rails_spec/adding_alongside_css.pcss' do
+          expect_wrapped_rule :p, 'color: cyan'
+        end
+        allow_additional_assets!
+      end)
+    end
   end
 
   it "should allow removing alongside CSS for a widget" do
     compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/removing_alongside_css.css' do
+      asset 'views/development_mode_rails_spec/removing_alongside_css.pcss' do
         expect_wrapped_rule :p, 'color: yellow'
       end
       allow_additional_assets!
     end)
 
-    remove_at_path('app/views/development_mode_rails_spec/removing_alongside_css.css')
+    remove_at_path('app/views/development_mode_rails_spec/removing_alongside_css.pcss')
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset_must_not_be_present('views/development_mode_rails_spec/removing_alongside_css.css')
-      allow_additional_assets!
-    end)
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset_must_not_be_present('views/development_mode_rails_spec/removing_alongside_css.pcss')
+        allow_additional_assets!
+      end)
+    end
   end
 
   it "should allow changing a file used by @import" do
@@ -150,7 +201,7 @@ describe "Parcels Rails development-mode support", :type => :rails do
         expect_wrapped_rule :p, 'color: #123456'
       end
 
-      asset 'views/development_mode_rails_spec/changing_import_file.css' do
+      asset 'views/development_mode_rails_spec/changing_import_file.pcss' do
         expect_wrapped_rule :div, 'color: #234567'
       end
 
@@ -160,17 +211,19 @@ describe "Parcels Rails development-mode support", :type => :rails do
     substitute_at_path('app/assets/stylesheets/changingone.scss', '123456', '456789')
     substitute_at_path('app/assets/stylesheets/changingtwo.scss', '234567', '567890')
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/changing_import_file.rb' do
-        expect_wrapped_rule :p, 'color: #456789'
-      end
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset 'views/development_mode_rails_spec/changing_import_file.rb' do
+          expect_wrapped_rule :p, 'color: #456789'
+        end
 
-      asset 'views/development_mode_rails_spec/changing_import_file.css' do
-        expect_wrapped_rule :div, 'color: #567890'
-      end
+        asset 'views/development_mode_rails_spec/changing_import_file.pcss' do
+          expect_wrapped_rule :div, 'color: #567890'
+        end
 
-      allow_additional_assets!
-    end)
+        allow_additional_assets!
+      end)
+    end
   end
 
   it "should allow changing a file imported via the CSS prefix, and respect that change" do
@@ -179,7 +232,7 @@ describe "Parcels Rails development-mode support", :type => :rails do
         expect_wrapped_rule :p, 'color: #abcdef'
       end
 
-      asset 'views/development_mode_rails_spec/changing_prefix_imported_file.css' do
+      asset 'views/development_mode_rails_spec/changing_prefix_imported_file.pcss' do
         expect_wrapped_rule :div, 'color: #abcdef'
       end
 
@@ -188,23 +241,25 @@ describe "Parcels Rails development-mode support", :type => :rails do
 
     substitute_at_path('app/assets/stylesheets/import_dir/import_dir_ss_1.scss', 'abcdef', 'fedcba')
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/changing_prefix_imported_file.rb' do
-        expect_wrapped_rule :p, 'color: #fedcba'
-      end
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset 'views/development_mode_rails_spec/changing_prefix_imported_file.rb' do
+          expect_wrapped_rule :p, 'color: #fedcba'
+        end
 
-      asset 'views/development_mode_rails_spec/changing_prefix_imported_file.css' do
-        expect_wrapped_rule :div, 'color: #fedcba'
-      end
+        asset 'views/development_mode_rails_spec/changing_prefix_imported_file.pcss' do
+          expect_wrapped_rule :div, 'color: #fedcba'
+        end
 
-      allow_additional_assets!
-    end)
+        allow_additional_assets!
+      end)
+    end
   end
 
   it "should allow adding a widget, along with an alongside file" do
     compiled_rails_asset('application.css').should_match(rails_assets do
       asset_must_not_be_present('views/development_mode_rails_spec/added_widget.rb')
-      asset_must_not_be_present('views/development_mode_rails_spec/added_widget.css')
+      asset_must_not_be_present('views/development_mode_rails_spec/added_widget.pcss')
       allow_additional_assets!
     end)
 
@@ -219,23 +274,23 @@ class Views::DevelopmentModeRailsSpec::AddedWidget < Views::Widgets::Base
   end
 end
 EOS
-    add_at_path('app/views/development_mode_rails_spec/added_widget.css', <<-EOS)
+    add_at_path('app/views/development_mode_rails_spec/added_widget.pcss', <<-EOS)
 div { color: purple; }
 EOS
 
-    sleep 1
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset 'views/development_mode_rails_spec/added_widget.rb' do
+          expect_wrapped_rule :p, 'color: blue'
+        end
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/development_mode_rails_spec/added_widget.rb' do
-        expect_wrapped_rule :p, 'color: blue'
-      end
+        asset 'views/development_mode_rails_spec/added_widget.pcss' do
+          expect_wrapped_rule :div, 'color: purple'
+        end
 
-      asset 'views/development_mode_rails_spec/added_widget.css' do
-        expect_wrapped_rule :div, 'color: purple'
-      end
-
-      allow_additional_assets!
-    end)
+        allow_additional_assets!
+      end)
+    end
   end
 
   it "should allow removing a widget, along with an alongside file" do
@@ -244,7 +299,7 @@ EOS
         expect_wrapped_rule :p, 'color: cyan'
       end
 
-      asset 'views/development_mode_rails_spec/removing_widget.css' do
+      asset 'views/development_mode_rails_spec/removing_widget.pcss' do
         expect_wrapped_rule :div, 'color: green'
       end
 
@@ -252,12 +307,14 @@ EOS
     end)
 
     remove_at_path('app/views/development_mode_rails_spec/removing_widget.rb')
-    remove_at_path('app/views/development_mode_rails_spec/removing_widget.css')
+    remove_at_path('app/views/development_mode_rails_spec/removing_widget.pcss')
 
-    compiled_rails_asset('application.css').should_match(rails_assets do
-      asset_must_not_be_present('views/development_mode_rails_spec/removing_widget.rb')
-      asset_must_not_be_present('views/development_mode_rails_spec/removing_widget.css')
-      allow_additional_assets!
-    end)
+    wait_until_passes do
+      compiled_rails_asset('application.css').should_match(rails_assets do
+        asset_must_not_be_present('views/development_mode_rails_spec/removing_widget.rb')
+        asset_must_not_be_present('views/development_mode_rails_spec/removing_widget.pcss')
+        allow_additional_assets!
+      end)
+    end
   end
 end
