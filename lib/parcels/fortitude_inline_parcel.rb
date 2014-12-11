@@ -52,8 +52,12 @@ module Parcels
       !! to_css(sprockets_context)
     end
 
+    def subpath
+      @subpath ||= widget_tree.subpath_to(full_path)
+    end
+
     def logical_path
-      @logical_path ||= widget_tree.logical_path_for_full_path(full_path)
+      @logical_path ||= widget_tree.logical_path_for_subpath(subpath)
     end
 
     def widget_class

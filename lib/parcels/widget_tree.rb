@@ -23,8 +23,12 @@ module Parcels
       sprockets_environment.prepend_path(workaround_directory)
     end
 
-    def logical_path_for_full_path(full_path)
-      File.join(PARCELS_LOGICAL_PATH_PREFIX, ::Parcels::Utils::PathUtils.path_under(full_path, root))
+    def logical_path_for_subpath(subpath)
+      File.join(PARCELS_LOGICAL_PATH_PREFIX, subpath)
+    end
+
+    def subpath_to(full_path)
+      ::Parcels::Utils::PathUtils.path_under(full_path, root)
     end
 
     def add_all_widgets_to_sprockets_context!(sprockets_context, set_names)
