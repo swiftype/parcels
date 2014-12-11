@@ -20,7 +20,6 @@ describe "Parcels alongside files", :type => :system do
 
     it "should aggregate the contents of that file" do
       asset = compiled_sprockets_asset('basic')
-      $stderr.puts "SOURCE: #{asset.source.inspect}"
       asset.should_match(file_assets do
         asset 'views/my_widget.pcss' do
           expect_wrapped_rule :p, 'color: red'
@@ -146,7 +145,7 @@ describe "Parcels alongside files", :type => :system do
     expect { compiled_sprockets_asset('one').source }.to raise_error(::Sprockets::FileNotFound, %r{views/my_widget\.pcss}i)
   end
 
-  it "should allow you to pick up the alongside file with a 'require' using '_parcels/', and it should not be wrapped" do
+  it "should allow you to pick up the alongside file with a 'require' using '_parcels/', and it should be wrapped" do
     files {
       file 'assets/basic.css', %{
         //= require_parcels
@@ -162,9 +161,11 @@ describe "Parcels alongside files", :type => :system do
       }
     }
 
+    ter = this_example_root
+
     compiled_sprockets_asset('one').should_match(file_assets do
-      asset :head do
-        expect_rule :p, 'color: red'
+      asset 'views/.parcels_sprockets_workaround/_parcels/my_widget.pcss' do
+        expect_rule ".parcels_class__views__my_widget p", 'color: red'
       end
     end)
   end

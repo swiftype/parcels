@@ -24,7 +24,6 @@ module Parcels
 
     def add_to_sprockets_context!(sprockets_context)
       if has_content?(sprockets_context)
-        $stderr.puts "Requiring asset: #{logical_path.inspect} in: #{sprockets_context.environment.paths.join("; ")}"
         sprockets_context.require_asset(logical_path)
       else
         sprockets_context.depend_on_asset(logical_path)
