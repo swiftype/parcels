@@ -35,7 +35,7 @@ describe "Parcels sets", :type => :system do
           css %{div { color: green; }}
         end
 
-        file 'views/widget_one.css', %{
+        file 'views/widget_one.pcss', %{
           div.a { color: green; }
         }
 
@@ -45,7 +45,7 @@ describe "Parcels sets", :type => :system do
           sets :bbb
         end
 
-        file 'views/widget_two.css', %{
+        file 'views/widget_two.pcss', %{
           span.a { color: blue; }
         }
 
@@ -55,7 +55,7 @@ describe "Parcels sets", :type => :system do
           sets :aaa, :bbb
         end
 
-        file 'views/widget_three.css', %{
+        file 'views/widget_three.pcss', %{
           em.a { color: yellow; }
         }
 
@@ -65,7 +65,7 @@ describe "Parcels sets", :type => :system do
           sets nil
         end
 
-        file 'views/widget_four.css', %{
+        file 'views/widget_four.pcss', %{
           strong.a { color: cyan; }
         }
 
@@ -75,7 +75,7 @@ describe "Parcels sets", :type => :system do
           sets :aaa
         end
 
-        file 'views/widget_five.css', %{
+        file 'views/widget_five.pcss', %{
           h1.a { color: magenta; }
         }
 
@@ -94,7 +94,7 @@ end
 }
         end
 
-        file 'views/widget_six.css', %{
+        file 'views/widget_six.pcss', %{
           h2.a { color: black; }
         }
 
@@ -103,7 +103,7 @@ end
           css %{h3 { color: white; }}
         end
 
-        file 'views/widget_seven.css', %{
+        file 'views/widget_seven.pcss', %{
           h3.a { color: white; }
         }
 
@@ -112,7 +112,7 @@ end
           css %{h4 { color: red; }}
         end
 
-        file 'views/widget_eight.css', %{
+        file 'views/widget_eight.pcss', %{
           h4.a { color: red; }
         }
       }
@@ -128,7 +128,7 @@ end
           expect_wrapped_rule :div, 'color: green'
         end
 
-        asset 'views/widget_one.css' do
+        asset 'views/widget_one.pcss' do
           expect_wrapped_rule :'div.a', 'color: green'
         end
 
@@ -136,7 +136,7 @@ end
           expect_wrapped_rule :span, 'color: blue'
         end
 
-        asset 'views/widget_two.css' do
+        asset 'views/widget_two.pcss' do
           expect_wrapped_rule :'span.a', 'color: blue'
         end
 
@@ -144,7 +144,7 @@ end
           expect_wrapped_rule :em, 'color: yellow'
         end
 
-        asset 'views/widget_three.css' do
+        asset 'views/widget_three.pcss' do
           expect_wrapped_rule :'em.a', 'color: yellow'
         end
 
@@ -152,7 +152,7 @@ end
           expect_wrapped_rule :strong, 'color: cyan'
         end
 
-        asset 'views/widget_four.css' do
+        asset 'views/widget_four.pcss' do
           expect_wrapped_rule :'strong.a', 'color: cyan'
         end
 
@@ -160,7 +160,7 @@ end
           expect_wrapped_rule :h1, 'color: magenta'
         end
 
-        asset 'views/widget_five.css' do
+        asset 'views/widget_five.pcss' do
           expect_wrapped_rule :'h1.a', 'color: magenta'
         end
 
@@ -168,7 +168,7 @@ end
           expect_wrapped_rule :h2, 'color: black'
         end
 
-        asset 'views/widget_six.css' do
+        asset 'views/widget_six.pcss' do
           expect_wrapped_rule :'h2.a', 'color: black'
         end
 
@@ -176,7 +176,7 @@ end
           expect_wrapped_rule :h3, 'color: white'
         end
 
-        asset 'views/widget_seven.css' do
+        asset 'views/widget_seven.pcss' do
           expect_wrapped_rule :'h3.a', 'color: white'
         end
 
@@ -184,7 +184,7 @@ end
           expect_wrapped_rule :h4, 'color: red'
         end
 
-        asset 'views/widget_eight.css' do
+        asset 'views/widget_eight.pcss' do
           expect_wrapped_rule :'h4.a', 'color: red'
         end
       end)
@@ -200,7 +200,7 @@ end
           expect_wrapped_rule :div, 'color: green'
         end
 
-        asset 'views/widget_one.css' do
+        asset 'views/widget_one.pcss' do
           expect_wrapped_rule :'div.a', 'color: green'
         end
 
@@ -208,7 +208,7 @@ end
           expect_wrapped_rule :em, 'color: yellow'
         end
 
-        asset 'views/widget_three.css' do
+        asset 'views/widget_three.pcss' do
           expect_wrapped_rule :'em.a', 'color: yellow'
         end
 
@@ -216,7 +216,7 @@ end
           expect_wrapped_rule :h1, 'color: magenta'
         end
 
-        asset 'views/widget_five.css' do
+        asset 'views/widget_five.pcss' do
           expect_wrapped_rule :'h1.a', 'color: magenta'
         end
 
@@ -224,7 +224,7 @@ end
           expect_wrapped_rule :h3, 'color: white'
         end
 
-        asset 'views/widget_seven.css' do
+        asset 'views/widget_seven.pcss' do
           expect_wrapped_rule :'h3.a', 'color: white'
         end
 
@@ -232,7 +232,7 @@ end
           expect_wrapped_rule :h4, 'color: red'
         end
 
-        asset 'views/widget_eight.css' do
+        asset 'views/widget_eight.pcss' do
           expect_wrapped_rule :'h4.a', 'color: red'
         end
       end)
@@ -244,7 +244,7 @@ end
           expect_wrapped_rule :span, 'color: blue'
         end
 
-        asset 'views/widget_two.css' do
+        asset 'views/widget_two.pcss' do
           expect_wrapped_rule :'span.a', 'color: blue'
         end
 
@@ -252,7 +252,7 @@ end
           expect_wrapped_rule :em, 'color: yellow'
         end
 
-        asset 'views/widget_three.css' do
+        asset 'views/widget_three.pcss' do
           expect_wrapped_rule :'em.a', 'color: yellow'
         end
 
@@ -260,7 +260,7 @@ end
           expect_wrapped_rule :h2, 'color: black'
         end
 
-        asset 'views/widget_six.css' do
+        asset 'views/widget_six.pcss' do
           expect_wrapped_rule :'h2.a', 'color: black'
         end
 
@@ -268,7 +268,7 @@ end
           expect_wrapped_rule :h3, 'color: white'
         end
 
-        asset 'views/widget_seven.css' do
+        asset 'views/widget_seven.pcss' do
           expect_wrapped_rule :'h3.a', 'color: white'
         end
       end)
@@ -284,7 +284,7 @@ end
           expect_wrapped_rule :div, 'color: green'
         end
 
-        asset 'views/widget_one.css' do
+        asset 'views/widget_one.pcss' do
           expect_wrapped_rule :'div.a', 'color: green'
         end
 
@@ -292,7 +292,7 @@ end
           expect_wrapped_rule :span, 'color: blue'
         end
 
-        asset 'views/widget_two.css' do
+        asset 'views/widget_two.pcss' do
           expect_wrapped_rule :'span.a', 'color: blue'
         end
 
@@ -300,7 +300,7 @@ end
           expect_wrapped_rule :em, 'color: yellow'
         end
 
-        asset 'views/widget_three.css' do
+        asset 'views/widget_three.pcss' do
           expect_wrapped_rule :'em.a', 'color: yellow'
         end
 
@@ -308,7 +308,7 @@ end
           expect_wrapped_rule :h1, 'color: magenta'
         end
 
-        asset 'views/widget_five.css' do
+        asset 'views/widget_five.pcss' do
           expect_wrapped_rule :'h1.a', 'color: magenta'
         end
 
@@ -316,7 +316,7 @@ end
           expect_wrapped_rule :h2, 'color: black'
         end
 
-        asset 'views/widget_six.css' do
+        asset 'views/widget_six.pcss' do
           expect_wrapped_rule :'h2.a', 'color: black'
         end
 
@@ -324,7 +324,7 @@ end
           expect_wrapped_rule :h3, 'color: white'
         end
 
-        asset 'views/widget_seven.css' do
+        asset 'views/widget_seven.pcss' do
           expect_wrapped_rule :'h3.a', 'color: white'
         end
 
@@ -332,7 +332,7 @@ end
           expect_wrapped_rule :h4, 'color: red'
         end
 
-        asset 'views/widget_eight.css' do
+        asset 'views/widget_eight.pcss' do
           expect_wrapped_rule :'h4.a', 'color: red'
         end
       end)
@@ -348,7 +348,7 @@ end
           expect_wrapped_rule :div, 'color: green'
         end
 
-        asset 'views/widget_one.css' do
+        asset 'views/widget_one.pcss' do
           expect_wrapped_rule :'div.a', 'color: green'
         end
 
@@ -356,7 +356,7 @@ end
           expect_wrapped_rule :span, 'color: blue'
         end
 
-        asset 'views/widget_two.css' do
+        asset 'views/widget_two.pcss' do
           expect_wrapped_rule :'span.a', 'color: blue'
         end
 
@@ -364,7 +364,7 @@ end
           expect_wrapped_rule :em, 'color: yellow'
         end
 
-        asset 'views/widget_three.css' do
+        asset 'views/widget_three.pcss' do
           expect_wrapped_rule :'em.a', 'color: yellow'
         end
 
@@ -372,7 +372,7 @@ end
           expect_wrapped_rule :h1, 'color: magenta'
         end
 
-        asset 'views/widget_five.css' do
+        asset 'views/widget_five.pcss' do
           expect_wrapped_rule :'h1.a', 'color: magenta'
         end
 
@@ -380,7 +380,7 @@ end
           expect_wrapped_rule :h2, 'color: black'
         end
 
-        asset 'views/widget_six.css' do
+        asset 'views/widget_six.pcss' do
           expect_wrapped_rule :'h2.a', 'color: black'
         end
 
@@ -388,7 +388,7 @@ end
           expect_wrapped_rule :h3, 'color: white'
         end
 
-        asset 'views/widget_seven.css' do
+        asset 'views/widget_seven.pcss' do
           expect_wrapped_rule :'h3.a', 'color: white'
         end
 
@@ -396,7 +396,7 @@ end
           expect_wrapped_rule :h4, 'color: red'
         end
 
-        asset 'views/widget_eight.css' do
+        asset 'views/widget_eight.pcss' do
           expect_wrapped_rule :'h4.a', 'color: red'
         end
       end)
