@@ -13,6 +13,14 @@ module Parcels
       end
     end
 
+    def tag_type
+      :inline
+    end
+
+    def tag_types_that_must_come_before
+      [ :alongside ]
+    end
+
     private
     attr_reader :widget_tree, :full_path
 

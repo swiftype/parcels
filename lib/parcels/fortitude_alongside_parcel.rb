@@ -15,6 +15,14 @@ module Parcels
       end
     end
 
+    def tag_types_that_must_come_before
+      [ ]
+    end
+
+    def tag_type
+      :alongside
+    end
+
     def usable?
       widget_class_full_path
     end

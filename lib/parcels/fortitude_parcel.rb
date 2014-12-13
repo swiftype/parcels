@@ -39,11 +39,29 @@ module Parcels
     end
 
     def tag
-      widget_class
+      [ tag_type, widget_class ]
     end
 
     def tags_that_must_come_before
-      widget_class.all_fortitude_superclasses
+      out = tag_types_that_must_come_before.map { |tt| [ tt, widget_class ] }
+      widget_class.all_fortitude_superclasses.each do |superclass|
+        all_tag_types.each do |tt|
+          out << [ tt, superclass ]
+        end
+      end
+      out
+    end
+
+    def all_tag_types
+      [ :alongside, :inline ]
+    end
+
+    def tag_type
+      raise "must implement in #{self.class.name}"
+    end
+
+    def tag_types_that_must_come_before
+      raise "must implement in #{self.class.name}"
     end
 
     def to_css(sprockets_context)

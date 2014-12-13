@@ -29,7 +29,9 @@ describe "Parcels dependency sorting", :type => :system do
 
     sequence.each { |s| require File.join(this_example_root, "views/widget#{s}") }
 
-    compiled_sprockets_asset('basic').should_match((file_assets do
+    asset = compiled_sprockets_asset('basic')
+
+    asset.should_match((file_assets do
       sequence.each do |seq|
         # It's important that we keep .pcss before .rb here -- because we want CSS in the .rb file (_i.e._, directly
         # in the widget class itself) to take priority over CSS in the .pcss alongside file.
