@@ -21,7 +21,7 @@ describe "Parcels dependency sorting", :type => :system do
           }
         end
 
-        file   "views/widget#{seq}.css", %{
+        file   "views/widget#{seq}.pcss", %{
           div { color: #FFFF#{'%02d' % seq}; }
         }
       end
@@ -31,9 +31,9 @@ describe "Parcels dependency sorting", :type => :system do
 
     compiled_sprockets_asset('basic').should_match((file_assets do
       sequence.each do |seq|
-        # It's important that we keep .css before .rb here -- because we want CSS in the .rb file (_i.e._, directly
-        # in the widget class itself) to take priority over CSS in the .css alongside file.
-        asset "views/widget#{seq}.css" do
+        # It's important that we keep .pcss before .rb here -- because we want CSS in the .rb file (_i.e._, directly
+        # in the widget class itself) to take priority over CSS in the .pcss alongside file.
+        asset "views/widget#{seq}.pcss" do
           expect_wrapped_rule :div, "color: #FFFF#{'%02d' % seq}"
         end
 

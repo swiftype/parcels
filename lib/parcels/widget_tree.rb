@@ -24,10 +24,6 @@ module Parcels
       sprockets_environment.prepend_path(workaround_directory)
     end
 
-    def logical_path_for_subpath(subpath)
-      File.join(PARCELS_LOGICAL_PATH_PREFIX, subpath)
-    end
-
     def subpath_to(full_path)
       ::Parcels::Utils::PathUtils.path_under(full_path, root)
     end
@@ -68,7 +64,8 @@ module Parcels
     ALL_EXTENSIONS                    = EXTENSION_TO_PARCEL_CLASS_MAP.keys.dup.freeze
 
     PARCELS_WORKAROUND_DIRECTORY_NAME = ".parcels_sprockets_workaround".freeze
-    PARCELS_LOGICAL_PATH_PREFIX       = "_parcels".freeze
+
+    PARCELS_LOGICAL_PATH_PREFIXES     = EXTENSION_TO_PARCEL_CLASS_MAP.values.map { |k| k.logical_path_prefix }
 
     def root_exists?
       File.exist?(root)
@@ -82,7 +79,7 @@ module Parcels
       @workaround_directory_exists ||= begin
         ensure_workaround_directory_exists!
         ensure_nothing_else_is_in_workaround_directory!
-        ensure_symlink_points_to_the_right_place!
+        ensure_symlinks_point_to_the_right_place!
 
         true
       end
@@ -102,13 +99,14 @@ module Parcels
 
     def ensure_nothing_else_is_in_workaround_directory!
       entries = Dir.entries(workaround_directory).reject { |e| e =~ /^\./ }
-      extra = entries - [ PARCELS_LOGICAL_PATH_PREFIX ]
+      extra = entries - PARCELS_LOGICAL_PATH_PREFIXES
 
       if extra.length > 0
         raise Errno::EEXIST, %{Parcels uses the directory '#{workaround_directory}' internally
 (to allow us to safely add assets to Sprockets without treading on the global asset namespace);
-it should either be empty, or contain a single symlink named '#{PARCELS_LOGICAL_PATH_PREFIX}'.
-(Parcels will create that symlink automatically; you should not manage it yourself.)
+it should either be empty, or contain at most symlinks named any of
+#{PARCELS_LOGICAL_PATH_PREFIXES.map { |p| "'#{p}'" }.join(", ")}.
+(Parcels will create those symlinks automatically; you should not manage them yourself.)
 
 However, this directory currently contains other file(s) that we weren't expecting:
 
@@ -118,36 +116,39 @@ However, this directory currently contains other file(s) that we weren't expecti
 
     SYMLINK_TARGET = "..".freeze
 
-    def ensure_symlink_points_to_the_right_place!
-      symlink = File.join(workaround_directory, PARCELS_LOGICAL_PATH_PREFIX)
+    def ensure_symlinks_point_to_the_right_place!
+      PARCELS_LOGICAL_PATH_PREFIXES.each do |prefix|
+        symlink = File.join(workaround_directory, prefix)
 
-      if File.exist?(symlink)
-        if File.symlink?(symlink)
-          contents = File.readlink(symlink)
+        if File.exist?(symlink)
+          if File.symlink?(symlink)
+            contents = File.readlink(symlink)
 
-          if contents == SYMLINK_TARGET
-            # ok, great
+            if contents == SYMLINK_TARGET
+              # ok, great
+            else
+              File.delete(symlink)
+              create_symlink!(prefix)
+            end
           else
-            File.delete(symlink)
-            create_symlink!
-          end
-        else
-          raise Errno::EEXIST, %{Parcels uses the directory '#{workaround_directory}' internally
+            raise Errno::EEXIST, %{Parcels uses the directory '#{workaround_directory}' internally
 (to allow us to safely add assets to Sprockets without treading on the global asset namespace);
-it should either be empty, or contain a single symlink named '#{PARCELS_LOGICAL_PATH_PREFIX}'.
+it should either be empty, or contain at most symlinks named any of
+#{PARCELS_LOGICAL_PATH_PREFIXES.map { |p| "'#{p}'" }.join(", ")}.
 
-This directory has a file called '#{PARCELS_LOGICAL_PATH_PREFIX}' that isn't a symlink.
+This directory has a file called '#{prefix}' that isn't a symlink.
 Out of respect for your data, we're going to raise this fatal error. Please check what's going on,
 and try again.}
+          end
+        else
+          create_symlink!(prefix)
         end
-      else
-        create_symlink!
       end
     end
 
-    def create_symlink!
+    def create_symlink!(prefix)
       Dir.chdir(workaround_directory) do
-        FileUtils.ln_s(SYMLINK_TARGET, PARCELS_LOGICAL_PATH_PREFIX)
+        FileUtils.ln_s(SYMLINK_TARGET, prefix)
       end
     end
   end

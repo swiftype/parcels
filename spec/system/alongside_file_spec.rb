@@ -145,14 +145,14 @@ describe "Parcels alongside files", :type => :system do
     expect { compiled_sprockets_asset('one').source }.to raise_error(::Sprockets::FileNotFound, %r{views/my_widget\.pcss}i)
   end
 
-  it "should allow you to pick up the alongside file with a 'require' using '_parcels/', and it should be wrapped" do
+  it "should allow you to pick up the alongside file with a 'require' using '_parcels_alongside/', and it should be wrapped" do
     files {
       file 'assets/basic.css', %{
         //= require_parcels
       }
 
       file 'assets/one.css', %{
-        //= require '_parcels/my_widget.pcss'
+        //= require '_parcels_alongside/my_widget.pcss'
       }
 
       widget('views/my_widget') { }
@@ -164,7 +164,7 @@ describe "Parcels alongside files", :type => :system do
     ter = this_example_root
 
     compiled_sprockets_asset('one').should_match(file_assets do
-      asset 'views/.parcels_sprockets_workaround/_parcels/my_widget.pcss' do
+      asset 'views/.parcels_sprockets_workaround/_parcels_alongside/my_widget.pcss' do
         expect_rule ".parcels_class__views__my_widget p", 'color: red'
       end
     end)

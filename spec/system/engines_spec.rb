@@ -143,13 +143,13 @@ describe "Parcels engines support", :type => :system do
         }
 
         widget 'views/my_widget'
-        file 'views/my_widget.css', %{
+        file 'views/my_widget.pcss', %{
           p { background-image: url("foo-<%= 7 * 3 %>"); }
         }
       }
 
       compiled_sprockets_asset('basic').should_match(file_assets do
-        asset 'views/my_widget.css' do
+        asset 'views/my_widget.pcss' do
           expect_wrapped_rule :p, 'background-image: url("foo-<%= 7 * 3 %>")'
         end
       end)
@@ -164,13 +164,13 @@ describe "Parcels engines support", :type => :system do
         widget 'views/my_widget' do
           class_text %{  css_options :engines => '.erb'}
         end
-        file 'views/my_widget.css', %{
+        file 'views/my_widget.pcss', %{
           p { background-image: url("foo-<%= 7 * 3 %>"); }
         }
       }
 
       compiled_sprockets_asset('basic').should_match(file_assets do
-        asset 'views/my_widget.css' do
+        asset 'views/my_widget.pcss' do
           expect_wrapped_rule :p, 'background-image: url("foo-21")'
         end
       end)
@@ -190,13 +190,13 @@ describe "Parcels engines support", :type => :system do
           requires %{views/parent_widget}
         end
 
-        file 'views/child_widget.css', %{
+        file 'views/child_widget.pcss', %{
           p { background-image: url("foo-<%= 7 * 3 %>"); }
         }
       }
 
       compiled_sprockets_asset('basic').should_match(file_assets do
-        asset 'views/child_widget.css' do
+        asset 'views/child_widget.pcss' do
           expect_wrapped_rule :p, 'background-image: url("foo-21")'
         end
       end)

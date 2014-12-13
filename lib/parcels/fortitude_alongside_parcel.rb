@@ -4,6 +4,10 @@ require 'parcels/utils/path_utils'
 
 module Parcels
   class FortitudeAlongsideParcel < FortitudeParcel
+    def self.logical_path_prefix
+      "_parcels_alongside"
+    end
+
     def to_css(sprockets_context)
       if widget_class.respond_to?(:_parcels_widget_class_alongside_css) &&
         (!(css = widget_class._parcels_widget_class_alongside_css(widget_tree.parcels_environment, sprockets_context)).blank?)

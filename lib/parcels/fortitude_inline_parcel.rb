@@ -2,6 +2,10 @@ require 'parcels/fortitude_parcel'
 
 module Parcels
   class FortitudeInlineParcel < FortitudeParcel
+    def self.logical_path_prefix
+      "_parcels_inline"
+    end
+
     def to_css(sprockets_context)
       if widget_class.respond_to?(:_parcels_widget_class_inline_css) &&
         (!(css = widget_class._parcels_widget_class_inline_css(widget_tree.parcels_environment, sprockets_context)).blank?)
