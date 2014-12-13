@@ -51,7 +51,18 @@ end
   alias_method_chain :format_extension, :parcels
 end
 
-import_class = nil
+static_compiler_class = '::Sprockets::StaticCompiler'.constantize rescue nil
+if static_compiler_class
+  static_compiler_class.class_eval do
+    def compile_path_with_parcels?(logical_path)
+      return false if logical_path =~ /^_parcels/
+      compile_path_without_parcels?(logical_path)
+    end
+
+    alias_method_chain :compile_path?, :parcels
+  end
+end
+
 [ '::Sprockets::SassImporter', '::Sass::Rails::Importer' ].each do |class_name|
   klass = class_name.constantize rescue nil
 
@@ -75,7 +86,5 @@ import_class = nil
         alias_method_chain :find_relative, :parcels
       end
     end
-
-    break
   end
 end
