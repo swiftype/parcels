@@ -9,6 +9,8 @@ module Parcels
     def initialize(sprockets_environment)
       @sprockets_environment = sprockets_environment
       @widget_trees = [ ]
+
+      register_engines!
     end
 
     def is_underneath_root?(filename)
@@ -39,5 +41,13 @@ module Parcels
 
     private
     attr_reader :widget_trees
+
+    def register_engines!
+      @engines_registered ||= begin
+        @sprockets_environment.register_engine '.rb', ::Parcels::Fortitude::WidgetEngine
+        @sprockets_environment.register_engine '.pcss', ::Parcels::Fortitude::AlongsideEngine
+        true
+      end
+    end
   end
 end

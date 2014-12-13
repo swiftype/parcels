@@ -50,7 +50,7 @@ describe "Parcels Rails basic support", :type => :rails do
   end
 
   it "should allow precompiling assets with 'rake'" do
-    rails_server.run_command_in_rails_root!("rake assets:precompile")
+    rails_server.run_command_in_rails_root!("rake assets:precompile --trace")
 
     asset = precompiled_rails_asset('application.css')
     asset.should_match(rails_assets do

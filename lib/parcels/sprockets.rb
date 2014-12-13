@@ -17,6 +17,14 @@ require "parcels/index"
 end
 
 ::Sprockets::Index.class_eval do
+  # Older versions of Sprockets don't actually hang on to the environment here.
+  def initialize_with_parcels(environment)
+    initialize_without_parcels(environment)
+    @environment ||= environment
+  end
+
+  alias_method_chain :initialize, :parcels
+
   def parcels
     @parcels ||= ::Parcels::Index.new(@environment.parcels)
   end
@@ -43,22 +51,31 @@ end
   alias_method_chain :format_extension, :parcels
 end
 
-::Sprockets::SassImporter.class_eval do
-  if defined?(::Sprockets::SassImporter::GLOB)
-    def find_relative_with_parcels(name, base, options)
-      parcels = context.environment.parcels
+import_class = nil
+[ '::Sprockets::SassImporter', '::Sass::Rails::Importer' ].each do |class_name|
+  klass = class_name.constantize rescue nil
 
-      if name =~ ::Sprockets::SassImporter::GLOB && parcels.is_underneath_root?(base)
-        imports = nil
-        options[:load_paths].each do |load_path|
-          imports = glob_imports(name, Pathname.new(File.join(load_path.to_s, "dummy")), :load_paths => [ load_path ])
-          return imports if imports
+  if klass
+    klass.class_eval do
+      if defined?(klass::GLOB)
+        def find_relative_with_parcels(name, base, options)
+          parcels = context.environment.parcels
+
+          if name =~ self.class.const_get(:GLOB) && parcels.is_underneath_root?(base)
+            imports = nil
+            options[:load_paths].each do |load_path|
+              imports = glob_imports(name, Pathname.new(File.join(load_path.to_s, "dummy")), :load_paths => [ load_path ])
+              return imports if imports
+            end
+          end
+
+          return find_relative_without_parcels(name, base, options)
         end
-      end
 
-      return find_relative_without_parcels(name, base, options)
+        alias_method_chain :find_relative, :parcels
+      end
     end
 
-    alias_method_chain :find_relative, :parcels
+    break
   end
 end

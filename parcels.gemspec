@@ -26,6 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "nokogiri"
-  spec.add_development_dependency "oop_rails_server", "~> 0"
+  spec.add_development_dependency "oop_rails_server", "~> 0", ">= 0.0.4"
   spec.add_development_dependency "crass"
 end

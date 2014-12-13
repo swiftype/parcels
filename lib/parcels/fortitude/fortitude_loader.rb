@@ -23,6 +23,5 @@ if defined?(::Fortitude)
     include ::Parcels::Fortitude::Enabling
   end
 
-  ::Sprockets.register_engine '.rb', ::Parcels::Fortitude::WidgetEngine
-  ::Sprockets.register_engine '.pcss', ::Parcels::Fortitude::AlongsideEngine
+  ::Parcels.fortitude_available!
 end

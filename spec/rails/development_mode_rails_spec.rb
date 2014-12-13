@@ -33,8 +33,6 @@ describe "Parcels Rails development-mode support", :type => :rails do
       rescue Interrupt => i
         raise
       rescue => e
-        # failed
-        # $stderr.puts "block failed, now sleeping, remaining #{timeout_time - Time.now} seconds"
         attempt_count += 1
         last_exception = e
         sleep interval
