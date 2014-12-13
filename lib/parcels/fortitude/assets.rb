@@ -75,12 +75,10 @@ module Parcels
         end
 
         def _parcels_alongside_css_fragments
-          @_parcels_alongside_css_fragments ||= begin
-            options = { :prefix => _parcels_get_css_prefix }.merge(_parcels_css_options)
-            _parcels_alongside_filenames.map do |filename|
-              if File.exist?(filename)
-                ::Parcels::Fragments::CssFragment.new(File.read(filename), self, filename, 1, options)
-              end
+          options = { :prefix => _parcels_get_css_prefix }.merge(_parcels_css_options)
+          _parcels_alongside_filenames.map do |filename|
+            if File.exist?(filename)
+              ::Parcels::Fragments::CssFragment.new(File.read(filename), self, filename, 1, options)
             end
           end.compact
         end
