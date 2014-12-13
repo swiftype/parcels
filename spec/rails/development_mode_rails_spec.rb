@@ -47,7 +47,10 @@ describe "Parcels Rails development-mode support", :type => :rails do
   end
 
   def sleep_before_change
-    sleep 1
+    start_time = Time.now.to_i
+    while Time.now.to_i == start_time
+      sleep 0.05
+    end
   end
 
   def substitute_at_path(subpath, from_what, to_what)
