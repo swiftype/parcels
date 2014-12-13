@@ -15,7 +15,7 @@ module Parcels
           end
         end
 
-        def widget_class_for_alongside_file(alongside_file)
+        def widget_class_file_for_alongside_file(alongside_file)
           directory = File.dirname(alongside_file)
           basename = File.basename(alongside_file)
           basename = $1 if basename =~ /^(.+?)\./
@@ -24,11 +24,7 @@ module Parcels
           entries = entries.sort_by(&:length)
           entry = entries[-1]
 
-          unless entry
-            raise Errno::ENOENT, "No widget class in #{directory.inspect} corresponding to #{basename.inspect}? Have: #{entries.inspect}"
-          end
-
-          File.join(directory, entry)
+          File.join(directory, entry) if entry
         end
       end
     end

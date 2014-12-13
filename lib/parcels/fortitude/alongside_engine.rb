@@ -18,7 +18,12 @@ module Parcels
 
       def evaluate(context, locals, &block)
         parcels_environment = context.environment.parcels
-        widget_file = ::Parcels::Utils::PathUtils.widget_class_for_alongside_file(context.pathname)
+        widget_file = ::Parcels::Utils::PathUtils.widget_class_file_for_alongside_file(context.pathname)
+
+        unless widget_file
+          raise Errno::ENOENT, "Somehow, we're being asked to render CSS from #{context.pathname.to_s.inspect}, but we can't find a Fortitude widget class next to that file"
+        end
+
         widget_class = parcels_environment.widget_class_from_file(widget_file)
 
         if widget_class

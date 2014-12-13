@@ -17,6 +17,10 @@ module Parcels
       "<#{self.class.name.demodulize} for #{widget_class}, tree #{widget_tree}>"
     end
 
+    def usable?
+      true
+    end
+
     def included_in_any_set?(set_names)
       if set_names.length == 0
         true

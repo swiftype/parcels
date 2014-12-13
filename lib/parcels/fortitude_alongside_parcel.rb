@@ -15,11 +15,16 @@ module Parcels
       end
     end
 
+    def usable?
+      widget_class_full_path
+    end
+
     private
     attr_reader :widget_tree, :full_path
 
     def widget_class_full_path
-      @widget_class_full_path ||= ::Parcels::Utils::PathUtils.widget_class_for_alongside_file(full_path)
+      @widget_class_full_path ||= (::Parcels::Utils::PathUtils.widget_class_file_for_alongside_file(full_path) || :none)
+      @widget_class_full_path unless @widget_class_full_path == :none
     end
   end
 end

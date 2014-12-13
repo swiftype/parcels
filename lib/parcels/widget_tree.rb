@@ -44,7 +44,7 @@ module Parcels
         extension = File.extname(full_path).strip.downcase
         if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
           parcel = klass.new(self, full_path)
-          all_parcels << parcel if parcel.included_in_any_set?(set_names)
+          all_parcels << parcel if parcel.usable? && parcel.included_in_any_set?(set_names)
         end
       end
 

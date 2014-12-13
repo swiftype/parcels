@@ -9,7 +9,7 @@ describe "Parcels Rails sets support", :type => :rails do
         expect_wrapped_rule :span, 'color: blue'
       end
 
-      asset 'views/sets_rails_spec/normal_one.css' do
+      asset 'views/sets_rails_spec/normal_one.pcss' do
         expect_wrapped_rule :'span.a', 'color: blue'
       end
 
@@ -17,7 +17,7 @@ describe "Parcels Rails sets support", :type => :rails do
         expect_wrapped_rule :em, 'color: yellow'
       end
 
-      asset 'views/sets_rails_spec/normal_two.css' do
+      asset 'views/sets_rails_spec/normal_two.pcss' do
         expect_wrapped_rule :'em.a', 'color: yellow'
       end
     end)
@@ -31,7 +31,7 @@ describe "Parcels Rails sets support", :type => :rails do
         expect_wrapped_rule :p, 'color: red'
       end
 
-      asset 'views/admin/admin_one.css' do
+      asset 'views/admin/admin_one.pcss' do
         expect_wrapped_rule :'p.a', 'color: red'
       end
 
@@ -39,7 +39,7 @@ describe "Parcels Rails sets support", :type => :rails do
         expect_wrapped_rule :div, 'color: green'
       end
 
-      asset 'views/admin/admin_two.css' do
+      asset 'views/admin/admin_two.pcss' do
         expect_wrapped_rule :'div.a', 'color: green'
       end
     end)
@@ -53,7 +53,7 @@ describe "Parcels Rails sets support", :type => :rails do
         expect_wrapped_rule :span, 'color: blue'
       end
 
-      asset 'views/sets_rails_spec/normal_one.css' do
+      asset 'views/sets_rails_spec/normal_one.pcss' do
         expect_wrapped_rule :'span.a', 'color: blue'
       end
 
@@ -61,7 +61,7 @@ describe "Parcels Rails sets support", :type => :rails do
         expect_wrapped_rule :em, 'color: yellow'
       end
 
-      asset 'views/sets_rails_spec/normal_two.css' do
+      asset 'views/sets_rails_spec/normal_two.pcss' do
         expect_wrapped_rule :'em.a', 'color: yellow'
       end
 
@@ -69,7 +69,7 @@ describe "Parcels Rails sets support", :type => :rails do
         expect_wrapped_rule :p, 'color: red'
       end
 
-      asset 'views/admin/admin_one.css' do
+      asset 'views/admin/admin_one.pcss' do
         expect_wrapped_rule :'p.a', 'color: red'
       end
 
@@ -77,7 +77,7 @@ describe "Parcels Rails sets support", :type => :rails do
         expect_wrapped_rule :div, 'color: green'
       end
 
-      asset 'views/admin/admin_two.css' do
+      asset 'views/admin/admin_two.pcss' do
         expect_wrapped_rule :'div.a', 'color: green'
       end
     end)

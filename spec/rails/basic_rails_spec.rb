@@ -27,7 +27,7 @@ describe "Parcels Rails basic support", :type => :rails do
         expect_wrapped_rule :p, 'color: green'
       end
 
-      asset 'views/basic_rails_spec/alongside_and_inline.css' do
+      asset 'views/basic_rails_spec/alongside_and_inline.pcss' do
         expect_wrapped_rule :div, 'color: blue'
       end
 
@@ -41,7 +41,7 @@ describe "Parcels Rails basic support", :type => :rails do
         expect_wrapped_rule :p, 'color: yellow'
       end
 
-      asset 'views/basic_rails_spec/alongside_and_inline_html.html.css' do
+      asset 'views/basic_rails_spec/alongside_and_inline_html.html.pcss' do
         expect_wrapped_rule :div, 'color: purple'
       end
 
@@ -63,7 +63,7 @@ describe "Parcels Rails basic support", :type => :rails do
 
   it "should not pick up alongside files if there is no corresponding widget class" do
     compiled_rails_asset('application.css') do
-      asset_must_not_be_present('views/basic_rails_spec/no_corresponding_widget.css')
+      asset_must_not_be_present('views/basic_rails_spec/no_corresponding_widget.pcss')
       allow_additional_assets!
     end
   end
@@ -79,7 +79,7 @@ describe "Parcels Rails basic support", :type => :rails do
 
   it "should allow using ERb in alongside CSS if desired" do
     compiled_rails_asset('application.css').should_match(rails_assets do
-      asset 'views/basic_rails_spec/alongside_erb.css' do
+      asset 'views/basic_rails_spec/alongside_erb.pcss' do
         expect_wrapped_rule :p, 'background-image: url("foo-21")'
       end
       allow_additional_assets!
@@ -92,7 +92,7 @@ describe "Parcels Rails basic support", :type => :rails do
         expect_wrapped_rule :p, 'background-image: url("21")'
       end
 
-      asset 'views/basic_rails_spec/multiple_engines.css' do
+      asset 'views/basic_rails_spec/multiple_engines.pcss' do
         expect_wrapped_rule :div, 'background-image: url("21")'
       end
 
