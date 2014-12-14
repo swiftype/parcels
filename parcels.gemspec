@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "nokogiri"
   spec.add_development_dependency "oop_rails_server", "~> 0", ">= 0.0.4"
   spec.add_development_dependency "crass"
+  spec.add_development_dependency "fortitude", ">= 0.9.0"
 end
