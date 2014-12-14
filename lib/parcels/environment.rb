@@ -20,9 +20,14 @@ module Parcels
 
     def add_widget_tree!(widget_tree_root)
       widget_tree_root = File.expand_path(widget_tree_root, root)
-      unless widget_trees.detect { |wt| wt.root == widget_tree_root }
-        widget_trees << WidgetTree.new(self, widget_tree_root)
+      widget_tree = widget_trees.detect { |wt| wt.root == widget_tree_root }
+
+      if (! widget_tree)
+        widget_tree = WidgetTree.new(self, widget_tree_root)
+        widget_trees << widget_tree
       end
+
+      widget_tree.add_workaround_directory_to_sprockets!(sprockets_environment)
     end
 
     def widget_class_from_file(pathname)
@@ -30,9 +35,9 @@ module Parcels
     end
 
     def create_and_add_all_workaround_directories!
-      widget_trees.each do |widget_tree|
-        widget_tree.add_workaround_directory_to_sprockets!(sprockets_environment)
-      end
+      # widget_trees.each do |widget_tree|
+      #   widget_tree.add_workaround_directory_to_sprockets!(sprockets_environment)
+      # end
     end
 
     def add_all_widgets_to!(sprockets_context, set_names)

@@ -14,14 +14,17 @@ module Parcels
       @parcels_environment = parcels_environment
       @root = File.expand_path(root, parcels_environment.root)
 
-      @sprockets_contexts_added_to = { }
+      @sprockets_environments_added_to = { }
     end
 
     def add_workaround_directory_to_sprockets!(sprockets_environment)
       return if (! root_exists?)
 
-      ensure_workaround_directory_is_set_up!
-      sprockets_environment.prepend_path(workaround_directory)
+      @sprockets_environments_added_to[sprockets_environment] ||= begin
+        ensure_workaround_directory_is_set_up!
+        sprockets_environment.prepend_path(workaround_directory)
+        true
+      end
     end
 
     def subpath_to(full_path)

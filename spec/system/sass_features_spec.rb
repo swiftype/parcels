@@ -98,7 +98,8 @@ describe "Parcels SASS features support", :type => :system do
       end
     }
 
-    compiled_sprockets_asset('basic').should_match(file_assets do
+    asset = compiled_sprockets_asset('basic')
+    asset.should_match(file_assets do
       asset 'views/my_widget.rb' do
         expect_wrapped_rule :p, 'color: #feabcd'
         expect_wrapped_rule :div, 'color: #abcdef'
