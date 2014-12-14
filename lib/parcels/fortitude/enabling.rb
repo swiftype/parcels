@@ -48,7 +48,10 @@ module Parcels
             next if done
 
             tag_object.all_method_names.each do |tag_method_name|
-              @_parcels_tag_methods_module.send(:define_method, tag_method_name) do |content_or_attributes = nil, attributes = nil, &block|
+              @_parcels_tag_methods_module.send(:define_method, tag_method_name) do |*args, &block|
+                content_or_attributes = args[0]
+                attributes = args[1]
+
                 directly_inside = rendering_context.current_element_nesting.last
                 if directly_inside.kind_of?(::Fortitude::Widget) && (css_wrapper_classes = directly_inside.class.try(:_parcels_widget_outer_element_classes))
                   if attributes || content_or_attributes.kind_of?(String)

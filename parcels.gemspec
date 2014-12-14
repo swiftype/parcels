@@ -18,7 +18,11 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activesupport"
+  if RUBY_VERSION =~ /^1\.8\./
+    spec.add_dependency "activesupport", "< 4.0.0"
+  else
+    spec.add_dependency "activesupport"
+  end
 
   if (ENV['PARCELS_SPECS_SPROCKETS_VERSION'] || '').strip.length > 0
     spec.add_dependency "sprockets", "= #{ENV['PARCELS_SPECS_SPROCKETS_VERSION']}"
@@ -31,8 +35,14 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "nokogiri"
+
+  if RUBY_VERSION =~ /^1\.8\./
+    spec.add_development_dependency "nokogiri", "< 1.6.0"
+  else
+    spec.add_development_dependency "nokogiri"
+  end
+
   spec.add_development_dependency "oop_rails_server", "~> 0", ">= 0.0.4"
-  spec.add_development_dependency "crass"
+  spec.add_development_dependency "css_parser"
   spec.add_development_dependency "fortitude", ">= 0.9.0"
 end

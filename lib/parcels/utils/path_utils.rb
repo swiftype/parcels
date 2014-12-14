@@ -7,7 +7,7 @@ module Parcels
           under_what = under_what.to_s.strip
 
           if (path.length - under_what.length) > 1 && path[0..(under_what.length - 1)] == under_what &&
-            path[under_what.length] == File::SEPARATOR
+            path[under_what.length..under_what.length] == File::SEPARATOR
 
             path[(under_what.length + 1)..-1]
           else
