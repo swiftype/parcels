@@ -44,8 +44,10 @@ module Parcels
 
     def register_engines!
       @engines_registered ||= begin
-        @sprockets_environment.register_engine '.rb', ::Parcels::Fortitude::WidgetEngine
-        @sprockets_environment.register_engine '.pcss', ::Parcels::Fortitude::AlongsideEngine
+        if ::Parcels.fortitude_available?
+          @sprockets_environment.register_engine '.rb', ::Parcels::Fortitude::WidgetEngine
+          @sprockets_environment.register_engine '.pcss', ::Parcels::Fortitude::AlongsideEngine
+        end
         true
       end
     end

@@ -6,7 +6,7 @@ module Parcels
       @environment = environment
     end
 
-    delegate :root, :logical_path_for, :is_underneath_root?, :add_all_widgets_to!, :widget_class_from_file, :to => :environment
+    delegate :root, :logical_path_for, :is_underneath_root?, :add_all_widgets_to!, :widget_class_from_file, :add_widget_tree!, :to => :environment
 
     private
     attr_reader :environment

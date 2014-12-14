@@ -3,7 +3,7 @@ require "parcels"
 module Parcels
   module Rails
     class Railtie < ::Rails::Railtie
-      initializer :parcels, :after => :append_assets_path do |app|
+      initializer :parcels, :after => :finisher_hook do |app|
         parcels = ::Rails.application.assets.parcels
 
         ::ApplicationController.view_paths.map(&:to_s).each do |view_path|
