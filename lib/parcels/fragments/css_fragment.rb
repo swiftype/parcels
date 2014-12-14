@@ -91,7 +91,12 @@ module Parcels
         result = data
 
         processors.each do |processor|
-          template = processor.new(file) { result }
+          args = [ file ]
+          if processor == ::Tilt::ScssTemplate && (::Sprockets::VERSION !~ /^2\.11\./)
+            args = [ file, 1, :load_paths => context.environment.paths ]
+          end
+
+          template = processor.new(*args) { result }
           result = template.render(context, {})
         end
 
