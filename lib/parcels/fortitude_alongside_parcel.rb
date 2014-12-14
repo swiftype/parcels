@@ -5,7 +5,7 @@ require 'parcels/utils/path_utils'
 module Parcels
   class FortitudeAlongsideParcel < FortitudeParcel
     def self.logical_path_prefix
-      "_parcels_alongside"
+      "#{logical_path_prefix_base}alongside"
     end
 
     def to_css(sprockets_context)

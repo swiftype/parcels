@@ -53,13 +53,42 @@ end
 
 static_compiler_class = '::Sprockets::StaticCompiler'.constantize rescue nil
 if static_compiler_class
-  static_compiler_class.class_eval do
-    def compile_path_with_parcels?(logical_path)
-      return false if logical_path =~ /^_parcels/
-      compile_path_without_parcels?(logical_path)
+  instance_methods = static_compiler_class.instance_methods(true).map(&:to_s)
+  if instance_methods.include?('compile_path?')
+    static_compiler_class.class_eval do
+      def compile_path_with_parcels?(logical_path)
+        return false if ::Parcels.is_fortitude_logical_path?(logical_path)
+        compile_path_without_parcels?(logical_path)
+      end
+
+      alias_method_chain :compile_path?, :parcels
+    end
+  elsif instance_methods.include?('compile')
+    module ::Parcels::Sprockets
+      class StaticCompilerEnvProxy
+        def initialize(env)
+          @env = env
+        end
+
+        def each_logical_path(*args, &block)
+          @env.each_logical_path do |logical_path|
+            unless ::Parcels.is_fortitude_logical_path?(logical_path)
+              block.call(logical_path)
+            end
+          end
+        end
+
+        def method_missing(name, *args, &block)
+          @env.send(name, *args, &block)
+        end
+      end
     end
 
-    alias_method_chain :compile_path?, :parcels
+    static_compiler_class.class_eval do
+      def env
+        @_parcels_env_proxy ||= ::Parcels::Sprockets::StaticCompilerEnvProxy.new(@env)
+      end
+    end
   end
 end
 

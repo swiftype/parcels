@@ -4,6 +4,14 @@ require 'parcels/utils/path_utils'
 
 module Parcels
   class FortitudeParcel
+    def self.logical_path_prefix_base
+      "_parcels_"
+    end
+
+    def self.is_fortitude_logical_path?(logical_path)
+      logical_path =~ /^#{Regexp.escape(logical_path_prefix_base)}/
+    end
+
     def initialize(widget_tree, full_path)
       @widget_tree = widget_tree
       @full_path = full_path

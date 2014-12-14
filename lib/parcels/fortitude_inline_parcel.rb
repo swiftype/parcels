@@ -3,7 +3,7 @@ require 'parcels/fortitude_parcel'
 module Parcels
   class FortitudeInlineParcel < FortitudeParcel
     def self.logical_path_prefix
-      "_parcels_inline"
+      "#{logical_path_prefix_base}inline"
     end
 
     def to_css(sprockets_context)
