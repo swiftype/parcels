@@ -6,7 +6,7 @@ module Parcels
       initializer :parcels, :after => [ :append_assets_path, :finisher_hook ] do |app|
         parcels = ::Rails.application.assets.parcels
 
-        ::ApplicationController.view_paths.map(&:to_s).each do |view_path|
+        ::ActionController::Base.view_paths.map(&:to_s).each do |view_path|
           view_path = File.expand_path(view_path)
           parcels.add_widget_tree!(view_path)
         end

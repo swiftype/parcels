@@ -54,8 +54,6 @@ end
       set_name.strip.to_sym
     end
     context.environment.parcels.add_all_widgets_to!(context, set_names.map(&:to_sym))
-  rescue Exception => e
-    $stderr.puts "#{e.message} (#{e.class.name})\n    #{e.backtrace.join("\n    ")}"
   end
 end
 
