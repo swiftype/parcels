@@ -35,7 +35,7 @@ describe "Parcels Rails development-mode support", :type => :rails do
       rescue => e
         attempt_count += 1
         last_exception = e
-        sleep interval
+        sleep interval.to_f
       end
     end
 

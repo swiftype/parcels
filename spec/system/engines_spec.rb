@@ -4,7 +4,7 @@ describe "Parcels engines support", :type => :system do
     let(:css_options) { nil }
     let(:css_arguments) do
       if css_options
-        [ css_with_erb, :options => css_options ]
+        [ css_with_erb, { :options => css_options } ]
       else
         [ css_with_erb ]
       end

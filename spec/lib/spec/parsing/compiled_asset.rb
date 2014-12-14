@@ -56,7 +56,7 @@ module Spec
       private
       attr_reader :raw_asset
 
-      FROM_LINE_REGEXP = %r{^\s*\/\*\s*From[\s'"]*([^'"]+?)\s*[\s'"]*:\s*(\d+)\s*\*/\s*$}i
+      FROM_LINE_REGEXP = %r{^\s*\/\*\s*From[\s'"]*([^'"]+?)\s*[\s'"]*:\s*(\d+)[\s'"]*\*/\s*$}i
       BREAK_LINE_REGEXP = %r{^\s*//\s*===\s*BREAK\s*===\s*$}i
 
       def parse_fragments_from_raw_source(raw_source)
