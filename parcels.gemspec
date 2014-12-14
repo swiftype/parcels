@@ -19,7 +19,13 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "activesupport"
-  spec.add_dependency "sprockets"
+
+  if (ENV['PARCELS_SPECS_SPROCKETS_VERSION'] || '').strip.length > 0
+    spec.add_dependency "sprockets", "= #{ENV['PARCELS_SPECS_SPROCKETS_VERSION']}"
+  else
+    spec.add_dependency "sprockets"
+  end
+
   spec.add_dependency "sass"
 
   spec.add_development_dependency "bundler", "~> 1.6"
