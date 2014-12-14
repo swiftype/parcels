@@ -1,4 +1,4 @@
-require 'crass'
+require 'css_parser'
 
 module Spec
   module Parsing
@@ -11,19 +11,15 @@ module Spec
         @style_rules ||= begin
           out = { }
 
-          parse_tree.each do |toplevel_parse_node|
-            if toplevel_parse_node[:node] == :style_rule
-              selector_node = toplevel_parse_node[:selector]
-              selector = selector_node[:value].to_s
-              rules = [ ]
-
-              toplevel_parse_node[:children].each do |child|
-                if child[:node] == :property
-                  rules << "#{child[:name]}: #{child[:value]}"
-                end
+          if raw_asset.source
+            parser = CssParser::Parser.new
+            parser.load_string!(raw_asset.source)
+            parser.each_selector do |selectors, declarations, specificity, media_types|
+              out[selectors] = Array(declarations).map do |declaration|
+                declaration = declaration.strip
+                declaration = $1 if declaration =~ /\A(.*?);\Z/mi
+                declaration
               end
-
-              out[selector] = rules if rules.length > 0
             end
           end
 
@@ -33,18 +29,6 @@ module Spec
 
       private
       attr_reader :raw_asset
-
-      def parse_tree
-        @parse_tree ||= begin
-          if raw_asset.source
-            ::Crass.parse(raw_asset.source)
-          else
-            :none
-          end
-        end
-
-        @parse_tree unless @parse_tree == :none
-      end
     end
   end
 end
