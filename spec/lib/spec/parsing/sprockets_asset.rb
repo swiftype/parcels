@@ -15,7 +15,13 @@ module Spec
       end
 
       def source
-        asset.source if asset
+        if asset
+          if asset.respond_to?(:source)
+            asset.source
+          else
+            asset.to_s
+          end
+        end
       end
 
       def to_s
