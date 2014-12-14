@@ -14,4 +14,10 @@ end
 
 if defined?(::Rails)
   require 'parcels/rails/railtie'
+
+  begin
+    require 'sass-rails'
+  rescue LoadError => le
+    # ok
+  end
 end

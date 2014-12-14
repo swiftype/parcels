@@ -63,6 +63,12 @@ if static_compiler_class
   end
 end
 
+begin
+  require 'sass/rails/importer'
+rescue LoadError => le
+  # oh, well
+end
+
 [ '::Sprockets::SassImporter', '::Sass::Rails::Importer' ].each do |class_name|
   klass = class_name.constantize rescue nil
 
@@ -71,16 +77,20 @@ end
       if defined?(klass::GLOB)
         def find_relative_with_parcels(name, base, options)
           parcels = context.environment.parcels
+          expanded_locations_to_search = context.environment.paths + [ File.dirname(base) ]
 
           if name =~ self.class.const_get(:GLOB) && parcels.is_underneath_root?(base)
+            paths_to_search = expanded_locations_to_search
+
             imports = nil
-            options[:load_paths].each do |load_path|
-              imports = glob_imports(name, Pathname.new(File.join(load_path.to_s, "dummy")), :load_paths => [ load_path ])
+            paths_to_search.each do |path_to_search|
+              glob_against = Pathname.new(File.join(path_to_search.to_s, 'dummy'))
+              imports = glob_imports(name, glob_against, :load_paths => [ path_to_search ])
               return imports if imports
             end
           end
 
-          return find_relative_without_parcels(name, base, options)
+          return find_relative_without_parcels(name, base, options.merge(:load_paths => expanded_locations_to_search))
         end
 
         alias_method_chain :find_relative, :parcels

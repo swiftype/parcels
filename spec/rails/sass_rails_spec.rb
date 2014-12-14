@@ -92,14 +92,17 @@ describe "Parcels Rails SASS support", :type => :rails do
   it "should support 'asset-path', 'asset-url', 'image-url', 'asset-data-url', etc." do
     asset = compiled_rails_asset('application.css')
 
+    asset_prefix = if rails_server.rails_version =~ /^3/ then "/assets" else "" end
+    image_prefix = if rails_server.rails_version =~ /^3/ then "/assets" else "/images" end
+
     asset.should_match(rails_assets do
       asset 'views/sass_rails_spec/asset_url.rb' do
-        expect_wrapped_rule :p, 'background: url("/foo/bar.jpg")'
-        expect_wrapped_rule :div, 'background: url(/bar/baz.png)'
+        expect_wrapped_rule :p, "background: url(\"#{asset_prefix}/foo/bar.jpg\")"
+        expect_wrapped_rule :div, "background: url(#{asset_prefix}/bar/baz.png)"
       end
 
       asset 'views/sass_rails_spec/asset_url.pcss' do
-        expect_wrapped_rule :span, 'background: url(/images/baz/quux.jpg)'
+        expect_wrapped_rule :span, "background: url(#{image_prefix}/baz/quux.jpg)"
         expect_wrapped_rule :section, /^background:\s+url\(data:image\/png;base64,/
       end
 
