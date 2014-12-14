@@ -28,9 +28,12 @@ app_class.configure do
   config.serve_static_assets = true
 
   # Compress JavaScripts and CSS.
-  config.assets.js_compressor = :uglifier
-  config.assets.css_compressor = :sass
-  config.assets.compress = true
+  if ::Rails.version =~ /^4/
+    config.assets.js_compressor = :uglifier
+    config.assets.css_compressor = :sass
+  else
+    config.assets.compress = true
+  end
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = true
