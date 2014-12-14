@@ -21,7 +21,7 @@ module Parcels
 
           @_parcels_tag_methods_module = Module.new
           const_set(:ParcelsEnablingModule, @_parcels_tag_methods_module)
-          self.include @_parcels_tag_methods_module
+          include @_parcels_tag_methods_module
 
           _parcels_ensure_all_tag_methods_overridden!
 
