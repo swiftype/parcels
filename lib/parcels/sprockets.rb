@@ -3,6 +3,22 @@ require 'active_support/core_ext/string'
 
 require "parcels/index"
 
+module Parcels
+  module Sprockets
+    def self.sprockets_version_components
+      @sprockets_version_components ||= ::Sprockets::VERSION.split(".").map { |x| x.to_i }
+    end
+
+    def self.requires_explicit_load_paths_for_css_template?
+      sprockets_version_components[0] <= 2 && sprockets_version_components[1] < 11
+    end
+
+    def self.requires_fix_for_protected_methods_on_directive_processor?
+      RUBY_VERSION =~ /^2/ && sprockets_version_components[0] <= 2 && sprockets_version_components[1] < 11
+    end
+  end
+end
+
 ::Sprockets::Environment.class_eval do
   def parcels
     @parcels ||= ::Parcels::Environment.new(self)
@@ -38,6 +54,8 @@ end
       set_name.strip.to_sym
     end
     context.environment.parcels.add_all_widgets_to!(context, set_names.map(&:to_sym))
+  rescue Exception => e
+    $stderr.puts "#{e.message} (#{e.class.name})\n    #{e.backtrace.join("\n    ")}"
   end
 end
 
@@ -49,6 +67,14 @@ end
   end
 
   alias_method_chain :format_extension, :parcels
+end
+
+if ::Parcels::Sprockets.requires_fix_for_protected_methods_on_directive_processor?
+  ::Sprockets::DirectiveProcessor.class_eval do
+    instance_methods(true).select { |m| m =~ /^process_.*directive$/i }.each do |method_name|
+      public method_name
+    end
+  end
 end
 
 static_compiler_class = '::Sprockets::StaticCompiler'.constantize rescue nil

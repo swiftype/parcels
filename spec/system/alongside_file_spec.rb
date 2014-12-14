@@ -152,7 +152,7 @@ describe "Parcels alongside files", :type => :system do
       }
 
       file 'assets/one.css', %{
-        //= require '_parcels_alongside/my_widget.pcss'
+        //= require _parcels_alongside/my_widget.pcss
       }
 
       widget('views/my_widget') { }
@@ -162,8 +162,8 @@ describe "Parcels alongside files", :type => :system do
     }
 
     ter = this_example_root
-
-    compiled_sprockets_asset('one').should_match(file_assets do
+    asset = compiled_sprockets_asset('one')
+    asset.should_match(file_assets do
       asset 'views/.parcels_sprockets_workaround/_parcels_alongside/my_widget.pcss' do
         expect_rule ".parcels_class__views__my_widget p", 'color: red'
       end

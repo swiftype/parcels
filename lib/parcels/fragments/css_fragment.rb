@@ -92,7 +92,7 @@ module Parcels
 
         processors.each do |processor|
           args = [ file ]
-          if processor == ::Tilt::ScssTemplate && (::Sprockets::VERSION !~ /^2\.11\./)
+          if processor == ::Tilt::ScssTemplate && (::Parcels::Sprockets.requires_explicit_load_paths_for_css_template?)
             args = [ file, 1, :load_paths => context.environment.paths ]
           end
 
