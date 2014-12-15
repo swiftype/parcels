@@ -95,7 +95,7 @@ if static_compiler_class
         end
 
         def each_logical_path(*args, &block)
-          @env.each_logical_path do |logical_path|
+          @env.each_logical_path(*args) do |logical_path|
             unless ::Parcels.is_fortitude_logical_path?(logical_path)
               block.call(logical_path)
             end
