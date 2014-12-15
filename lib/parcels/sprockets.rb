@@ -143,7 +143,7 @@ end
             end
           end
 
-          return find_relative_without_parcels(name, base, options.merge(:load_paths => expanded_locations_to_search))
+          return find_relative_without_parcels(name, base, options.merge(:load_paths => (options[:load_paths] || [ ]) + expanded_locations_to_search))
         end
 
         alias_method_chain :find_relative, :parcels
