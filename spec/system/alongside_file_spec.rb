@@ -161,10 +161,12 @@ describe "Parcels alongside files", :type => :system do
       }
     }
 
+    compiled_sprockets_asset('basic').source # to make sure workaround directories get added
+
     ter = this_example_root
     asset = compiled_sprockets_asset('one')
     asset.should_match(file_assets do
-      asset 'views/.parcels_sprockets_workaround/_parcels_alongside/my_widget.pcss' do
+      asset 'views/my_widget.pcss' do
         expect_rule ".parcels_class__views__my_widget p", 'color: red'
       end
     end)

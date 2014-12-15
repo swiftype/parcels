@@ -21,7 +21,6 @@ module Parcels
       return if (! root_exists?)
 
       @sprockets_environments_added_to[sprockets_environment] ||= begin
-        ensure_workaround_directory_is_set_up!
         sprockets_environment.prepend_path(workaround_directory)
         true
       end
@@ -47,7 +46,13 @@ module Parcels
         extension = File.extname(full_path).strip.downcase
         if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
           parcel = klass.new(self, full_path)
-          all_parcels << parcel if parcel.usable? && parcel.included_in_any_set?(set_names)
+          if parcel.usable? && parcel.included_in_any_set?(set_names)
+            if all_parcels.length == 0
+              ensure_workaround_directory_is_set_up!
+            end
+
+            all_parcels << parcel
+          end
         end
       end
 
