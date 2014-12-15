@@ -110,7 +110,7 @@ if static_compiler_class
 
     static_compiler_class.class_eval do
       def env
-        @_parcels_env_proxy ||= ::Parcels::Sprockets::StaticCompilerEnvProxy.new(@env)
+        ::Parcels::Sprockets::StaticCompilerEnvProxy.new(@env)
       end
     end
   end
