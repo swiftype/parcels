@@ -9,6 +9,8 @@ module Parcels
     def initialize(sprockets_environment)
       @sprockets_environment = sprockets_environment
       @widget_trees = [ ]
+      @workaround_directories_for_widget_trees = { }
+      @workaround_directories_root = nil
 
       register_engines!
     end
@@ -50,8 +52,43 @@ as #parcels from your Sprockets environment.}
       widget_trees.each { |wt| wt.add_all_widgets_to_sprockets_context!(sprockets_context, set_names) }
     end
 
+    def workaround_directory_root_for_widget_tree(widget_tree)
+      @workaround_directories_for_widget_trees[widget_tree] ||= begin
+        if @workaround_directories_root
+          File.join(@workaround_directories_root, workaround_directory_name_for(widget_tree))
+        else
+          File.join(widget_tree.root, PARCELS_WORKAROUND_DIRECTORY_NAME)
+        end
+      end
+    end
+
+    def workaround_directories_root
+      @workaround_directories_root
+    end
+
+    def workaround_directories_root=(new_root)
+      new_root = File.expand_path(new_root)
+
+      if @workaround_directories_for_widget_trees.size > 0 && @workaround_directories_root != new_root
+        raise "You can't set the workaround directories root to:
+#{new_root}
+...it's already set to:
+#{@workaround_directories_root}"
+      end
+
+      @workaround_directories_root = new_root
+    end
+
     private
     attr_reader :widget_trees
+
+    PARCELS_WORKAROUND_DIRECTORY_NAME = ".parcels_sprockets_workaround".freeze
+
+    def workaround_directory_name_for(widget_tree)
+      require 'digest/md5'
+      digest = Digest::MD5.hexdigest(widget_tree.root).strip
+      "#{PARCELS_WORKAROUND_DIRECTORY_NAME}_#{digest}"
+    end
 
     def register_engines!
       @engines_registered ||= begin

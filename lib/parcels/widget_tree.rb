@@ -4,6 +4,8 @@ require 'parcels/fortitude_inline_parcel'
 require 'parcels/fortitude_alongside_parcel'
 require 'parcels/dependency_parcel_list'
 
+require 'pathname'
+
 require 'find'
 
 module Parcels
@@ -71,8 +73,6 @@ module Parcels
 
     ALL_EXTENSIONS                    = EXTENSION_TO_PARCEL_CLASS_MAP.keys.dup.freeze
 
-    PARCELS_WORKAROUND_DIRECTORY_NAME = ".parcels_sprockets_workaround".freeze
-
     PARCELS_LOGICAL_PATH_PREFIXES     = EXTENSION_TO_PARCEL_CLASS_MAP.values.map { |k| k.logical_path_prefix }
 
     def root_exists?
@@ -80,7 +80,7 @@ module Parcels
     end
 
     def workaround_directory
-      @workaround_directory ||= File.join(root, PARCELS_WORKAROUND_DIRECTORY_NAME)
+      @workaround_directory ||= parcels_environment.workaround_directory_root_for_widget_tree(self)
     end
 
     def ensure_workaround_directory_is_set_up!
@@ -132,7 +132,7 @@ However, this directory currently contains other file(s) that we weren't expecti
           if File.symlink?(symlink)
             contents = File.readlink(symlink)
 
-            if contents == SYMLINK_TARGET
+            if contents == symlink_target
               # ok, great
             else
               File.delete(symlink)
@@ -156,8 +156,14 @@ and try again.}
 
     def create_symlink!(prefix)
       Dir.chdir(workaround_directory) do
-        FileUtils.ln_s(SYMLINK_TARGET, prefix)
+        FileUtils.ln_s(symlink_target, prefix)
       end
+    end
+
+    def symlink_target
+      workaround_dir_path = Pathname.new(workaround_directory).realpath
+      root_path = Pathname.new(root).realpath
+      root_path.relative_path_from(workaround_dir_path).to_s
     end
   end
 end

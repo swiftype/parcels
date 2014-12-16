@@ -17,7 +17,13 @@ module SprocketsHelpers
       end
     end
 
-    out.parcels.add_widget_tree!(File.join(this_example_root, 'views'))
+    default_widget_trees_to_add_to_sprockets.each do |widget_tree_root|
+      out.parcels.add_widget_tree!(widget_tree_root)
+    end
     out
+  end
+
+  def default_widget_trees_to_add_to_sprockets
+    [ File.join(this_example_root, 'views') ]
   end
 end
