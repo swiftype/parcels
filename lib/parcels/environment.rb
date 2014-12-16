@@ -41,6 +41,12 @@ module Parcels
     end
 
     def add_all_widgets_to!(sprockets_context, set_names)
+      if widget_trees.length == 0
+        raise %{Error: You have not defined any widget trees -- directories containing Fortitude widgets.
+You must call #add_widget_tree! on the Parcels environment, which usually is accessible
+as #parcels from your Sprockets environment.}
+      end
+
       widget_trees.each { |wt| wt.add_all_widgets_to_sprockets_context!(sprockets_context, set_names) }
     end
 
