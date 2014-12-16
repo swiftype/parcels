@@ -5,7 +5,7 @@ module ParcelsRailsHelpers
 
   def rails_server_additional_gemfile_lines
     [
-      "gem 'fortitude', \">= 0.9.0\"",
+      "gem 'fortitude', \">= 0.9.2\"",
       "gem 'parcels', :path => '#{rails_server_project_root}'"
     ]
   end

@@ -44,5 +44,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "oop_rails_server", "~> 0", ">= 0.0.5"
   spec.add_development_dependency "css_parser"
-  spec.add_development_dependency "fortitude", ">= 0.9.1"
+  spec.add_development_dependency "fortitude", ">= 0.9.2"
 end

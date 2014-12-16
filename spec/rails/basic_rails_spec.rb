@@ -99,4 +99,15 @@ describe "Parcels Rails basic support", :type => :rails do
       allow_additional_assets!
     end)
   end
+
+  it "should allow putting a .rb file in views/ that is just a module (~ helpers)" do
+    compiled_rails_asset('application.css').should_match(rails_assets do
+      asset 'views/basic_rails_spec/helpers_module_test.rb' do
+        expect_wrapped_rule :p, 'color: green'
+      end
+      allow_additional_assets!
+    end)
+
+    expect_match("helpers_module_test", /and it is this is my_helper\! tada\!/)
+  end
 end

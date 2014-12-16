@@ -24,7 +24,7 @@ module Parcels
     end
 
     def usable?
-      widget_class_full_path
+      super && widget_class_full_path
     end
 
     private

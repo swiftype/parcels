@@ -26,7 +26,7 @@ module Parcels
     end
 
     def usable?
-      true
+      !! widget_class
     end
 
     def included_in_any_set?(set_names)
@@ -96,7 +96,19 @@ module Parcels
     end
 
     def widget_class
-      @widget_class ||= ::Fortitude::Widget.widget_class_from_file(widget_class_full_path, :root_dirs => [ widget_tree.root ])
+      @widget_class ||= begin
+        if widget_class_full_path
+          begin
+            ::Fortitude::Widget.widget_class_from_file(widget_class_full_path, :root_dirs => [ widget_tree.root ])
+          rescue ::Fortitude::Widget::Files::CannotDetermineWidgetClassNameError => cdwcne
+            raise unless cdwcne.resulting_objects.detect { |o| o.kind_of?(Module) }
+            :none
+          end
+        else
+          :none
+        end
+      end
+      @widget_class unless @widget_class == :none
     end
   end
 end
