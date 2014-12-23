@@ -145,6 +145,9 @@ you may want to enable Parcels on any of its Fortitude superclasses, which are:
           end
 
           @_parcels_inline_css_fragments ||= [ ]
+          @_parcels_inline_css_fragments.delete_if do |fragment|
+            fragment.file == caller_file && fragment.line >= caller_line
+          end
           @_parcels_inline_css_fragments += css_strings.map do |css_string|
             ::Parcels::Fragments::CssFragment.new(css_string, self, caller_file, caller_line, _parcels_css_options.merge(options))
           end

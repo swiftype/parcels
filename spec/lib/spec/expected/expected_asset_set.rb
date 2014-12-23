@@ -12,8 +12,8 @@ module Spec
         instance_eval(&block) if block
       end
 
-      def asset(subpath, &block)
-        expected_asset = Spec::Expected::ExpectedAsset.new(root_directory, subpath, &block)
+      def asset(subpath, options = { }, &block)
+        expected_asset = Spec::Expected::ExpectedAsset.new(root_directory, subpath, options, &block)
         @expected_assets << expected_asset
       end
 

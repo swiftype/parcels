@@ -5,11 +5,14 @@ require 'spec/expected/base_expected_asset'
 module Spec
   module Expected
     class ExpectedAsset < BaseExpectedAsset
-      def initialize(root_directory, expected_subpath, &block)
+      def initialize(root_directory, expected_subpath, options = { }, &block)
         super(root_directory, expected_subpath)
 
         @expected_rules = { }
         @allow_extra_rules = false
+        @options = options
+
+        options.assert_valid_keys(:sequencing)
 
         instance_eval(&block) if block
       end
@@ -52,7 +55,7 @@ module Spec
             message << "\n\n    #{remaining_asset}:\n        #{remaining_asset.source}\n"
           end
           raise message
-        elsif matching_remaining_assets.length == 1
+        elsif matching_remaining_assets.length == 1 || options[:sequencing]
           matching_remaining_asset = matching_remaining_assets.first
 
           unless asset_matches?(matching_remaining_asset)
@@ -79,7 +82,7 @@ module Spec
       end
 
       private
-      attr_reader :expected_rules
+      attr_reader :expected_rules, :options
 
       def extra_rules_allowed?
         !! @allow_extra_rules
