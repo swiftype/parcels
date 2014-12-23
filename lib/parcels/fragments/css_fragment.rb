@@ -8,6 +8,8 @@ module Parcels
         end
       end
 
+      attr_reader :file, :line
+
       def initialize(css_string, source, file, line, options)
         options.assert_valid_keys(:engines, :wrap, :prefix)
 
@@ -51,7 +53,7 @@ module Parcels
       end
 
       private
-      attr_reader :css_string, :source, :options, :file, :line
+      attr_reader :css_string, :source, :options
 
       def header_comment
         out = "/* From '#{file}'"
@@ -91,13 +93,8 @@ module Parcels
         result = data
 
         processors.each do |processor|
-          args = [ file ]
-          if processor == ::Tilt::ScssTemplate && (::Parcels::Sprockets.requires_explicit_load_paths_for_css_template?)
-            args = [ file, 1, { :load_paths => context.environment.paths } ]
-          end
-
-          template = processor.new(*args) { result }
-          result = template.render(context, {})
+          template = processor.new(file, 1, { :load_paths => context.environment.paths, :filename => file }) { result }
+          result = template.render(context, { :filename => file })
         end
 
         result
