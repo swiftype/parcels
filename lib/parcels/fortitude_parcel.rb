@@ -99,7 +99,8 @@ module Parcels
       @widget_class ||= begin
         if widget_class_full_path
           begin
-            ::Fortitude::Widget.widget_class_from_file(widget_class_full_path, :root_dirs => [ widget_tree.root ])
+            ::Fortitude::Widget.widget_class_from_file(widget_class_full_path,
+              :root_dirs => widget_tree.widget_naming_root_dirs)
           rescue ::Fortitude::Widget::Files::CannotDetermineWidgetClassNameError => cdwcne
             raise unless cdwcne.resulting_objects.detect { |o| o.kind_of?(Module) }
             :none

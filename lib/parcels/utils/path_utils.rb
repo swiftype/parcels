@@ -3,6 +3,11 @@ module Parcels
     module PathUtils
       class << self
         def path_under(path, under_what)
+          maybe_path_under(path, under_what) ||
+            raise(Errno::ENOENT, %{Path #{path.inspect} is not underneath directory #{under_what.inspect}.})
+        end
+
+        def maybe_path_under(path, under_what)
           path = path.to_s.strip
           under_what = under_what.to_s.strip
 
@@ -10,8 +15,6 @@ module Parcels
             path[under_what.length..under_what.length] == File::SEPARATOR
 
             path[(under_what.length + 1)..-1]
-          else
-            raise Errno::ENOENT, %{Path #{path.inspect} is not underneath directory #{under_what.inspect}.}
           end
         end
 

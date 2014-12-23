@@ -32,8 +32,15 @@ module Parcels
       widget_tree.add_workaround_directory_to_sprockets!(sprockets_environment)
     end
 
-    def widget_class_from_file(pathname)
-      ::Fortitude::Widget.widget_class_from_file(pathname, :root_dirs => widget_trees.map(&:root))
+    def widget_class_from_file(full_path)
+      widget_trees.each do |widget_tree|
+        if (removed = widget_tree.remove_workaround_directory_from(full_path))
+          full_path = removed
+          break
+        end
+      end
+
+      ::Fortitude::Widget.widget_class_from_file(full_path, :root_dirs => widget_trees.map(&:widget_naming_root_dirs).flatten.uniq)
     end
 
     def create_and_add_all_workaround_directories!

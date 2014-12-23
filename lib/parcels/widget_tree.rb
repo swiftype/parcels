@@ -19,6 +19,10 @@ module Parcels
       @sprockets_environments_added_to = { }
     end
 
+    def widget_naming_root_dirs
+      @widget_naming_root_dirs ||= [ root, File.dirname(root) ]
+    end
+
     def add_workaround_directory_to_sprockets!(sprockets_environment)
       return if (! root_exists?)
 
@@ -30,6 +34,26 @@ module Parcels
 
     def subpath_to(full_path)
       ::Parcels::Utils::PathUtils.path_under(full_path, root)
+    end
+
+    def remove_workaround_directory_from(full_path)
+      if (path_under_workaround = ::Parcels::Utils::PathUtils.maybe_path_under(full_path, workaround_directory))
+        if (separator_index = path_under_workaround.index(File::SEPARATOR))
+          if (separator_index > 0 && separator_index < (path_under_workaround.length - 1))
+            link_name = path_under_workaround[0..(separator_index - 1)]
+            after_link = path_under_workaround[(separator_index + 1)..-1]
+
+            if File.symlink?(File.join(workaround_directory, link_name))
+              link_value = File.readlink(File.join(workaround_directory, link_name))
+              resolved_link = File.expand_path(File.join(workaround_directory, link_value))
+              final_path = File.join(resolved_link, after_link)
+              return final_path
+            end
+          end
+        end
+      end
+
+      nil
     end
 
     def add_all_widgets_to_sprockets_context!(sprockets_context, set_names)
