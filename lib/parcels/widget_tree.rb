@@ -89,6 +89,25 @@ module Parcels
       end
     end
 
+    # not ideal since this same traversal happens in add_all_widgets_to_sprockets_context
+    # fortunately we have an early return if we run into a usable parcel
+    def ensure_workaround_directory_is_set_up_during_init!
+      Find.find(root) do |path|
+        full_path = File.expand_path(path, root)
+        stat = File.stat(full_path)
+        next unless stat.file?
+
+        extension = File.extname(full_path).strip.downcase
+        if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
+          parcel = klass.new(self, full_path)
+          if parcel.usable? # note the lack of set_names here
+            ensure_workaround_directory_is_set_up!
+            return
+          end
+        end
+      end
+    end
+
     private
     EXTENSION_TO_PARCEL_CLASS_MAP   = {
       '.rb'.freeze => ::Parcels::FortitudeInlineParcel,
