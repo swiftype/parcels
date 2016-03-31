@@ -62,23 +62,13 @@ module Parcels
 
       all_parcels = [ ]
 
-      Find.find(root) do |path|
-        full_path = File.expand_path(path, root)
-        stat = File.stat(full_path)
-
-        sprockets_context.depend_on(path) if stat.directory?
-        next unless stat.file?
-
-        extension = File.extname(full_path).strip.downcase
-        if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
-          parcel = klass.new(self, full_path)
-          if parcel.usable? && parcel.included_in_any_set?(set_names)
-            if all_parcels.length == 0
-              ensure_workaround_directory_is_set_up!
-            end
-
-            all_parcels << parcel
+      for_each_parcel(sprockets_context) do |parcel|
+        if parcel.included_in_any_set?(set_names)
+          if all_parcels.length == 0
+            ensure_workaround_directory_is_set_up!
           end
+
+          all_parcels << parcel
         end
       end
 
@@ -92,19 +82,9 @@ module Parcels
     # not ideal since this same traversal happens in add_all_widgets_to_sprockets_context
     # fortunately we have an early return if we run into a usable parcel
     def ensure_workaround_directory_is_set_up_during_init!
-      Find.find(root) do |path|
-        full_path = File.expand_path(path, root)
-        stat = File.stat(full_path)
-        next unless stat.file?
-
-        extension = File.extname(full_path).strip.downcase
-        if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
-          parcel = klass.new(self, full_path)
-          if parcel.usable? # note the lack of set_names here
-            ensure_workaround_directory_is_set_up!
-            return
-          end
-        end
+      for_each_parcel do |parcel|
+        ensure_workaround_directory_is_set_up!
+        return
       end
     end
 
@@ -117,6 +97,22 @@ module Parcels
     ALL_EXTENSIONS                    = EXTENSION_TO_PARCEL_CLASS_MAP.keys.dup.freeze
 
     PARCELS_LOGICAL_PATH_PREFIXES     = EXTENSION_TO_PARCEL_CLASS_MAP.values.map { |k| k.logical_path_prefix }
+
+    def for_each_parcel(sprockets_context_to_add_to = nil)
+      Find.find(root) do |path|
+        full_path = File.expand_path(path, root)
+        stat = File.stat(full_path)
+
+        sprockets_context_to_add_to.depend_on(path) if sprockets_context_to_add_to && stat.directory?
+        next unless stat.file?
+
+        extension = File.extname(full_path).strip.downcase
+        if (klass = EXTENSION_TO_PARCEL_CLASS_MAP[extension])
+          parcel = klass.new(self, full_path)
+          yield parcel if parcel.usable?
+        end
+      end
+    end
 
     def root_exists?
       File.exist?(root)
