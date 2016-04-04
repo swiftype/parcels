@@ -1,5 +1,10 @@
 # Parcels Releases
 
+## 0.0.3,
+
+* Fixed an issue where Parcels workaround directories weren't getting created early enough, causing asset
+  precompilation to fail in Rails. (Thanks to [Brian Stevenson](https://github.com/tehsven) for the fix!)
+
 ## 0.0.2, 21 January 2015
 
 * Fixed an issue where having a `.rb` file in your `views` directory that didn't define a widget class, but rather a
