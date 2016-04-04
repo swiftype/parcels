@@ -15,6 +15,24 @@ module Parcels
   end
 end
 
+::Sprockets::Base.class_eval do
+  def each_logical_path_with_parcels(*args, &block)
+    if block_given?
+      each_logical_path_without_parcels(*args) do |logical_path|
+        unless ::Parcels.is_fortitude_logical_path?(logical_path)
+          block.call(logical_path)
+        end
+      end
+    else
+      each_logical_path_without_parcels(*args).reject do |logical_path|
+        ::Parcels.is_fortitude_logical_path?(logical_path)
+      end
+    end
+  end
+
+  alias_method_chain :each_logical_path, :parcels
+end
+
 ::Sprockets::Environment.class_eval do
   def parcels
     @parcels ||= ::Parcels::Environment.new(self)
