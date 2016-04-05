@@ -79,15 +79,6 @@ module Parcels
       end
     end
 
-    # not ideal since this same traversal happens in add_all_widgets_to_sprockets_context
-    # fortunately we have an early return if we run into a usable parcel
-    def ensure_workaround_directory_is_set_up_during_init!
-      for_each_parcel do |parcel|
-        ensure_workaround_directory_is_set_up!
-        return
-      end
-    end
-
     private
     EXTENSION_TO_PARCEL_CLASS_MAP   = {
       '.rb'.freeze => ::Parcels::FortitudeInlineParcel,

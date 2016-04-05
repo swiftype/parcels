@@ -30,7 +30,6 @@ module Parcels
       end
 
       widget_tree.add_workaround_directory_to_sprockets!(sprockets_environment)
-      widget_tree.ensure_workaround_directory_is_set_up_during_init!
     end
 
     def widget_class_from_file(full_path)
