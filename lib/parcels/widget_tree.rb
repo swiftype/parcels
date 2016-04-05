@@ -196,7 +196,12 @@ and try again.}
 
     def create_symlink!(prefix)
       Dir.chdir(workaround_directory) do
-        FileUtils.ln_s(symlink_target, prefix)
+        begin
+          FileUtils.ln_s(symlink_target, prefix)
+        rescue Errno::EEXIST
+          # This is to deal with race conditions -- if multiple processes try to create the
+          # symlink at the exact same time.
+        end
       end
     end
 
