@@ -180,7 +180,11 @@ and try again.}
 
     def create_symlink!(prefix)
       Dir.chdir(workaround_directory) do
-        FileUtils.ln_s(symlink_target, prefix)
+        begin
+          FileUtils.ln_s(SYMLINK_TARGET, prefix)
+        rescue Errno::EEXIST
+          # file exists, we're good
+        end
       end
     end
 
