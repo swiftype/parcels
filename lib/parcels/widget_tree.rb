@@ -99,6 +99,7 @@ module Parcels
     PARCELS_LOGICAL_PATH_PREFIXES     = EXTENSION_TO_PARCEL_CLASS_MAP.values.map { |k| k.logical_path_prefix }
 
     def for_each_parcel(sprockets_context_to_add_to = nil)
+      return unless File.exist?(root)
       Find.find(root) do |path|
         full_path = File.expand_path(path, root)
         stat = File.stat(full_path)

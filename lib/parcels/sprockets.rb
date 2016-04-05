@@ -138,22 +138,26 @@ end
   end
 end
 
-[ '::Sprockets::SassImporter', '::Sass::Rails::Importer', '::Sprockets::Sass::Importer' ].each do |class_name|
+[ '::Sprockets::SassImporter', '::Sass::Rails::Importer', '::Sass::Rails::SassImporter', '::Sprockets::Sass::Importer' ].each do |class_name|
   klass = class_name.constantize rescue nil
 
   if klass
     klass.class_eval do
       if defined?(klass::GLOB)
-        def find_relative_with_parcels(name, base, options)
+        def _parcels_fetch_sprockets_context(options)
           sprockets_context = (options[:custom] || { })[:sprockets_context]
+          sprockets_context ||= (options[:sprockets] || { })[:context]
           sprockets_context ||= context if respond_to?(:context)
           unless sprockets_context
-            raise "Unable to find the Sprockets context here; it was neither in options, nor do we have it in the class"
+            raise "Unable to find the Sprockets context here; it was neither in options, nor do we have it in the class. Options keys are: #{options.keys.inspect}"
           end
 
-          parcels = sprockets_context.environment.parcels
-          expanded_locations_to_search = sprockets_context.environment.paths + [ File.dirname(base) ]
-          expanded_locations_to_search = expanded_locations_to_search.map do |location|
+          sprockets_context
+        end
+
+        def _parcels_fetch_pathnames_to_search(sprockets_context, base)
+          out = sprockets_context.environment.paths + [ File.dirname(base) ]
+          out = out.map do |location|
             if location.kind_of?(::Pathname)
               location
             else
@@ -161,18 +165,40 @@ end
             end
           end
 
-          if name =~ self.class.const_get(:GLOB) && parcels.is_underneath_root?(base)
-            paths_to_search = expanded_locations_to_search
+          out
+        end
 
+        if klass.name == 'Sass::Rails::SassImporter' && (::Sass::Rails::VERSION =~ /^5/)
+          def _parcels_call_glob_imports(base, glob, options)
+            glob_imports(base, glob.to_s, options)
+          end
+        else
+          def _parcels_call_glob_imports(base, glob, options)
+            glob_imports(glob.to_s, base.join("dummy"), options)
+          end
+        end
+
+        def find_relative_with_parcels(name, base, options)
+          sprockets_context = _parcels_fetch_sprockets_context(options)
+          parcels = sprockets_context.environment.parcels
+
+          paths_to_search = _parcels_fetch_pathnames_to_search(sprockets_context, base)
+
+          if name =~ self.class.const_get(:GLOB) && parcels.is_underneath_root?(base)
             imports = nil
             paths_to_search.each do |path_to_search|
-              glob_against = Pathname.new(File.join(path_to_search.to_s, 'dummy'))
-              imports = glob_imports(name, glob_against, :load_paths => [ path_to_search ])
-              return imports if imports
+              combined = path_to_search.join(name)
+              glob = combined.basename
+              base = combined.dirname
+
+              if base.directory?
+                imports = _parcels_call_glob_imports(base, glob, options.merge(:load_paths => [ path_to_search ]))
+                return imports if imports
+              end
             end
           end
 
-          load_paths = (options[:load_paths] || [ ]) + expanded_locations_to_search
+          load_paths = (options[:load_paths] || [ ]) + paths_to_search
           return find_relative_without_parcels(name, base, options.merge(:load_paths => load_paths))
         end
 
