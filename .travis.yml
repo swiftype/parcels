@@ -2,15 +2,17 @@ language:   ruby
 rvm:
     - "1.8.7-p375"
     - "1.9.3-p551"
-    - "2.0.0-p598"
-    - "2.1.5"
-    - "2.2.0"
-    - "jruby-1.7.18"
+    - "2.0.0-p648"
+    - "2.1.8"
+    - "2.2.4"
+    - "2.3.0"
+    - "jruby-1.7.24"
+    - "jruby-9.0.5.0"
 env:
-    - PARCELS_SPECS_SPROCKETS_VERSION=2.12.3 PARCELS_SPECS_RAILS_VERSION=4.2.0
-    - PARCELS_SPECS_SPROCKETS_VERSION=2.12.3 PARCELS_SPECS_RAILS_VERSION=4.1.9
-    - PARCELS_SPECS_SPROCKETS_VERSION=2.12.3 PARCELS_SPECS_RAILS_VERSION=4.0.13
-    - PARCELS_SPECS_SPROCKETS_VERSION=2.2.3 PARCELS_SPECS_RAILS_VERSION=3.2.21
+    - PARCELS_SPECS_SPROCKETS_VERSION=2.12.4 PARCELS_SPECS_RAILS_VERSION=4.2.6
+    - PARCELS_SPECS_SPROCKETS_VERSION=2.12.4 PARCELS_SPECS_RAILS_VERSION=4.1.15
+    - PARCELS_SPECS_SPROCKETS_VERSION=2.12.4 PARCELS_SPECS_RAILS_VERSION=4.0.13
+    - PARCELS_SPECS_SPROCKETS_VERSION=2.2.3 PARCELS_SPECS_RAILS_VERSION=3.2.22.2
     - PARCELS_SPECS_SPROCKETS_VERSION=2.0.5 PARCELS_SPECS_RAILS_VERSION=3.1.12
 before_script:
     - export JRUBY_OPTS="$JRUBY_OPTS -J-Xmx384m -J-Xms384m -J-Xss2048k"
@@ -18,9 +20,11 @@ matrix:
     exclude:
         # Rails 4.x doesn't support Ruby 1.8.7
         -   rvm: 1.8.7-p375
-            env: PARCELS_SPECS_SPROCKETS_VERSION=2.12.3 PARCELS_SPECS_RAILS_VERSION=4.1.9
+            env: PARCELS_SPECS_SPROCKETS_VERSION=2.12.4 PARCELS_SPECS_RAILS_VERSION=4.2.6
         -   rvm: 1.8.7-p375
-            env: PARCELS_SPECS_SPROCKETS_VERSION=2.12.3 PARCELS_SPECS_RAILS_VERSION=4.0.13
+            env: PARCELS_SPECS_SPROCKETS_VERSION=2.12.4 PARCELS_SPECS_RAILS_VERSION=4.1.15
+        -   rvm: 1.8.7-p375
+            env: PARCELS_SPECS_SPROCKETS_VERSION=2.12.4 PARCELS_SPECS_RAILS_VERSION=4.0.13
     allow_failures:
         # 2014-12-14 ageweke -- Unfortunately, there appears to be a bug in Ruby 1.8.7 that conflicts with Sass and
         # is biting us here. The symptom is that our out-of-process Rails server suddenly crashes, causing various
@@ -41,16 +45,6 @@ matrix:
         # keep running these tests but monitor them manually, to see if anything *other* than the Rails specs
         # starts failing.
         -   rvm: 1.8.7-p375
-            env: PARCELS_SPECS_SPROCKETS_VERSION=2.2.3 PARCELS_SPECS_RAILS_VERSION=3.2.21
+            env: PARCELS_SPECS_SPROCKETS_VERSION=2.2.3 PARCELS_SPECS_RAILS_VERSION=3.2.22.2
         -   rvm: 1.8.7-p375
-            env: PARCELS_SPECS_SPROCKETS_VERSION=2.0.5 PARCELS_SPECS_RAILS_VERSION=3.1.12
-        # 2014-12-14 ageweke -- Just like Fortitude, getting Travis to actually do reliable JRuby specs seems to be
-        # impossible, sadly.
-        -   rvm: jruby-1.7.18
-            env: PARCELS_SPECS_SPROCKETS_VERSION=2.12.3 PARCELS_SPECS_RAILS_VERSION=4.1.9
-        -   rvm: jruby-1.7.18
-            env: PARCELS_SPECS_SPROCKETS_VERSION=2.12.3 PARCELS_SPECS_RAILS_VERSION=4.0.13
-        -   rvm: jruby-1.7.18
-            env: PARCELS_SPECS_SPROCKETS_VERSION=2.2.3 PARCELS_SPECS_RAILS_VERSION=3.2.21
-        -   rvm: jruby-1.7.18
             env: PARCELS_SPECS_SPROCKETS_VERSION=2.0.5 PARCELS_SPECS_RAILS_VERSION=3.1.12
