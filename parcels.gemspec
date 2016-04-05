@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   if (ENV['PARCELS_SPECS_SPROCKETS_VERSION'] || '').strip.length > 0
     spec.add_dependency "sprockets", "= #{ENV['PARCELS_SPECS_SPROCKETS_VERSION']}"
   else
-    spec.add_dependency "sprockets"
+    spec.add_dependency "sprockets", "< 3.0"
   end
 
   spec.add_dependency "sass"
