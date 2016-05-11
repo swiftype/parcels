@@ -134,15 +134,11 @@ module Parcels
     end
 
     def ensure_workaround_directory_exists!
-      unless File.directory?(workaround_directory)
-        if File.exist?(workaround_directory)
-          raise Errno::EEXIST, %{Parcels uses the directory '#{workaround_directory}' internally
+      FileUtils.mkdir_p(workaround_directory)
+    rescue Errno::EEXIST
+      raise Errno::EEXIST, %{Parcels uses the directory '#{workaround_directory}' internally
   (to allow us to safely add assets to Sprockets without treading on the global asset namespace);
   however, there is already something at that path that is not a directory.}
-        end
-
-        FileUtils.mkdir_p(workaround_directory)
-      end
     end
 
     def ensure_nothing_else_is_in_workaround_directory!
